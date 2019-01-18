@@ -37,8 +37,8 @@ def drawLevel(level):
                 #if level.layout[row][column] == TILE_BREAKABLE:
                 if isinstance(level.layout[row][column], Wall.Wall) and level.layout[row][column].breakable:
                     screen.blit(level.breakableImage, (SCREEN_OFFSET_X_LEFT + column*TILE_SIZE, SCREEN_OFFSET_Y_TOP + row*TILE_SIZE))
-                if level.layout[row][column] == TILE_DOOR_HIDDEN:
-                    screen.blit(level.breakableImage, (SCREEN_OFFSET_X_LEFT + column*TILE_SIZE, SCREEN_OFFSET_Y_TOP + row*TILE_SIZE))
+                #if level.layout[row][column] == TILE_DOOR_HIDDEN:
+                    #screen.blit(level.breakableImage, (SCREEN_OFFSET_X_LEFT + column*TILE_SIZE, SCREEN_OFFSET_Y_TOP + row*TILE_SIZE))
                 if level.layout[row][column] == TILE_DOOR_OPENED:
                     screen.blit(level.doorOpenedImage, (SCREEN_OFFSET_X_LEFT + column*TILE_SIZE, SCREEN_OFFSET_Y_TOP + row*TILE_SIZE))
                 if level.layout[row][column] == TILE_DOOR_CLOSED:
@@ -48,7 +48,25 @@ def drawLevel(level):
                 
     
 
-################## Testing ###########################################
+################## Testing ########################## Testing ################# vvvvvv
+player_speed = 5
+ball2 = pygame.image.load("test2.png").convert_alpha()
+ballrect2 = ball2.get_rect()
+
+def userInput():
+    key=pygame.key.get_pressed()
+    if key[pygame.K_UP]:
+        ballrect2[1] -= player_speed
+    if key[pygame.K_DOWN]:
+        ballrect2[1] += player_speed
+    if key[pygame.K_LEFT]:
+        ballrect2[0] -= player_speed
+    if key[pygame.K_RIGHT]:
+        ballrect2[0] += player_speed  
+                
+def render():
+    screen.blit(ball2, ballrect2)                
+                
 ball = []#pygame.image.load("intro_ball.gif").convert_alpha()
 speed = []
 num_balls = 0#300
@@ -71,7 +89,7 @@ def ball_test():
             speed[i][1] = -speed[i][1]
     fps = font.render(str(int(clock.get_fps())), True, pygame.Color('white'))
     screen.blit(fps, (25, 25))
-################## Testing ###########################################
+################## Testing ########################## Testing ################# ^^^^^
 
 current_level = level.Level(1)
 while gameRunning:
@@ -89,6 +107,8 @@ while gameRunning:
 
     drawLevel(current_level)
     ball_test()     ## Testing ##
+    userInput()
+    render()
 
     pygame.display.update()
     screen.fill(colors.Black)

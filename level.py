@@ -51,6 +51,8 @@ class Level(object):
                          layout[y][x] = Wall.Wall(False, 0)
                      elif layout[y][x] == TILE_BREAKABLE:
                          layout[y][x] = Wall.Wall(True, 0)
+                     elif layout[y][x] == TILE_DOOR_HIDDEN:
+                         layout[y][x] = Wall.Wall(True, 0, True)
                          
         backgroundFile = str(graphicsDir.joinpath("back" + str(backgroundNum) + ".png"))
         self.backgroundImage = pygame.image.load(backgroundFile).convert()
@@ -73,7 +75,7 @@ class Level(object):
     def show_door(self):
         for y in range(self.levelHeight):
             for x in range(self.levelWidth):
-                if self.layout[y][x] == TILE_DOOR_HIDDEN:
+                if isinstance(self.layout[y][x], Wall.Wall) and self.layout[y][x].door:
                     self.layout[y][x] = TILE_DOOR_CLOSED
         door = TILE_DOOR_CLOSED
         
