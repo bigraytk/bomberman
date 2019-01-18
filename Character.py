@@ -14,14 +14,14 @@ class Character(object):
         This object is for the player's character. Only one
         should be instantiated.
         '''
-
-
+        
         def __init__(self):
             '''Constructor'''
             self.bombCount = 1
             self.bombRange = 1
             self.speed = 40 #placeholder
             self.activeBombs = 0
+            self.boot = False
 
         def dropBomb():
             '''Creates an instance of the bomb class at the PC's position'''
@@ -35,6 +35,17 @@ class Character(object):
             the explode method of the Bomb
             '''
             self.activeBombs = self.activeBombs + change
+
+        def getPowerup(powerup):
+            '''This method is called when the PC occupies the same space as a 
+            powerup. 
+            '''
+            if powerup == RANGE and self.bombRange < 5:
+                self.bombRange += 1
+            elif powerup == COUNT and self.bombCount < 5:
+                self.bombCount += 1
+            elif powerup == BOOT:
+                self.boot = True
 
 
     class Enemy(object):
