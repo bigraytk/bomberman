@@ -9,7 +9,7 @@ class Wall(object):
     breakable and door are type bool, power is int in range 0-3. 
     '''
 
-    def __init__(self,breakable,power,door):
+    def __init__(self,breakable,power,door=False):
         '''Constructor
         breakable must be bool.
         power must be 0,1,2,3.
