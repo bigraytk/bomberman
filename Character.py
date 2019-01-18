@@ -17,6 +17,7 @@ class Character(object):
         
         def __init__(self):
             '''Constructor'''
+            Character.__init__(self)
             self.bombCount = 1
             self.bombRange = 1
             self.speed = 40 #placeholder
@@ -58,6 +59,7 @@ class Character(object):
 
         def __init__(self,version):
             '''Constructor'''
+            Character.__init__(self)
             if version == BASIC: #BASIC is some value that we have not mapped yet
                 self.speed = LOW
                 self.logic = RANDOM
@@ -90,7 +92,7 @@ class Character(object):
             raise RuntimeError(kind + ' is not a valid kind of character')
 
 
-    def move(self,direction):
+    def move(self,direction,layout):
         '''
         Controls movement of a character. Takes a direcetion as input, if character
         is able to move in that direction, will update the character's position and 
