@@ -9,7 +9,7 @@ class Wall(object):
     breakable and door are type bool, power is int in range 0-3. 
     '''
 
-    def __init__(self,breakable,power,door=False):
+    def __init__(self,breakable,power,door):
         '''Constructor
         breakable must be bool.
         power must be 0,1,2,3.
@@ -27,7 +27,7 @@ class Wall(object):
         self.powerup = power
         self.door = door
 
-    def destroy():
+    def destroy(self):
         '''This method is called to check if a wall would be destryoed by an explosion.
         will return False if no, True if yes. 
         If the wall contained a powerup or door this method will instantiate an object 

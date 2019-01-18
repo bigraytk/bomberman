@@ -8,7 +8,7 @@ class Character(object):
     PlayerCharacter and Emeny are subclasses
     '''
 
-    class PlayerCharacter(object):
+    class PlayerCharacter(Character):
 
         '''
         This object is for the player's character. Only one
@@ -23,20 +23,20 @@ class Character(object):
             self.activeBombs = 0
             self.boot = False
 
-        def dropBomb():
+        def dropBomb(self):
             '''Creates an instance of the bomb class at the PC's position'''
             if self.activeBombs < self.bombCount:
                 newBomb = Bomb.Bomb(self.bombRange,self.x,self.y)
                 self.changeBombCount(1)
 
-        def changeBombCount(change):
+        def changeBombCount(self,change):
             '''This method is how to change the value of self.activeBombs
             will be called by dropBomb method of the PlayerCharacter, and
             the explode method of the Bomb
             '''
             self.activeBombs = self.activeBombs + change
 
-        def getPowerup(powerup):
+        def getPowerup(self,powerup):
             '''This method is called when the PC occupies the same space as a 
             powerup. 
             '''
@@ -48,7 +48,7 @@ class Character(object):
                 self.boot = True
 
 
-    class Enemy(object):
+    class Enemy(Character):
 
         '''
         This is the object for enemies. Many of them will be 
@@ -63,15 +63,15 @@ class Character(object):
                 self.logic = RANDOM
             elif version == MED: 
                 self.speed = LOW
-                self.logic = BASIC:
+                self.logic = BASIC
             elif version == ADVANCED:
                 self.speed = HIGH
                 self.logic = SMART
             
 
-        def destroy():
+        def destroy(self):
             #gets called if something destroys an enemy
-            #
+            pass
 
 
     def __init__(self,x,y,facing,kind):
@@ -79,8 +79,8 @@ class Character(object):
 
         self.x = x
         self.y = y
-        self.xres = #init this by running self.x through the grid_to_res conversion function
-        self.yres = #same but for y
+        self.xres = x#init this by running self.x through the grid_to_res conversion function
+        self.yres = y#same but for y
         self.facing = facing
         if kind == PC:
             self.Player = self.PlayerCharacter()
