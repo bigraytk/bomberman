@@ -30,6 +30,7 @@ MAP_HEIGHT  = 13
 
 # Game specifications
 FRAMERATE = 90
+SECOND = 1000  #1 second = 1000 milliseconds
 SCREEN_OFFSET_X_LEFT = 32
 SCREEN_OFFSET_Y_TOP = 32
 SCREEN_OFFSET_X_RIGHT = 32
@@ -42,7 +43,7 @@ ADVANCED = 2
 SMART = 3
 HIGH = 4
 MED = 5
-LOW = 6
+LOW = 1
 
 # Power Up Constants
 RANGE = 0
@@ -54,6 +55,7 @@ PC = 0
 ENEMY = 1
 GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
+PLAYER_SPEED = 3
 
 #character states
 STATE_IDLE = 0
@@ -61,6 +63,7 @@ STATE_MOVING_UP = 1
 STATE_MOVING_DOWN = 2
 STATE_MOVING_LEFT = 3
 STATE_MOVING_RIGHT = 4 
+STATE_DEAD = 5
 
 #direction constants
 UP = 0
