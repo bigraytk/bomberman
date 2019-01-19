@@ -6,12 +6,13 @@ Created on Sun Jan 13 12:45:40 2019
 """
 
 # Map values and parameters
-TILE_WALL        = 'W'
-TILE_BREAKABLE   = 'B'
-TILE_BACKGROUND  = '0'
-TILE_DOOR_HIDDEN = 'D'
-TILE_DOOR_CLOSED = 'C'
-TILE_DOOR_OPENED = 'O'
+TILE_WALL         = 'W'
+TILE_BREAKABLE    = 'B'
+TILE_BACKGROUND   = '0'
+TILE_DOOR_HIDDEN  = 'D'
+TILE_DOOR_CLOSED  = 'C'
+TILE_DOOR_OPENED  = 'O'
+TILE_PLAYER_START = 'P'
 
 LEVEL_WIDTH       = 0
 LEVEL_HEIGHT      = 1
@@ -52,6 +53,13 @@ PC = 0
 ENEMY = 1
 GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
+
+#character states
+STATE_IDLE = 0
+STATE_MOVING_UP = 1
+STATE_MOVING_DOWN = 2
+STATE_MOVING_LEFT = 3
+STATE_MOVING_RIGHT = 4 
 
 #direction constants
 UP = 0
