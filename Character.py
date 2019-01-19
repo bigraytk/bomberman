@@ -105,7 +105,11 @@ class Character(object):
                 
         self.rect.x = self.xres
         self.rect.y = self.yres
-
+        
+        #temporary means to handle the image size difference (from tilesize) for the bman image
+        if self.kind == constants.PC:
+            self.rect.x += 8
+            self.rect.y -= 16
 
 
 
@@ -128,7 +132,7 @@ class PlayerCharacter(Character):
         self.activeBombs = 0
         self.boot = False
         
-        imageFile = str(Path.cwd() / "graphics" / "player.png")
+        imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
         self.image = pygame.image.load(imageFile).convert_alpha()
         self.rect = self.image.get_rect()
 
