@@ -27,6 +27,15 @@ pygame.display.set_caption("BomberDude")
 
 
 
+def startLevel(num):
+    level = Level.Level(num)
+    player = Character.PlayerCharacter(level)
+    enemies = []
+    for i in range(level.numEnemies):
+        enemies.append(Character.Enemy(level, i))
+    
+    return (level, player, enemies)
+
 
 
 def drawLevel(level):
@@ -70,7 +79,7 @@ def userInput(player):
                 
 def render(level, player, enemies):
     #Render level
-    drawLevel(current_level)
+    drawLevel(level)
     
     #Render player
     player.updatePosition(level)
@@ -80,9 +89,13 @@ def render(level, player, enemies):
     for i in range(level.numEnemies):
         enemies[i].updatePosition(level)
         screen.blit(enemies[i].image, enemies[i].rect)
+        
+        #placeholder for proper handling of collision detection
         if checkCollision(enemies[i].xres, enemies[i].yres, TILE_SIZE-8, TILE_SIZE-8, player.xres, player.yres, TILE_SIZE-8, TILE_SIZE-8):
             screen.blit(death_test_image, death_test_rect)
-                
+            pygame.display.update()
+            pygame.time.wait(1000)
+            player.state = STATE_DEAD
 
     text1 = str(int(clock.get_fps()))
     fps = font.render(text1, True, pygame.Color('white'))
@@ -90,14 +103,14 @@ def render(level, player, enemies):
 ################## Testing ########################## Testing ################# ^^^^^
 
 
+current_level_num = 1
+current_level, player, enemies = startLevel(current_level_num)
 
-current_level = Level.Level(1)
-player = Character.PlayerCharacter(current_level)
-enemies = []
-for i in range(current_level.numEnemies):
-    enemies.append(Character.Enemy(current_level, i))
 
 while gameRunning:
+    if player.state == STATE_DEAD:
+        current_level, player, enemies = startLevel(current_level_num)
+        
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             gameRunning = False
