@@ -13,6 +13,7 @@ TILE_DOOR_HIDDEN  = 'D'
 TILE_DOOR_CLOSED  = 'C'
 TILE_DOOR_OPENED  = 'O'
 TILE_PLAYER_START = 'P'
+TILE_ENEMY_SPAWN  = 'E'
 
 LEVEL_WIDTH       = 0
 LEVEL_HEIGHT      = 1
@@ -41,7 +42,7 @@ ADVANCED = 2
 SMART = 3
 HIGH = 4
 MED = 5
-LOW = 6
+LOW = 1
 
 # Power Up Constants
 RANGE = 0
@@ -53,6 +54,7 @@ PC = 0
 ENEMY = 1
 GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
+PLAYER_SPEED = 3
 
 #character states
 STATE_IDLE = 0

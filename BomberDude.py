@@ -6,6 +6,7 @@ Created on Fri Jan 11 08:09:12 2019
 """
 
 from constants import *
+from pathlib import Path
 import Level #from level import *
 import Wall
 import Character
@@ -47,9 +48,16 @@ def drawLevel(level):
     
 
 ################## Testing ########################## Testing ################# vvvvvv
+imageFile = str(Path.cwd() / "graphics" / "death_temp.png")     #placeholder
+death_test_image = pygame.image.load(imageFile).convert_alpha()
+death_test_rect = death_test_image.get_rect()
+death_test_rect.x = int(screen_width / 2 - death_test_rect.width / 2)
+death_test_rect.y = int(screen_height / 2 - death_test_rect.height / 2)
 
+def checkCollision(x1, y1, w1, h1, x2, y2, w2, h2):
+    return x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2
 
-def userInput():
+def userInput(player):
     key=pygame.key.get_pressed()
     if key[pygame.K_UP]:
         player.move(UP, current_level)
@@ -60,10 +68,20 @@ def userInput():
     if key[pygame.K_RIGHT]:
         player.move(RIGHT, current_level)
                 
-def render():
-    playerRect.x = player.xres
-    playerRect.y = player.yres
-    screen.blit(playerImage, playerRect)             
+def render(level, player, enemies):
+    #Render level
+    drawLevel(current_level)
+    
+    #Render player
+    player.updatePosition(level)
+    screen.blit(player.image, player.rect)
+    
+    #Render enemies
+    for i in range(level.numEnemies):
+        enemies[i].updatePosition(level)
+        screen.blit(enemies[i].image, enemies[i].rect)
+        if checkCollision(enemies[i].xres, enemies[i].yres, TILE_SIZE-8, TILE_SIZE-8, player.xres, player.yres, TILE_SIZE-8, TILE_SIZE-8):
+            screen.blit(death_test_image, death_test_rect)
                 
 
     text1 = str(int(clock.get_fps()))
@@ -73,12 +91,11 @@ def render():
 
 
 
-player_speed = 3
-playerImage = pygame.image.load("test2.png").convert_alpha()
-playerRect = playerImage.get_rect()
-
 current_level = Level.Level(1)
-player = Character.PlayerCharacter(current_level.playerStartPosit[0], current_level.playerStartPosit[1], DOWN, player_speed)
+player = Character.PlayerCharacter(current_level)
+enemies = []
+for i in range(current_level.numEnemies):
+    enemies.append(Character.Enemy(current_level, i))
 
 while gameRunning:
     for event in pygame.event.get():
@@ -92,14 +109,13 @@ while gameRunning:
                 if event.key == pygame.K_x:
                     current_level.open_door()
 
-
-    drawLevel(current_level)
-    userInput()
-    player.updatePosition()
+    #drawLevel(current_level)
+    userInput(player)
+    #player.updatePosition()
 
     #for i in range (numEnemies):
     #    enemy[i].updatePosition(current_level)
-    render()
+    render(current_level, player, enemies)
 
     pygame.display.update()
     screen.fill(colors.Black)

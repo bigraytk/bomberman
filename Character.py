@@ -1,5 +1,7 @@
 
 import pygame
+from pathlib import Path
+import random
 import Bomb
 import Level
 import Wall
@@ -30,8 +32,8 @@ class Character(object):
             #self.Enemy = self.Enemy()
         #else:
             #raise RuntimeError(kind + ' is not a valid kind of character')
-
-
+        
+        
     def move(self, direction, level):
         '''
         Controls movement of a character. Takes a direcetion as input, if character
@@ -61,10 +63,15 @@ class Character(object):
         #if yes, move to correct square and update self.facing
         
         
-    def updatePosition(self):
+    def updatePosition(self, level):
         '''
         Updates character position when a character is moving towards a grid position
         '''
+        if self.kind == constants.ENEMY and self.state == constants.STATE_IDLE:
+            if self.logic == constants.RANDOM:
+                direction = random.choice([constants.UP, constants.DOWN, constants.LEFT, constants.RIGHT])
+                self.move(direction, level)
+        
         xDest = constants.SCREEN_OFFSET_X_LEFT + self.x * constants.TILE_SIZE
         yDest = constants.SCREEN_OFFSET_Y_TOP + self.y * constants.TILE_SIZE
         
@@ -95,8 +102,11 @@ class Character(object):
             else:
                 self.xres = xDest
                 self.state = constants.STATE_IDLE
+                
+        self.rect.x = self.xres
+        self.rect.y = self.yres
 
-            
+
 
 
 class PlayerCharacter(Character):
@@ -106,14 +116,21 @@ class PlayerCharacter(Character):
     should be instantiated.
     '''
     
-    def __init__(self, x, y, facing, speed):
+    def __init__(self, level):
         '''Constructor'''
-        Character.__init__(self, x, y, facing, speed, constants.PC)
+        x = level.playerStartPosit[0]
+        y = level.playerStartPosit[1]
+        facing = constants.DOWN
+        Character.__init__(self, x, y, facing, constants.PLAYER_SPEED, constants.PC)
         self.bombCount = 1
         self.bombRange = 1
         #self.speed = 40 #placeholder
         self.activeBombs = 0
         self.boot = False
+        
+        imageFile = str(Path.cwd() / "graphics" / "player.png")
+        self.image = pygame.image.load(imageFile).convert_alpha()
+        self.rect = self.image.get_rect()
 
     def dropBomb(self):
         '''Creates an instance of the bomb class at the PC's position'''
@@ -149,9 +166,18 @@ class Enemy(Character):
     constructor to choose one of several attribute values
     '''
 
-    def __init__(self,version):
+    def __init__(self, level, i):#version):
         '''Constructor'''
-        Character.__init__(self, x, y, facing, speed, constants.ENEMY)
+        x = level.enemyStartPosit[i][0]
+        y = level.enemyStartPosit[i][1]
+        facing = constants.DOWN
+        version = constants.BASIC       #placeholder, maybe load enemy types from a list based on level #
+        Character.__init__(self, x, y, facing, 0, constants.ENEMY)
+        
+        imageFile = str(Path.cwd() / "graphics" / "enemy1.png")     #placeholder
+        self.image = pygame.image.load(imageFile).convert_alpha()
+        self.rect = self.image.get_rect()
+        
         if version == constants.BASIC: #BASIC is some value that we have not mapped yet
             self.speed = constants.LOW
             self.logic = constants.RANDOM
