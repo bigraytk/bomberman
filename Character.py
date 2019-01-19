@@ -41,6 +41,8 @@ class Character(object):
         facing. Else, will just update facing.
         ''' 
         layout = level.layout
+        self.facing = direction
+        
         if constants.UP == direction:
             if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and self.state == constants.STATE_IDLE:
                 self.y -= 1

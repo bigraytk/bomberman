@@ -10,16 +10,19 @@ import Wall
 import pygame
 
 class Level(object):
-    __backgroundImage = None
-    __wallImage = None
-    __breakableImage = None
-    __doorOpenedImage = None
-    __doorClosedImage = None
-    __levelFile = None
+    backgroundImage = None
+    wallImage = None
+    breakableImage = None
+    doorOpenedImage = None
+    doorClosedImage = None
+    levelFile = None
     layout = []
     levelWidth = None
     levelHeight = None
     door = TILE_DOOR_HIDDEN
+    playerStartPosit = None
+    numEnemies = 0
+    enemyStartPosit = []
     
     #@property
     #def backgroundFile(self):
@@ -53,6 +56,13 @@ class Level(object):
                          layout[y][x] = Wall.Wall(True, 0)
                      elif layout[y][x] == TILE_DOOR_HIDDEN:
                          layout[y][x] = Wall.Wall(True, 0, True)
+                     elif layout[y][x] == TILE_PLAYER_START:
+                         layout[y][x] = None
+                         self.playerStartPosit = (x, y)
+                     elif layout[y][x] == TILE_ENEMY_SPAWN:
+                         layout[y][x] = None
+                         self.numEnemies += 1
+                         self.enemyStartPosit.append((x, y))
                          
         backgroundFile = str(graphicsDir.joinpath("back" + str(backgroundNum) + ".png"))
         self.backgroundImage = pygame.image.load(backgroundFile).convert()
@@ -90,6 +100,7 @@ class Level(object):
         
     def __init__(self, levelNum):
          # Set the current working directory, read and write:
+         self.numEnemies = 0
          dataDir = Path.cwd() / "data"
          
          #Open csv level file to create level layout      

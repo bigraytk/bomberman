@@ -42,7 +42,7 @@ ADVANCED = 2
 SMART = 3
 HIGH = 4
 MED = 5
-LOW = 1
+LOW = 6
 
 # Power Up Constants
 RANGE = 0
@@ -54,7 +54,6 @@ PC = 0
 ENEMY = 1
 GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
-PLAYER_SPEED = 3
 
 #character states
 STATE_IDLE = 0
@@ -62,7 +61,6 @@ STATE_MOVING_UP = 1
 STATE_MOVING_DOWN = 2
 STATE_MOVING_LEFT = 3
 STATE_MOVING_RIGHT = 4 
-STATE_DEAD = 5
 
 #direction constants
 UP = 0
