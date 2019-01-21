@@ -14,7 +14,11 @@ import random
 from pathlib import Path
 import pygame, sys
 
+file = str(Path.cwd() / "sounds" / "music1.mp3")
 pygame.init()
+pygame.mixer.init()
+pygame.mixer.music.load(file)
+
 
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 30)
@@ -103,6 +107,8 @@ def render(level, player, enemies):
         #placeholder for proper handling of collision detection
         if checkCollision(enemies[i].xres, enemies[i].yres, const.TILE_SIZE, const.TILE_SIZE, player.xres, player.yres, const.TILE_SIZE, const.TILE_SIZE, 18):
             player.state = const.STATE_DEAD
+            if soundOn:
+                player.deathSound.play()
 
     text1 = str(int(clock.get_fps()))
     fps = font.render(text1, True, pygame.Color('white'))
@@ -117,8 +123,15 @@ currentLevelNum = 1
 currentLevel, player, enemies = startLevel(currentLevelNum)
 gameState = const.GAME_STATE_RUNNING
 screenImage = pygame.Surface(screenSize)    #used to store the screen to an image, useful for transparent menus
+musicOn = False
+soundOn = False
 
 while gameRunning:
+    if musicOn:
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.play(-1)
+    else:
+        pygame.mixer.music.stop()
         
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -130,6 +143,16 @@ while gameRunning:
                     currentLevel.showDoor()
                 if event.key == pygame.K_x:
                     currentLevel.openDoor()
+                if event.key == pygame.K_m:
+                    if musicOn: 
+                        musicOn = False
+                    else:
+                        musicOn = True
+                if event.key == pygame.K_s:
+                    if soundOn: 
+                        soundOn = False
+                    else:
+                        soundOn = True
                 if event.key == pygame.K_f:     # Toggle fullscreen or windowed with "f" key
                     if screen.get_flags() & pygame.FULLSCREEN:
                         pygame.display.set_mode(screenSize)
@@ -160,6 +183,7 @@ while gameRunning:
     clock.tick(const.FRAMERATE)
 
 
+pygame.mixer.music.stop()
 pygame.display.quit()
 pygame.quit()
 #exit()

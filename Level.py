@@ -108,9 +108,4 @@ class Level(object):
         self.layout = self.levelParser(levelFile)
 
 
-         
-# Importing level data
-#lev1 = Level(1, 1, 1, 1)
-
-
 

@@ -152,6 +152,8 @@ class PlayerCharacter(Character):
         self.image = pygame.image.load(imageFile).convert_alpha()
         self.rect = self.image.get_rect()
 
+        self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
+
     def dropBomb(self):
         '''Creates an instance of the bomb class at the PC's position'''
         if self.activeBombs < self.bombCount:
