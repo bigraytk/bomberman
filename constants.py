@@ -31,6 +31,7 @@ MAP_HEIGHT  = 13
 # Game specifications
 FRAMERATE = 90
 SECOND = 1000  #1 second = 1000 milliseconds
+PLAYER_DEATH_SCREEN_TIMER = 1.5      #death screen is shown for 1.5 seconds
 SCREEN_OFFSET_X_LEFT = 32
 SCREEN_OFFSET_Y_TOP = 32
 SCREEN_OFFSET_X_RIGHT = 32
@@ -64,6 +65,13 @@ STATE_MOVING_DOWN = 2
 STATE_MOVING_LEFT = 3
 STATE_MOVING_RIGHT = 4 
 STATE_DEAD = 5
+
+
+#game states
+GAME_STATE_RUNNING = 0
+GAME_STATE_PAUSED = 1
+GAME_STATE_MENU = 2
+GAME_STATE_PLAYER_DEAD = 3
 
 #direction constants
 UP = 0

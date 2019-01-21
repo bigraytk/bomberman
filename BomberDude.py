@@ -46,28 +46,21 @@ def drawLevel(level):
             try:
                 if isinstance(level.layout[row][column], Wall.Wall) and not level.layout[row][column].breakable:
                     drawTile(level.wallImage, column, row)
-                    #screen.blit(level.wallImage, (const.SCREEN_OFFSET_X_LEFT + column * const.TILE_SIZE, const.SCREEN_OFFSET_Y_TOP + row * const.TILE_SIZE))
                 if isinstance(level.layout[row][column], Wall.Wall) and level.layout[row][column].breakable:
                     drawTile(level.breakableImage, column, row)
-                    #screen.blit(level.breakableImage, (const.SCREEN_OFFSET_X_LEFT + column*  const.TILE_SIZE, const.SCREEN_OFFSET_Y_TOP + row * const.TILE_SIZE))
                 if level.layout[row][column] == const.TILE_DOOR_OPENED:
                     drawTile(level.doorOpenedImage, column, row)
-                    #screen.blit(level.doorOpenedImage, (const.SCREEN_OFFSET_X_LEFT + column * const.TILE_SIZE, const.SCREEN_OFFSET_Y_TOP + row * const.TILE_SIZE))
                 if level.layout[row][column] == const.TILE_DOOR_CLOSED:
                     drawTile(level.doorClosedImage, column, row)
-                    #screen.blit(level.doorClosedImage, (const.SCREEN_OFFSET_X_LEFT + column * const.TILE_SIZE, const.SCREEN_OFFSET_Y_TOP + row * const.TILE_SIZE))
             except:
                 print("Index out of range error")
-
 
 
 def drawTile(image, x, y):
     xres = const.SCREEN_OFFSET_X_LEFT + x * const.TILE_SIZE
     yres = const.SCREEN_OFFSET_Y_TOP + y * const.TILE_SIZE
     screen.blit(image, (xres, yres))
-        #const.SCREEN_OFFSET_X_LEFT + column * const.TILE_SIZE, const.SCREEN_OFFSET_Y_TOP + row * const.TILE_SIZE))
                 
-    
 
 ################## Testing ########################## Testing ################# vvvvvv
 imageFile = str(Path.cwd() / "graphics" / "death_temp.png")     #placeholder
@@ -76,7 +69,11 @@ death_test_rect = death_test_image.get_rect()
 death_test_rect.x = int(screenWidth / 2 - death_test_rect.width / 2)
 death_test_rect.y = int(screenHeight / 2 - death_test_rect.height / 2)
 
-def checkCollision(x1, y1, w1, h1, x2, y2, w2, h2):
+def checkCollision(x1, y1, w1, h1, x2, y2, w2, h2, buffer):
+    w1 -= buffer
+    h1 -= buffer
+    w2 -= buffer
+    h2 -= buffer
     return x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2
 
 def userInput(player):
@@ -104,25 +101,24 @@ def render(level, player, enemies):
         screen.blit(enemies[i].image, enemies[i].rect)
         
         #placeholder for proper handling of collision detection
-        if checkCollision(enemies[i].xres, enemies[i].yres, const.TILE_SIZE-8, const.TILE_SIZE-8, player.xres, player.yres, const.TILE_SIZE-8, const.TILE_SIZE-8):
-            screen.blit(death_test_image, death_test_rect)
-            pygame.display.update()
-            pygame.time.wait(1000)
+        if checkCollision(enemies[i].xres, enemies[i].yres, const.TILE_SIZE, const.TILE_SIZE, player.xres, player.yres, const.TILE_SIZE, const.TILE_SIZE, 18):
             player.state = const.STATE_DEAD
 
     text1 = str(int(clock.get_fps()))
     fps = font.render(text1, True, pygame.Color('white'))
     screen.blit(fps, (25, 25))
+
+
+
 ################## Testing ########################## Testing ################# ^^^^^
 
 
 currentLevelNum = 1
 currentLevel, player, enemies = startLevel(currentLevelNum)
-
+gameState = const.GAME_STATE_RUNNING
+screenImage = pygame.Surface(screenSize)    #used to store the screen to an image, useful for transparent menus
 
 while gameRunning:
-    if player.state == const.STATE_DEAD:
-        currentLevel, player, enemies = startLevel(currentLevelNum)
         
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -130,27 +126,39 @@ while gameRunning:
         elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     gameRunning = False
-                if event.key == pygame.K_z:
+                if event.key == pygame.K_z:     #testing code for door
                     currentLevel.showDoor()
                 if event.key == pygame.K_x:
                     currentLevel.openDoor()
-                if event.key == pygame.K_f:
+                if event.key == pygame.K_f:     # Toggle fullscreen or windowed with "f" key
                     if screen.get_flags() & pygame.FULLSCREEN:
                         pygame.display.set_mode(screenSize)
                     else:
                         pygame.display.set_mode(screenSize, pygame.FULLSCREEN)
 
-    #drawLevel(currentLevel)
-    userInput(player)
-    #player.updatePosition()
+    if gameState == const.GAME_STATE_RUNNING:
+        userInput(player)
+        render(currentLevel, player, enemies)
 
-    #for i in range (numEnemies):
-    #    enemy[i].updatePosition(currentLevel)
-    render(currentLevel, player, enemies)
+        if player.state == const.STATE_DEAD:
+            screenImage.blit(screen, (0,0), ((0,0), screenSize))    #take a snapshot of the screen
+            gameState = const.GAME_STATE_PLAYER_DEAD
+            start_ticks = pygame.time.get_ticks() #starter tick
+
+    #display death screen when player dies
+    elif gameState == const.GAME_STATE_PLAYER_DEAD:
+        screen.blit(screenImage, (0,0))
+        screen.blit(death_test_image, death_test_rect)
+        seconds = (pygame.time.get_ticks() - start_ticks) / const.SECOND #calculate how many seconds
+        if seconds > const.PLAYER_DEATH_SCREEN_TIMER: 
+            currentLevel, player, enemies = startLevel(currentLevelNum)
+            gameState = const.GAME_STATE_RUNNING
+    
 
     pygame.display.update()
     screen.fill(colors.Black)
     clock.tick(const.FRAMERATE)
+
 
 pygame.display.quit()
 pygame.quit()
