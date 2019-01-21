@@ -2,7 +2,7 @@
 """
 Created on Fri Jan 11 09:45:04 2019
 
-@author: jkh02
+@author: 
 """
 
 AliceBlue = (240, 248, 255)

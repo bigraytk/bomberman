@@ -2,7 +2,7 @@
 """
 Created on Sun Jan 13 12:45:40 2019
 
-@author: jkh02
+@author: 
 """
 
 # Map values and parameters
@@ -41,8 +41,8 @@ BASIC = 0
 RANDOM = 1
 ADVANCED = 2
 SMART = 3
-SPEED_HIGH = 5
-SPEED_MED = 3
+SPEED_HIGH = 3
+SPEED_MED = 2
 SPEED_LOW = 1
 
 # Power Up Constants

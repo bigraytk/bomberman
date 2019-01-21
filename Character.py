@@ -1,11 +1,11 @@
-
-import pygame
-from pathlib import Path
-import random
-import Bomb
+import constants as const
 import Level
 import Wall
-import constants
+import Bomb
+import random
+from pathlib import Path
+import pygame
+
 
 class Character(object):
 
@@ -19,16 +19,16 @@ class Character(object):
 
         self.x = x
         self.y = y
-        self.xres = constants.SCREEN_OFFSET_X_LEFT + self.x * constants.TILE_SIZE#init this by running self.x through the grid_to_res conversion function
-        self.yres = constants.SCREEN_OFFSET_Y_TOP + self.y * constants.TILE_SIZE#same but for y
+        self.xres = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE#init this by running self.x through the grid_to_res conversion function
+        self.yres = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE#same but for y
         self.speed = speed
         self.facing = facing
         self.kind = kind
-        self.state = constants.STATE_IDLE
-        constants.TILE_WALL
-        #if kind == constants.PC:
+        self.state = const.STATE_IDLE
+        const.TILE_WALL
+        #if kind == const.PC:
             #self.Player = self.PlayerCharacter()
-        #elif kind == constants.ENEMY:
+        #elif kind == const.ENEMY:
             #self.Enemy = self.Enemy()
         #else:
             #raise RuntimeError(kind + ' is not a valid kind of character')
@@ -44,28 +44,28 @@ class Character(object):
         self.facing = direction
         pathBlocked = False
         
-        if constants.UP == direction:
-            if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and self.state == constants.STATE_IDLE:
+        if const.UP == direction:
+            if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
                 self.y -= 1
-                self.state = constants.STATE_MOVING_UP
+                self.state = const.STATE_MOVING_UP
             else:
                 pathBlocked = True
-        elif constants.DOWN == direction:
-            if self.y < constants.MAP_HEIGHT - 1 and not isinstance(layout[self.y + 1][self.x], Wall.Wall) and self.state == constants.STATE_IDLE:
+        elif const.DOWN == direction:
+            if self.y < const.MAP_HEIGHT - 1 and not isinstance(layout[self.y + 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_UP):
                 self.y += 1
-                self.state = constants.STATE_MOVING_DOWN
+                self.state = const.STATE_MOVING_DOWN
             else:
                 pathBlocked = True
-        elif constants.LEFT == direction:
-            if self.x > 0 and not isinstance(layout[self.y][self.x - 1], Wall.Wall) and self.state == constants.STATE_IDLE:
+        elif const.LEFT == direction:
+            if self.x > 0 and not isinstance(layout[self.y][self.x - 1], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_RIGHT):
                 self.x -= 1
-                self.state = constants.STATE_MOVING_LEFT
+                self.state = const.STATE_MOVING_LEFT
             else:
                 pathBlocked = True
-        elif constants.RIGHT == direction:
-            if self.x < constants.MAP_WIDTH - 1 and not isinstance(layout[self.y][self.x + 1], Wall.Wall) and self.state == constants.STATE_IDLE:
+        elif const.RIGHT == direction:
+            if self.x < const.MAP_WIDTH - 1 and not isinstance(layout[self.y][self.x + 1], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_LEFT):
                 self.x += 1
-                self.state = constants.STATE_MOVING_RIGHT
+                self.state = const.STATE_MOVING_RIGHT
             else:
                 pathBlocked = True
 
@@ -80,50 +80,50 @@ class Character(object):
         '''
         Updates character position when a character is moving towards a grid position
         '''
-        if self.kind == constants.ENEMY and self.state == constants.STATE_IDLE:
+        if self.kind == const.ENEMY and self.state == const.STATE_IDLE:
 
-            if self.logic == constants.BASIC:
+            if self.logic == const.BASIC:
                 pathBlocked = self.move(self.direction, level)
                 if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
-                    self.direction = random.choice([constants.UP, constants.DOWN, constants.LEFT, constants.RIGHT])
+                    self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
                 
         
-        xDest = constants.SCREEN_OFFSET_X_LEFT + self.x * constants.TILE_SIZE
-        yDest = constants.SCREEN_OFFSET_Y_TOP + self.y * constants.TILE_SIZE
+        xDest = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
+        yDest = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
         
-        if self.state == constants.STATE_MOVING_UP:
+        if self.state == const.STATE_MOVING_UP:
             if self.yres > yDest:
                 self.yres -= self.speed
             else:
                 self.yres = yDest
-                self.state = constants.STATE_IDLE
+                self.state = const.STATE_IDLE
                 
-        if self.state == constants.STATE_MOVING_DOWN:
+        if self.state == const.STATE_MOVING_DOWN:
             if self.yres < yDest:
                 self.yres += self.speed
             else:
                 self.yres = yDest
-                self.state = constants.STATE_IDLE
+                self.state = const.STATE_IDLE
                 
-        if self.state == constants.STATE_MOVING_LEFT:
+        if self.state == const.STATE_MOVING_LEFT:
             if self.xres > xDest:
                 self.xres -= self.speed
             else:
                 self.xres = xDest
-                self.state = constants.STATE_IDLE
+                self.state = const.STATE_IDLE
                 
-        if self.state == constants.STATE_MOVING_RIGHT:
+        if self.state == const.STATE_MOVING_RIGHT:
             if self.xres < xDest:
                 self.xres += self.speed
             else:
                 self.xres = xDest
-                self.state = constants.STATE_IDLE
+                self.state = const.STATE_IDLE
                 
         self.rect.x = self.xres
         self.rect.y = self.yres
         
         #temporary means to handle the image size difference (from tilesize) for the bman image
-        if self.kind == constants.PC:
+        if self.kind == const.PC:
             self.rect.x += 8
             self.rect.y -= 16
 
@@ -140,8 +140,8 @@ class PlayerCharacter(Character):
         '''Constructor'''
         x = level.playerStartPosit[0]
         y = level.playerStartPosit[1]
-        facing = constants.DOWN
-        Character.__init__(self, x, y, facing, constants.PLAYER_SPEED, constants.PC)
+        facing = const.DOWN
+        Character.__init__(self, x, y, facing, const.PLAYER_SPEED, const.PC)
         self.bombCount = 1
         self.bombRange = 1
         #self.speed = 40 #placeholder
@@ -169,11 +169,11 @@ class PlayerCharacter(Character):
         '''This method is called when the PC occupies the same space as a 
         powerup. 
         '''
-        if powerup == constants.RANGE and self.bombRange < 5:
+        if powerup == const.RANGE and self.bombRange < 5:
             self.bombRange += 1
-        elif powerup == constants.COUNT and self.bombCount < 5:
+        elif powerup == const.COUNT and self.bombCount < 5:
             self.bombCount += 1
-        elif powerup == constants.BOOT:
+        elif powerup == const.BOOT:
             self.boot = True
     
 
@@ -190,24 +190,24 @@ class Enemy(Character):
         '''Constructor'''
         x = level.enemyStartPosit[i][0]
         y = level.enemyStartPosit[i][1]
-        facing = constants.DOWN
-        version = constants.BASIC       #placeholder, maybe load enemy types from a list based on level #
-        Character.__init__(self, x, y, facing, 0, constants.ENEMY)
-        self.direction = random.choice([constants.UP, constants.DOWN, constants.LEFT, constants.RIGHT])
+        facing = const.DOWN
+        version = const.BASIC       #placeholder, maybe load enemy types from a list based on level #
+        Character.__init__(self, x, y, facing, 0, const.ENEMY)
+        self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
 
         imageFile = str(Path.cwd() / "graphics" / "enemy1.png")     #placeholder
         self.image = pygame.image.load(imageFile).convert_alpha()
         self.rect = self.image.get_rect()
         
-        if version == constants.RANDOM: #BASIC is some value that we have not mapped yet
-            self.speed = constants.SPEED_LOW
-            self.logic = constants.RANDOM
-        elif version == constants.BASIC: 
-            self.speed = constants.SPEED_MED
-            self.logic = constants.BASIC
-        elif version == constants.ADVANCED:
-            self.speed = constants.SPEED_HIGH
-            self.logic = constants.SMART
+        if version == const.RANDOM: #BASIC is some value that we have not mapped yet
+            self.speed = const.SPEED_LOW
+            self.logic = const.RANDOM
+        elif version == const.BASIC: 
+            self.speed = const.SPEED_MED
+            self.logic = const.BASIC
+        elif version == const.ADVANCED:
+            self.speed = const.SPEED_HIGH
+            self.logic = const.SMART
         
 
     def destroy(self):
