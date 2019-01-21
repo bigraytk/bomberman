@@ -42,23 +42,34 @@ class Character(object):
         ''' 
         layout = level.layout
         self.facing = direction
+        pathBlocked = False
         
         if constants.UP == direction:
             if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and self.state == constants.STATE_IDLE:
                 self.y -= 1
                 self.state = constants.STATE_MOVING_UP
+            else:
+                pathBlocked = True
         elif constants.DOWN == direction:
             if self.y < constants.MAP_HEIGHT - 1 and not isinstance(layout[self.y + 1][self.x], Wall.Wall) and self.state == constants.STATE_IDLE:
                 self.y += 1
                 self.state = constants.STATE_MOVING_DOWN
+            else:
+                pathBlocked = True
         elif constants.LEFT == direction:
             if self.x > 0 and not isinstance(layout[self.y][self.x - 1], Wall.Wall) and self.state == constants.STATE_IDLE:
                 self.x -= 1
                 self.state = constants.STATE_MOVING_LEFT
+            else:
+                pathBlocked = True
         elif constants.RIGHT == direction:
             if self.x < constants.MAP_WIDTH - 1 and not isinstance(layout[self.y][self.x + 1], Wall.Wall) and self.state == constants.STATE_IDLE:
                 self.x += 1
                 self.state = constants.STATE_MOVING_RIGHT
+            else:
+                pathBlocked = True
+
+        return pathBlocked
 
         #checks if able to move in direction
         #if no, stays in same square, but update self.facing
@@ -70,9 +81,12 @@ class Character(object):
         Updates character position when a character is moving towards a grid position
         '''
         if self.kind == constants.ENEMY and self.state == constants.STATE_IDLE:
-            if self.logic == constants.RANDOM:
-                direction = random.choice([constants.UP, constants.DOWN, constants.LEFT, constants.RIGHT])
-                self.move(direction, level)
+
+            if self.logic == constants.BASIC:
+                pathBlocked = self.move(self.direction, level)
+                if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
+                    self.direction = random.choice([constants.UP, constants.DOWN, constants.LEFT, constants.RIGHT])
+                
         
         xDest = constants.SCREEN_OFFSET_X_LEFT + self.x * constants.TILE_SIZE
         yDest = constants.SCREEN_OFFSET_Y_TOP + self.y * constants.TILE_SIZE
@@ -179,19 +193,20 @@ class Enemy(Character):
         facing = constants.DOWN
         version = constants.BASIC       #placeholder, maybe load enemy types from a list based on level #
         Character.__init__(self, x, y, facing, 0, constants.ENEMY)
-        
+        self.direction = random.choice([constants.UP, constants.DOWN, constants.LEFT, constants.RIGHT])
+
         imageFile = str(Path.cwd() / "graphics" / "enemy1.png")     #placeholder
         self.image = pygame.image.load(imageFile).convert_alpha()
         self.rect = self.image.get_rect()
         
-        if version == constants.BASIC: #BASIC is some value that we have not mapped yet
-            self.speed = constants.LOW
+        if version == constants.RANDOM: #BASIC is some value that we have not mapped yet
+            self.speed = constants.SPEED_LOW
             self.logic = constants.RANDOM
-        elif version == constants.MED: 
-            self.speed = constants.LOW
+        elif version == constants.BASIC: 
+            self.speed = constants.SPEED_MED
             self.logic = constants.BASIC
         elif version == constants.ADVANCED:
-            self.speed = constants.HIGH
+            self.speed = constants.SPEED_HIGH
             self.logic = constants.SMART
         
 

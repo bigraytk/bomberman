@@ -134,5 +134,6 @@ while gameRunning:
     screen.fill(colors.Black)
     clock.tick(FRAMERATE)
 
+pygame.display.quit()
 pygame.quit()
-exit()
+#exit()

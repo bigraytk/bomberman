@@ -41,9 +41,9 @@ BASIC = 0
 RANDOM = 1
 ADVANCED = 2
 SMART = 3
-HIGH = 4
-MED = 5
-LOW = 1
+SPEED_HIGH = 5
+SPEED_MED = 3
+SPEED_LOW = 1
 
 # Power Up Constants
 RANGE = 0
