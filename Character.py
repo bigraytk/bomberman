@@ -82,7 +82,10 @@ class Character(object):
         '''
         if self.kind == const.ENEMY and self.state == const.STATE_IDLE:
 
-            if self.logic == const.BASIC:
+            if self.logic == const.RANDOM:
+                self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
+                self.move(self.direction, level)
+            elif self.logic == const.BASIC:
                 pathBlocked = self.move(self.direction, level)
                 if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
                     self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
@@ -196,6 +199,7 @@ class Enemy(Character):
         version = const.BASIC       #placeholder, maybe load enemy types from a list based on level #
         Character.__init__(self, x, y, facing, 0, const.ENEMY)
         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
+        version = random.choice([const.BASIC, const.RANDOM]) 
 
         imageFile = str(Path.cwd() / "graphics" / "enemy1.png")     #placeholder
         self.image = pygame.image.load(imageFile).convert_alpha()
@@ -209,7 +213,7 @@ class Enemy(Character):
             self.logic = const.BASIC
         elif version == const.ADVANCED:
             self.speed = const.SPEED_HIGH
-            self.logic = const.SMART
+            self.logic = const.ADVANCED
         
 
     def destroy(self):

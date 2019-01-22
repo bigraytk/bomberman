@@ -186,4 +186,4 @@ while gameRunning:
 pygame.mixer.music.stop()
 pygame.display.quit()
 pygame.quit()
-#exit()
+exit()
