@@ -6,8 +6,10 @@ Created on Sun Jan 13 13:17:57 2019
 """
 import constants as const
 import Wall
+import Character
 from pathlib import Path
 import pygame
+
 
 class Level(object):
     backgroundImage = None
@@ -107,5 +109,11 @@ class Level(object):
         levelFile = dataDir.joinpath("level" + str(levelNum) + ".csv")
         self.layout = self.levelParser(levelFile)
 
-
-
+def startNewLevel(num):
+    level = Level(num)
+    player = Character.PlayerCharacter(level)
+    enemies = []
+    for i in range(level.numEnemies):
+        enemies.append(Character.Enemy(level, i))
+    
+    return (level, player, enemies)
