@@ -25,7 +25,6 @@ class Character(pygame.sprite.Sprite): #object):
         self.facing = facing
         self.kind = kind
         self.state = const.STATE_IDLE
-        const.TILE_WALL
         #if kind == const.PC:
             #self.Player = self.PlayerCharacter()
         #elif kind == const.ENEMY:
@@ -124,7 +123,8 @@ class Character(pygame.sprite.Sprite): #object):
                 
         self.rect.x = self.xres
         self.rect.y = self.yres
-        
+        self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X
+        self.hitbox.y = self.rect.y
         #temporary means to handle the image size difference (from tilesize) for the bman image
         if self.kind == const.PC:
             self.rect.x += 8
@@ -139,11 +139,9 @@ class PlayerCharacter(Character):
     should be instantiated.
     '''
     
-    def __init__(self, level):
+    def __init__(self, level, x, y):
         '''Constructor'''
         pygame.sprite.Sprite.__init__(self)
-        x = level.playerStartPosit[0]
-        y = level.playerStartPosit[1]
         facing = const.DOWN
         Character.__init__(self, x, y, facing, const.PLAYER_SPEED, const.PC)
         self.bombCount = 1
@@ -155,7 +153,7 @@ class PlayerCharacter(Character):
         imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
         self.image = pygame.image.load(imageFile).convert_alpha()
         self.rect = self.image.get_rect()
-
+        self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
 
     def dropBomb(self):
@@ -192,11 +190,9 @@ class Enemy(Character):
     constructor to choose one of several attribute values
     '''
 
-    def __init__(self, level, i):#version):
+    def __init__(self, level, x, y):#version):
         '''Constructor'''
         pygame.sprite.Sprite.__init__(self)
-        x = level.enemyStartPosit[i][0]
-        y = level.enemyStartPosit[i][1]
         facing = const.DOWN
         version = const.BASIC       #placeholder, maybe load enemy types from a list based on level #
         Character.__init__(self, x, y, facing, 0, const.ENEMY)
@@ -206,6 +202,7 @@ class Enemy(Character):
         imageFile = str(Path.cwd() / "graphics" / "enemy1.png")     #placeholder
         self.image = pygame.image.load(imageFile).convert_alpha()
         self.rect = self.image.get_rect()
+        self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         
         if version == const.RANDOM: #BASIC is some value that we have not mapped yet
             self.speed = const.SPEED_LOW

@@ -51,11 +51,23 @@ class Game(object):
         #load starting level
         self.levelNum = 1
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
-        ##enemySprites = pygame.sprite.Group()
+
+        #Create sprite groups
         self.spritePlayer = pygame.sprite.Group()
         self.spritePlayer.add(self.player)
         self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
+
+        self.testsprite  = Level.tileSprite(self.level.backgroundImage, 1, 1)
+
+        self.tile_group = pygame.sprite.LayeredDirty()  #This is the Pygame group you need for dirty sprites.  
+        for y in range(self.level.levelHeight):
+            for x in range(self.level.levelWidth):
+                if isinstance(self.level.layout[y][x], Wall.Wall) and not self.level.layout[y][x].breakable:
+                    tile  = Level.tileSprite(self.level.wallImage, x, y)
+                else:
+                    tile  = Level.tileSprite(self.level.backgroundImage, x, y)
+                self.tile_group.add(tile)
 
         #player death screen
         ################## Testing ########################## Testing ################# vvvvvv
@@ -70,19 +82,23 @@ class Game(object):
     #redering/drawing, update frames functions
     def render(self):#level, player, enemies):
         #Render level
+        #for tile in self.tile_group:               ### could be used to optimize drawing tiles, but requires a lot of changes to do so
+        #    if pygame.sprite.spritecollideany(tile, self.enemies):     ### also, tested the optimization and it's not any faster
+        #        tile.dirty = True
+        self.tile_group.draw(self.screen)
         self.drawLevel()#self.level)
         
-        #Update and render player
-        self.spritePlayer.update(self.level)
-        self.spritePlayer.draw(self.screen)
-
         #Update and render enemies
         self.spriteEnemies.update(self.level)
         self.spriteEnemies.draw(self.screen)
 
+        #Update and render player
+        self.spritePlayer.update(self.level)
+        self.spritePlayer.draw(self.screen)
+        #pygame.draw.rect(self.screen, (255, 255, 0), self.player.hitbox, 2)  #Draws player's collision box, for testing purposes
+
         for enemy in self.spriteEnemies:
-            col = pygame.sprite.collide_rect(self.player, enemy)
-            if col:
+            if enemy.rect.colliderect(self.player.hitbox):
                 self.player.state = const.STATE_DEAD
                 if self.soundOn:
                     self.player.deathSound.play()
@@ -92,21 +108,17 @@ class Game(object):
         self.screen.blit(fps, (25, 25))
 
 
-    def checkCollision(self, x1, y1, w1, h1, x2, y2, w2, h2, buffer):
-        w1 -= buffer
-        h1 -= buffer
-        w2 -= buffer
-        h2 -= buffer
-        return x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2
+    def checkCollision(self, sprite, spriteGroup):
+        return pygame.sprite.spritecollide(sprite, spriteGroup, False)
 
     
     def drawLevel(self):#level):
         for row in range(const.MAP_HEIGHT):
-            for column in range(const.MAP_WIDTH):
-                self.drawTile(self.level.backgroundImage, column, row)
+            for column in range(const.MAP_WIDTH):   
+                #self.drawTile(self.level.backgroundImage, column, row)
                 try:
-                    if isinstance(self.level.layout[row][column], Wall.Wall) and not self.level.layout[row][column].breakable:
-                        self.drawTile(self.level.wallImage, column, row)
+                    #if isinstance(self.level.layout[row][column], Wall.Wall) and not self.level.layout[row][column].breakable:
+                    #    self.drawTile(self.level.wallImage, column, row)
                     if isinstance(self.level.layout[row][column], Wall.Wall) and self.level.layout[row][column].breakable:
                         self.drawTile(self.level.breakableImage, column, row)
                     if self.level.layout[row][column] == const.TILE_DOOR_OPENED:
@@ -137,6 +149,8 @@ class Game(object):
             pygame.mixer.music.stop()
 
         self.getUserInput()
+
+        #Check current game state
         if self.gameState == const.GAME_STATE_RUNNING:
             self.render()#currentLevel, player, enemies)
 
@@ -145,28 +159,34 @@ class Game(object):
                 self.gameState = const.GAME_STATE_PLAYER_DEAD
                 self.start_ticks = pygame.time.get_ticks() #starter tick
 
-            #display death screen when player dies
+        #display death screen when player dies, then reset level
         elif self.gameState == const.GAME_STATE_PLAYER_DEAD:
             self.screen.blit(self.screenImage, (0,0))
             self.screen.blit(self.death_test_image, self.death_test_rect)
             seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
             if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
-                self.spritePlayer = None
-                self.spriteEnemies = None 
-                self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
-                self.spritePlayer = pygame.sprite.Group()
-                self.spritePlayer.add(self.player)
-                self.spriteEnemies = pygame.sprite.Group()
-                self.spriteEnemies.add(self.enemies)
-                self.gameState = const.GAME_STATE_RUNNING
+                self.resetLevel()
         
         self.updateScreen()
         if self.gameState == const.GAME_STATE_QUITTING:
             self.quitGame()
 
 
+    def resetLevel(self):
+        self.spritePlayer = None
+        self.spriteEnemies = None 
+        self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+        self.spritePlayer = pygame.sprite.Group()
+        self.spritePlayer.add(self.player)
+        self.spriteEnemies = pygame.sprite.Group()
+        self.spriteEnemies.add(self.enemies)
+        self.gameState = const.GAME_STATE_RUNNING
+
+
+    #User keyboard input, game controls
     def getUserInput(self):
         self.getEvents()
+
         if self.gameState == const.GAME_STATE_RUNNING:
             key = pygame.key.get_pressed()
             if key[pygame.K_UP]:
@@ -179,6 +199,7 @@ class Game(object):
                 self.player.move(const.RIGHT, self.level)
 
 
+    #Event-driven input
     def getEvents(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

@@ -109,11 +109,31 @@ class Level(object):
         levelFile = dataDir.joinpath("level" + str(levelNum) + ".csv")
         self.layout = self.levelParser(levelFile)
 
+
+class tileSprite(pygame.sprite.DirtySprite):
+    '''
+    Usage: TileSprite(image, x, y).  Use map grid coordinates, not actual on screen x,y values
+    '''
+    def __init__(self, image, x, y):
+        # call DirtySprite initializer
+        pygame.sprite.DirtySprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = const.SCREEN_OFFSET_X_LEFT + x * const.TILE_SIZE
+        self.rect.y = const.SCREEN_OFFSET_Y_TOP + y * const.TILE_SIZE
+        self.dirty = 2      #Tile is redrawn every frame.  Could use 1 to redraw once until flag is reset, useful for optimization
+
+
+#Loads level file based on number passed, returns level, player and enemies
 def startNewLevel(num):
     level = Level(num)
-    player = Character.PlayerCharacter(level)
+    x = level.playerStartPosit[0]
+    y = level.playerStartPosit[1]
+    player = Character.PlayerCharacter(level, x, y)
     enemies = []
     for i in range(level.numEnemies):
-        enemies.append(Character.Enemy(level, i))
+        x = level.enemyStartPosit[i][0]
+        y = level.enemyStartPosit[i][1]
+        enemies.append(Character.Enemy(level, x, y))
     
     return (level, player, enemies)
