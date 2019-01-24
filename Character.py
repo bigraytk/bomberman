@@ -7,7 +7,7 @@ from pathlib import Path
 import pygame
 
 
-class Character(object):
+class Character(pygame.sprite.Sprite): #object):
 
     '''
     This class encompasess all characters (Player and Enemy)
@@ -76,7 +76,7 @@ class Character(object):
         #if yes, move to correct square and update self.facing
         
         
-    def updatePosition(self, level):
+    def update(self, level):
         '''
         Updates character position when a character is moving towards a grid position
         '''
@@ -141,6 +141,7 @@ class PlayerCharacter(Character):
     
     def __init__(self, level):
         '''Constructor'''
+        pygame.sprite.Sprite.__init__(self)
         x = level.playerStartPosit[0]
         y = level.playerStartPosit[1]
         facing = const.DOWN
@@ -193,6 +194,7 @@ class Enemy(Character):
 
     def __init__(self, level, i):#version):
         '''Constructor'''
+        pygame.sprite.Sprite.__init__(self)
         x = level.enemyStartPosit[i][0]
         y = level.enemyStartPosit[i][1]
         facing = const.DOWN

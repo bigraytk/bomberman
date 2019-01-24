@@ -51,6 +51,11 @@ class Game(object):
         #load starting level
         self.levelNum = 1
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+        ##enemySprites = pygame.sprite.Group()
+        self.spritePlayer = pygame.sprite.Group()
+        self.spritePlayer.add(self.player)
+        self.spriteEnemies = pygame.sprite.Group()
+        self.spriteEnemies.add(self.enemies)
 
         #player death screen
         ################## Testing ########################## Testing ################# vvvvvv
@@ -67,17 +72,17 @@ class Game(object):
         #Render level
         self.drawLevel()#self.level)
         
-        #Render player
-        self.player.updatePosition(self.level)
-        self.screen.blit(self.player.image, self.player.rect)
-        
-        #Render enemies
-        for i in range(self.level.numEnemies):
-            self.enemies[i].updatePosition(self.level)
-            self.screen.blit(self.enemies[i].image, self.enemies[i].rect)
-            
-            #placeholder for proper handling of collision detection
-            if self.checkCollision(self.enemies[i].xres, self.enemies[i].yres, const.TILE_SIZE, const.TILE_SIZE, self.player.xres, self.player.yres, const.TILE_SIZE, const.TILE_SIZE, 18):
+        #Update and render player
+        self.spritePlayer.update(self.level)
+        self.spritePlayer.draw(self.screen)
+
+        #Update and render enemies
+        self.spriteEnemies.update(self.level)
+        self.spriteEnemies.draw(self.screen)
+
+        for enemy in self.spriteEnemies:
+            col = pygame.sprite.collide_rect(self.player, enemy)
+            if col:
                 self.player.state = const.STATE_DEAD
                 if self.soundOn:
                     self.player.deathSound.play()
@@ -146,7 +151,13 @@ class Game(object):
             self.screen.blit(self.death_test_image, self.death_test_rect)
             seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
             if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
+                self.spritePlayer = None
+                self.spriteEnemies = None 
                 self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+                self.spritePlayer = pygame.sprite.Group()
+                self.spritePlayer.add(self.player)
+                self.spriteEnemies = pygame.sprite.Group()
+                self.spriteEnemies.add(self.enemies)
                 self.gameState = const.GAME_STATE_RUNNING
         
         self.updateScreen()

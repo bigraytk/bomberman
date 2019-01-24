@@ -2,7 +2,9 @@
 """
 Created on Fri Jan 11 08:09:12 2019
 
-@author: 
+@author:
+
+Main program
 """
 
 import Game
