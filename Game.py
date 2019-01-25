@@ -214,6 +214,11 @@ class Game(object):
                     self.level.showDoor()
                 if event.key == pygame.K_x:
                     self.level.openDoor()
+                if event.key == pygame.K_f:
+                    if self.screen.get_flags() & pygame.FULLSCREEN:
+                        pygame.display.set_mode(self.screenSize)
+                    else:
+                        pygame.display.set_mode(self.screenSize, pygame.FULLSCREEN)
                 if event.key == pygame.K_m:
                     if self.musicOn: 
                         self.musicOn = False
