@@ -100,6 +100,7 @@ class Game(object):
         for enemy in self.spriteEnemies:
             if enemy.rect.colliderect(self.player.hitbox):
                 self.player.state = const.STATE_DEAD
+                self.updateScore()
                 if self.soundOn:
                     self.player.deathSound.play()
 
@@ -166,7 +167,9 @@ class Game(object):
             seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
             if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
                 self.resetLevel()
-        
+
+        elif self.gameState == const.GAME_STATE_MENU:
+            self.mainMenu()
         self.updateScreen()
         if self.gameState == const.GAME_STATE_QUITTING:
             self.quitGame()
@@ -222,6 +225,13 @@ class Game(object):
                     else:
                         self.soundOn = True
 
+    def mainMenu(self):
+        #TODO
+        pass
+
+    def updateScore(self):
+        #TODO
+        pass
     
     def quitGame(self):
         pygame.mixer.music.stop()
