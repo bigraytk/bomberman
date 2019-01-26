@@ -49,7 +49,7 @@ class Game(object):
         self.screenImage = pygame.Surface(self.screenSize)    #used to store the screen to an image, useful for transparent menus
 
         #load starting level
-        self.levelNum = 1
+        self.levelNum = 2
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
 
         #Create sprite groups
@@ -210,25 +210,22 @@ class Game(object):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.gameState = const.GAME_STATE_QUITTING
-                if event.key == pygame.K_z:     #testing code for door
-                    self.level.showDoor()
-                if event.key == pygame.K_x:
-                    self.level.openDoor()
-                if event.key == pygame.K_f:
+                elif event.key == pygame.K_f:
                     if self.screen.get_flags() & pygame.FULLSCREEN:
                         pygame.display.set_mode(self.screenSize)
                     else:
                         pygame.display.set_mode(self.screenSize, pygame.FULLSCREEN)
-                if event.key == pygame.K_m:
+                elif event.key == pygame.K_m:
                     if self.musicOn: 
                         self.musicOn = False
                     else:
                         self.musicOn = True
-                if event.key == pygame.K_s:
+                elif event.key == pygame.K_s:
                     if self.soundOn: 
                         self.soundOn = False
                     else:
                         self.soundOn = True
+                self.debug_mode(event)          #Testing purposeses  #TODO  remove
 
     def mainMenu(self):
         #TODO
@@ -243,3 +240,13 @@ class Game(object):
         pygame.display.quit()
         pygame.quit()
         self.gameRunning = False
+
+    #TODO  remove before release
+    def debug_mode(self, event):
+        if event.key == pygame.K_z:     #testing code for door
+            self.level.showDoor()
+        elif event.key == pygame.K_x:
+            self.level.openDoor()
+        elif event.key == pygame.K_k:   #kill all enemies on screen
+            self.spriteEnemies.empty()
+        
