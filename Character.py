@@ -43,25 +43,25 @@ class Character(pygame.sprite.Sprite): #object):
         self.facing = direction
         pathBlocked = False
         
-        if const.UP == direction:
+        if direction == const.UP:
             if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
                 self.y -= 1
                 self.state = const.STATE_MOVING_UP
             else:
                 pathBlocked = True
-        elif const.DOWN == direction:
+        elif direction == const.DOWN:
             if self.y < const.MAP_HEIGHT - 1 and not isinstance(layout[self.y + 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_UP):
                 self.y += 1
                 self.state = const.STATE_MOVING_DOWN
             else:
                 pathBlocked = True
-        elif const.LEFT == direction:
+        elif direction == const.LEFT:
             if self.x > 0 and not isinstance(layout[self.y][self.x - 1], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_RIGHT):
                 self.x -= 1
                 self.state = const.STATE_MOVING_LEFT
             else:
                 pathBlocked = True
-        elif const.RIGHT == direction:
+        elif direction == const.RIGHT:
             if self.x < const.MAP_WIDTH - 1 and not isinstance(layout[self.y][self.x + 1], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_LEFT):
                 self.x += 1
                 self.state = const.STATE_MOVING_RIGHT
@@ -80,7 +80,6 @@ class Character(pygame.sprite.Sprite): #object):
         Updates character position when a character is moving towards a grid position
         '''
         if self.kind == const.ENEMY and self.state == const.STATE_IDLE:
-
             if self.logic == const.RANDOM:
                 self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
                 self.move(self.direction, level)
@@ -199,8 +198,9 @@ class Enemy(Character):
         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
         version = random.choice([const.BASIC, const.RANDOM]) 
 
-        imageFile = str(Path.cwd() / "graphics" / "enemy1.png")     #placeholder
-        self.image = pygame.image.load(imageFile).convert_alpha()
+        #imageFile = str(Path.cwd() / "graphics" / "enemy1.png")     #placeholder
+        #self.image = pygame.image.load(imageFile).convert_alpha()
+        self.image = level.enemyImage
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         

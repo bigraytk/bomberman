@@ -49,8 +49,15 @@ class Game(object):
         self.screenImage = pygame.Surface(self.screenSize)    #used to store the screen to an image, useful for transparent menus
 
         #load starting level
-        self.levelNum = 2
+        self.levelNum = 1
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+
+        #retreive total number of levels stored in data directory
+        self.numLevels = 0
+        dataDir = Path.cwd() / "data"
+        for f in dataDir.glob('level*.csv'):
+            self.numLevels += 1
+        print(self.numLevels)
 
         #Create sprite groups
         self.spritePlayer = pygame.sprite.Group()
@@ -58,16 +65,16 @@ class Game(object):
         self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
 
-        self.testsprite  = Level.tileSprite(self.level.backgroundImage, 1, 1)
+        #self.testsprite  = Level.tileSprite(self.level.backgroundImage, 1, 1)
 
-        self.tile_group = pygame.sprite.LayeredDirty()  #This is the Pygame group you need for dirty sprites.  
-        for y in range(self.level.levelHeight):
-            for x in range(self.level.levelWidth):
-                if isinstance(self.level.layout[y][x], Wall.Wall) and not self.level.layout[y][x].breakable:
-                    tile  = Level.tileSprite(self.level.wallImage, x, y)
-                else:
-                    tile  = Level.tileSprite(self.level.backgroundImage, x, y)
-                self.tile_group.add(tile)
+        #self.tile_group = pygame.sprite.LayeredDirty()  #dirty sprites can be used for optimized tilemaps, but I didn't see much improvement
+        #for y in range(self.level.levelHeight):
+        #    for x in range(self.level.levelWidth):
+        #        if isinstance(self.level.layout[y][x], Wall.Wall) and not self.level.layout[y][x].breakable:
+        #            tile  = Level.tileSprite(self.level.wallImage, x, y)
+        #        else:
+        #            tile  = Level.tileSprite(self.level.backgroundImage, x, y)
+        #        self.tile_group.add(tile)
 
         #player death screen
         ################## Testing ########################## Testing ################# vvvvvv
@@ -85,7 +92,7 @@ class Game(object):
         #for tile in self.tile_group:               ### could be used to optimize drawing tiles, but requires a lot of changes to do so
         #    if pygame.sprite.spritecollideany(tile, self.enemies):     ### also, tested the optimization and it's not any faster
         #        tile.dirty = True
-        self.tile_group.draw(self.screen)
+        #self.tile_group.draw(self.screen)
         self.drawLevel()#self.level)
         
         #Update and render enemies
@@ -116,10 +123,10 @@ class Game(object):
     def drawLevel(self):#level):
         for row in range(const.MAP_HEIGHT):
             for column in range(const.MAP_WIDTH):   
-                #self.drawTile(self.level.backgroundImage, column, row)
+                self.drawTile(self.level.backgroundImage, column, row)
                 try:
-                    #if isinstance(self.level.layout[row][column], Wall.Wall) and not self.level.layout[row][column].breakable:
-                    #    self.drawTile(self.level.wallImage, column, row)
+                    if isinstance(self.level.layout[row][column], Wall.Wall) and not self.level.layout[row][column].breakable:
+                        self.drawTile(self.level.wallImage, column, row)
                     if isinstance(self.level.layout[row][column], Wall.Wall) and self.level.layout[row][column].breakable:
                         self.drawTile(self.level.breakableImage, column, row)
                     if self.level.layout[row][column] == const.TILE_DOOR_OPENED:
@@ -153,7 +160,8 @@ class Game(object):
 
         #Check current game state
         if self.gameState == const.GAME_STATE_RUNNING:
-            self.render()#currentLevel, player, enemies)
+            self.render()
+            self.checkPlayerProgress()
 
             if self.player.state == const.STATE_DEAD:
                 self.screenImage.blit(self.screen, (0,0), ((0,0), self.screenSize))    #take a snapshot of the screen
@@ -176,14 +184,27 @@ class Game(object):
 
 
     def resetLevel(self):
-        self.spritePlayer = None
-        self.spriteEnemies = None 
+        for enemy in self.spriteEnemies:
+            del enemy
+        self.spritePlayer.empty()
+        self.spriteEnemies.empty()
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
         self.spritePlayer = pygame.sprite.Group()
         self.spritePlayer.add(self.player)
         self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
         self.gameState = const.GAME_STATE_RUNNING
+
+
+    def checkPlayerProgress(self):
+        if self.level.layout[self.player.y][self.player.x] == const.TILE_DOOR_OPENED and self.player.state == const.STATE_IDLE:
+            if self.levelNum < self.numLevels:
+                self.levelNum += 1
+                #self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+                self.resetLevel()
+            else:
+                #TODO player wins game
+                pass
 
 
     #User keyboard input, game controls
@@ -227,19 +248,23 @@ class Game(object):
                         self.soundOn = True
                 self.debug_mode(event)          #Testing purposeses  #TODO  remove
 
+
     def mainMenu(self):
         #TODO
         pass
+
 
     def updateScore(self):
         #TODO
         pass
     
+
     def quitGame(self):
         pygame.mixer.music.stop()
         pygame.display.quit()
         pygame.quit()
         self.gameRunning = False
+
 
     #TODO  remove before release
     def debug_mode(self, event):
@@ -248,5 +273,6 @@ class Game(object):
         elif event.key == pygame.K_x:
             self.level.openDoor()
         elif event.key == pygame.K_k:   #kill all enemies on screen
-            self.spriteEnemies.empty()
+            for enemy in self.enemies:
+                self.spriteEnemies.remove(enemy)
         

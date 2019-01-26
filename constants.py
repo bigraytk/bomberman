@@ -20,6 +20,7 @@ LEVEL_HEIGHT      = 1
 LEVEL_BG_GFX      = 2
 LEVEL_WALL_GFX    = 3
 LEVEL_BREAK_GFX   = 4
+LEVEL_ENEMY_GFX   = 5
 
 
 # Map specifications
