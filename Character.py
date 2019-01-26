@@ -3,6 +3,7 @@ import Level
 import Wall
 import Bomb
 import random
+import math
 from pathlib import Path
 import pygame
 
@@ -75,7 +76,7 @@ class Character(pygame.sprite.Sprite): #object):
         #if yes, move to correct square and update self.facing
         
         
-    def update(self, level):
+    def update(self, level, player = None):
         '''
         Updates character position when a character is moving towards a grid position
         '''
@@ -87,7 +88,18 @@ class Character(pygame.sprite.Sprite): #object):
                 pathBlocked = self.move(self.direction, level)
                 if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
                     self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
-                
+                    self.move(self.direction, level)
+            elif self.logic == const.ADVANCED and player != None:
+                if abs(self.x - player.x) < const.ADVANCED_ENEMY_RANGE and abs(self.y - player.y) < const.ADVANCED_ENEMY_RANGE:
+                    self.pursuePlayer = True
+                    self.speed = const.SPEED_HIGH
+                if self.pursuePlayer:
+                    self.advancedMovement(level, player)
+                else:
+                    pathBlocked = self.move(self.direction, level)
+                    if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
+                        self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
+                        self.move(self.direction, level)
         
         xDest = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
         yDest = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
@@ -122,13 +134,43 @@ class Character(pygame.sprite.Sprite): #object):
                 
         self.rect.x = self.xres
         self.rect.y = self.yres
-        self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X
-        self.hitbox.y = self.rect.y
+        
         #temporary means to handle the image size difference (from tilesize) for the bman image
         if self.kind == const.PC:
+            self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X - 2
+            self.hitbox.y = self.rect.y + 4
             self.rect.x += 8
             self.rect.y -= 16
+        else:
+            self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X / 2
+            self.hitbox.y = self.rect.y + const.HIT_BOX_OFFSET_Y / 2
 
+
+    def advancedMovement(self, level, player):
+        pathsBlocked = 0
+        if self.x > player.x:
+            self.direction = const.LEFT
+            pathBlocked = self.move(self.direction, level)
+            if pathBlocked:
+                pathsBlocked += 1
+        elif self.x < player.x:
+            self.direction = const.RIGHT
+            pathBlocked = self.move(self.direction, level)
+            if pathBlocked:
+                pathsBlocked += 1
+        elif self.y > player.y:
+            self.direction = const.UP
+            pathBlocked = self.move(self.direction, level)
+            if pathBlocked:
+                pathsBlocked += 1
+        elif self.y < player.y:
+            self.direction = const.DOWN
+            pathBlocked = self.move(self.direction, level)
+            if pathBlocked:
+                pathsBlocked += 1
+        if pathsBlocked > 0 or self.direction == None:
+            self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
+            self.move(self.direction, level)
 
 
 class PlayerCharacter(Character):
@@ -196,10 +238,9 @@ class Enemy(Character):
         version = const.BASIC       #placeholder, maybe load enemy types from a list based on level #
         Character.__init__(self, x, y, facing, 0, const.ENEMY)
         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
-        version = random.choice([const.BASIC, const.RANDOM]) 
+        version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED]) 
+        self.pursuePlayer = False
 
-        #imageFile = str(Path.cwd() / "graphics" / "enemy1.png")     #placeholder
-        #self.image = pygame.image.load(imageFile).convert_alpha()
         self.image = level.enemyImage
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
@@ -211,7 +252,7 @@ class Enemy(Character):
             self.speed = const.SPEED_MED
             self.logic = const.BASIC
         elif version == const.ADVANCED:
-            self.speed = const.SPEED_HIGH
+            self.speed = const.SPEED_LOW    #advanced enemies start slow but speed up when in pursuit
             self.logic = const.ADVANCED
         
 

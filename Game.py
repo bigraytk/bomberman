@@ -57,7 +57,6 @@ class Game(object):
         dataDir = Path.cwd() / "data"
         for f in dataDir.glob('level*.csv'):
             self.numLevels += 1
-        print(self.numLevels)
 
         #Create sprite groups
         self.spritePlayer = pygame.sprite.Group()
@@ -96,8 +95,15 @@ class Game(object):
         self.drawLevel()#self.level)
         
         #Update and render enemies
-        self.spriteEnemies.update(self.level)
+        self.spriteEnemies.update(self.level, self.player)
         self.spriteEnemies.draw(self.screen)
+
+        #for enemy in self.spriteEnemies:
+        #    if enemy.logic == const.ADVANCED:
+        #        if enemy.pursuePlayer:
+        #            pygame.draw.rect(self.screen, (255, 0, 0), enemy.hitbox, 2)  #Draws player's collision box, for testing purposes
+        #        else:
+        #            pygame.draw.rect(self.screen, (255, 255, 0), enemy.hitbox, 2)  #Draws player's collision box, for testing purposes
 
         #Update and render player
         self.spritePlayer.update(self.level)
@@ -105,6 +111,8 @@ class Game(object):
         #pygame.draw.rect(self.screen, (255, 255, 0), self.player.hitbox, 2)  #Draws player's collision box, for testing purposes
 
         for enemy in self.spriteEnemies:
+            if enemy.logic == const.ADVANCED:
+                pass
             if enemy.rect.colliderect(self.player.hitbox):
                 self.player.state = const.STATE_DEAD
                 self.updateScore()
@@ -200,10 +208,9 @@ class Game(object):
         if self.level.layout[self.player.y][self.player.x] == const.TILE_DOOR_OPENED and self.player.state == const.STATE_IDLE:
             if self.levelNum < self.numLevels:
                 self.levelNum += 1
-                #self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
                 self.resetLevel()
             else:
-                #TODO player wins game
+                #TODO player wins game?
                 pass
 
 
@@ -273,6 +280,6 @@ class Game(object):
         elif event.key == pygame.K_x:
             self.level.openDoor()
         elif event.key == pygame.K_k:   #kill all enemies on screen
-            for enemy in self.enemies:
-                self.spriteEnemies.remove(enemy)
+            for enemy in self.spriteEnemies:
+                enemy.kill()
         
