@@ -193,13 +193,13 @@ class Game(object):
 
     def resetLevel(self):
         for enemy in self.spriteEnemies:
-            del enemy
+            enemy.kill()
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
-        self.spritePlayer = pygame.sprite.Group()
+        #self.spritePlayer = pygame.sprite.Group()
         self.spritePlayer.add(self.player)
-        self.spriteEnemies = pygame.sprite.Group()
+        #self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
         self.gameState = const.GAME_STATE_RUNNING
 
@@ -282,4 +282,12 @@ class Game(object):
         elif event.key == pygame.K_k:   #kill all enemies on screen
             for enemy in self.spriteEnemies:
                 enemy.kill()
+        elif event.key == pygame.K_COMMA:
+            if self.levelNum > 1:
+                self.levelNum -= 1
+                self.resetLevel()
+        elif event.key == pygame.K_PERIOD:
+            if self.levelNum < self.numLevels:
+                self.levelNum += 1
+                self.resetLevel()
         

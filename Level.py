@@ -105,8 +105,22 @@ class Level(object):
         
         
     def __init__(self, levelNum):
-        # Set the current working directory, read and write:
+        #set class variable
+        self.backgroundImage = None
+        self.wallImage = None
+        self.breakableImage = None
+        self.doorOpenedImage = None
+        self.doorClosedImage = None
+        self.levelFile = None
+        self.layout = []
+        self.levelWidth = None
+        self.levelHeight = None
+        self.door = const.TILE_DOOR_HIDDEN
+        self.playerStartPosit = None
         self.numEnemies = 0
+        self.enemyStartPosit = []
+
+        # Set the current working directory, read and write:
         dataDir = Path.cwd() / "data"
 
         #Open csv level file to create level layout      
