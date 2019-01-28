@@ -8,7 +8,7 @@ from pathlib import Path
 import pygame
 
 
-class Character(pygame.sprite.Sprite): #object):
+class Character(pygame.sprite.Sprite):
 
     '''
     This class encompasess all characters (Player and Enemy)
@@ -17,7 +17,7 @@ class Character(pygame.sprite.Sprite): #object):
 
     def __init__(self, x, y, facing, speed, kind):
         '''Constructor'''
-
+        pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
         self.xres = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE#init this by running self.x through the grid_to_res conversion function
@@ -186,9 +186,8 @@ class PlayerCharacter(Character):
     
     def __init__(self, level, x, y):
         '''Constructor'''
-        pygame.sprite.Sprite.__init__(self)
         facing = const.DOWN
-        Character.__init__(self, x, y, facing, const.PLAYER_SPEED, const.PC)
+        super().__init__(x, y, facing, const.PLAYER_SPEED, const.PC)
         self.bombCount = 1
         self.bombRange = 1
         #self.speed = 40 #placeholder
@@ -212,7 +211,7 @@ class PlayerCharacter(Character):
         self.back = pygame.image.load(imageFile).convert_alpha()
 
         self.image = self.front
-        
+
 
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
@@ -221,8 +220,11 @@ class PlayerCharacter(Character):
     def dropBomb(self):
         '''Creates an instance of the bomb class at the PC's position'''
         if self.activeBombs < self.bombCount:
-            newBomb = Bomb.Bomb(self.bombRange, self.x, self.y)
+            newBomb = Bomb.Bomb(self.x, self.y, self.bombRange)
             self.changeBombCount(1)
+            return newBomb
+        else:
+            return None
 
     def changeBombCount(self,change):
         '''This method is how to change the value of self.activeBombs
@@ -266,10 +268,9 @@ class Enemy(Character):
 
     def __init__(self, level, x, y):#version):
         '''Constructor'''
-        pygame.sprite.Sprite.__init__(self)
         facing = const.DOWN
         version = const.BASIC       #placeholder, maybe load enemy types from a list based on level #
-        Character.__init__(self, x, y, facing, 0, const.ENEMY)
+        super().__init__(x, y, facing, 0, const.ENEMY)
         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
         version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED]) 
         self.pursuePlayer = False

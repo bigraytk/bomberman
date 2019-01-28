@@ -63,6 +63,7 @@ class Game(object):
         self.spritePlayer.add(self.player)
         self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
+        self.spriteBombs = pygame.sprite.Group()
 
         #self.testsprite  = Level.tileSprite(self.level.backgroundImage, 1, 1)
 
@@ -99,6 +100,7 @@ class Game(object):
         #Update and render enemies
         self.spriteEnemies.update(self.level, self.player)
         self.spriteEnemies.draw(self.screen)
+        self.spriteBombs.draw(self.screen)
 
         #for enemy in self.spriteEnemies:
         #    if enemy.logic == const.ADVANCED:
@@ -196,6 +198,8 @@ class Game(object):
     def resetLevel(self):
         for enemy in self.spriteEnemies:
             enemy.kill()
+        for bomb in self.spriteBombs:
+            bomb.kill()
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
@@ -231,7 +235,9 @@ class Game(object):
             if key[pygame.K_RIGHT]:
                 self.player.move(const.RIGHT, self.level)
             if key[pygame.K_SPACE]:
-                self.player.dropBomb()
+                newBomb = self.player.dropBomb()
+                if newBomb:
+                    self.spriteBombs.add(newBomb)
 
 
     #Event-driven input
