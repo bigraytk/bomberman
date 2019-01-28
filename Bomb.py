@@ -19,6 +19,7 @@ class Bomb(object):
     def countdown(self):
         #need to countdown starting at self.time to 0
         # once at 0, call explode
+        
         pass
 
     def explode(self):

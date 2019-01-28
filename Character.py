@@ -44,7 +44,6 @@ class Character(pygame.sprite.Sprite): #object):
         self.facing = direction
         pathBlocked = False
 
-                
         
         if direction == const.UP:
             if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
@@ -71,6 +70,8 @@ class Character(pygame.sprite.Sprite): #object):
             else:
                 pathBlocked = True
 
+        if self.kind == const.PC and not pathBlocked:
+            self.changeDirection(direction)
         return pathBlocked
 
         #checks if able to move in direction
@@ -139,9 +140,10 @@ class Character(pygame.sprite.Sprite): #object):
         
         #temporary means to handle the image size difference (from tilesize) for the bman image
         if self.kind == const.PC:
+            #self.changeDirection(self.facing)
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X - 2
             self.hitbox.y = self.rect.y + 4
-            self.rect.x += 8
+            self.rect.x += 0#8
             self.rect.y -= 16
         else:
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X / 2
@@ -194,8 +196,8 @@ class PlayerCharacter(Character):
         self.boot = False
         
         
-        imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
-        self.image = pygame.image.load(imageFile).convert_alpha()
+        #imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
+        #self.image = pygame.image.load(imageFile).convert_alpha()
 
         imageFile = str(Path.cwd() / "graphics" / "Left.png")
         self.left = pygame.image.load(imageFile).convert_alpha()
@@ -209,7 +211,8 @@ class PlayerCharacter(Character):
         imageFile = str(Path.cwd() / "graphics" / "Back.png")
         self.back = pygame.image.load(imageFile).convert_alpha()
 
-
+        self.image = self.front
+        
 
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
@@ -240,13 +243,13 @@ class PlayerCharacter(Character):
             self.boot = True
     
     def changeDirection(self,direction):
-        if direction == const.RIGHT:
+        if direction == const.RIGHT and self.image != self.right: #and self.state == const.STATE_IDLE:
             self.image = self.right
-        if direction == const.LEFT:
+        if direction == const.LEFT and self.image != self.left: #and self.state == const.STATE_IDLE:
             self.image = self.left
-        if direction == const.UP:
+        if direction == const.UP and self.image != self.back: #and self.state == const.STATE_IDLE:
             self.image = self.back
-        if direction == const.DOWN:
+        if direction == const.DOWN and self.image != self.front:# and self.state == const.STATE_IDLE:
             self.image = self.front
 
         
