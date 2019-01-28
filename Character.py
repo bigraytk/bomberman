@@ -43,6 +43,8 @@ class Character(pygame.sprite.Sprite): #object):
         layout = level.layout
         self.facing = direction
         pathBlocked = False
+
+                
         
         if direction == const.UP:
             if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
@@ -191,8 +193,24 @@ class PlayerCharacter(Character):
         self.activeBombs = 0
         self.boot = False
         
+        
         imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
         self.image = pygame.image.load(imageFile).convert_alpha()
+
+        imageFile = str(Path.cwd() / "graphics" / "Left.png")
+        self.left = pygame.image.load(imageFile).convert_alpha()
+
+        imageFile = str(Path.cwd() / "graphics" / "Right.png")
+        self.right = pygame.image.load(imageFile).convert_alpha()
+
+        imageFile = str(Path.cwd() / "graphics" / "Front.png")
+        self.front = pygame.image.load(imageFile).convert_alpha()
+
+        imageFile = str(Path.cwd() / "graphics" / "Back.png")
+        self.back = pygame.image.load(imageFile).convert_alpha()
+
+
+
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
@@ -220,6 +238,18 @@ class PlayerCharacter(Character):
             self.bombCount += 1
         elif powerup == const.BOOT:
             self.boot = True
+    
+    def changeDirection(self,direction):
+        if direction == const.RIGHT:
+            self.image = self.right
+        if direction == const.LEFT:
+            self.image = self.left
+        if direction == const.UP:
+            self.image = self.back
+        if direction == const.DOWN:
+            self.image = self.front
+
+        
     
 
 
