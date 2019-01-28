@@ -219,7 +219,9 @@ class PlayerCharacter(Character):
 
     def dropBomb(self):
         '''Creates an instance of the bomb class at the PC's position'''
-        if self.activeBombs < self.bombCount:
+        xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
+        yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
+        if xDiff < 10 and yDiff < 10:# and self.activeBombs < self.bombCount:
             newBomb = Bomb.Bomb(self.x, self.y, self.bombRange)
             self.changeBombCount(1)
             return newBomb
