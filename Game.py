@@ -282,8 +282,11 @@ class Game(object):
         print(graphicsDir)
         NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
         newGameButt = pygame.image.load(NewGameGraph)
+<<<<<<< HEAD
         NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_Red.png"))
         newGameButtRed = pygame.image.load(NewGameGraphRed)
+=======
+>>>>>>> 8f8a43c77fefe308f0d3e4efdb651348c46b69f7
         ngRect = pygame.Rect(newGameLocLeft,newGameLocTop,200,50)
         highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
         highScoreButt = pygame.image.load(highScoreGraph)
