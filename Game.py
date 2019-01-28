@@ -74,6 +74,8 @@ class Game(object):
         #        else:
         #            tile  = Level.tileSprite(self.level.backgroundImage, x, y)
         #        self.tile_group.add(tile)
+        
+
 
         #player death screen
         ################## Testing ########################## Testing ################# vvvvvv
@@ -221,12 +223,16 @@ class Game(object):
         if self.gameState == const.GAME_STATE_RUNNING:
             key = pygame.key.get_pressed()
             if key[pygame.K_UP]:
+                self.player.changeDirection(const.UP)
                 self.player.move(const.UP, self.level)
             if key[pygame.K_DOWN]:
+                self.player.changeDirection(const.DOWN)
                 self.player.move(const.DOWN, self.level)
             if key[pygame.K_LEFT]:
+                self.player.changeDirection(const.LEFT)
                 self.player.move(const.LEFT, self.level)
             if key[pygame.K_RIGHT]:
+                self.player.changeDirection(const.RIGHT)
                 self.player.move(const.RIGHT, self.level)
 
 
