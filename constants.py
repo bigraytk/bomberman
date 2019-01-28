@@ -20,6 +20,7 @@ LEVEL_HEIGHT      = 1
 LEVEL_BG_GFX      = 2
 LEVEL_WALL_GFX    = 3
 LEVEL_BREAK_GFX   = 4
+LEVEL_ENEMY_GFX   = 5
 
 
 # Map specifications
@@ -37,7 +38,7 @@ SCREEN_OFFSET_Y_TOP = 64
 SCREEN_OFFSET_X_RIGHT = 32
 SCREEN_OFFSET_Y_BOTTOM = 32
 HIT_BOX_OFFSET_X = 20
-HIT_BOX_OFFSET_Y = 26
+HIT_BOX_OFFSET_Y = 28
 
 
 # Enemy Constants
@@ -45,9 +46,10 @@ BASIC = 0
 RANDOM = 1
 ADVANCED = 2
 #SMART = 3      # < do we need this?  We can just use ADVANCED for the type and logic
-SPEED_HIGH = 3
+SPEED_HIGH = 2.5
 SPEED_MED = 2
 SPEED_LOW = 1
+ADVANCED_ENEMY_RANGE = 3    #how close an advanced enemy needs to be to player to persue
 
 # Power Up Constants
 RANGE = 0
