@@ -226,8 +226,49 @@ class Game(object):
                         self.soundOn = True
 
     def mainMenu(self):
-        #TODO
-        pass
+
+        newGameLocLeft = 500
+        newGameLocTop = 200
+        highScoreLocLeft = 500
+        highScoreLocTop = 300
+        '''Will display the main menu.'''
+        self.screen.fill(const.GREY)
+
+        NewGameButton = str(graphicsDir.joinpath("NewGameButton.png"))
+        newGameButt = pygame.image.load(NewGameButton)
+        ngRect = pygame.Rect(newGameLocLeft,newGameLocTop,200,50)
+        highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
+        highScoreButt = pygame.image.load(NewGameButton)
+        hsRect = pygame.Rect(highScoreLocLeft,highScoreLocTop,200,50)
+        mousex = 0
+        mousey = 0
+
+        #main menu loop
+        while True:
+            mouseClicked = False
+            
+            self.screen.blit(newGameButt,(newGameLocLeft,newGameLocTop))
+            self.screen.blit(highScoreButt,((highScoreLocLeft,highScoreLocTop))
+            #pygame.draw.rect(DISPLAYSURF,RED,ngRect)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    mousex,mousey = event.pos
+                    print(mousex,mousey)
+                    if ngRect.collidepoint(mousex,mousey):
+                        #TODO
+                        #change game state and start the 1st level
+                    elif hsRect.collidepoint(mousex,mousey):
+                        #TODO
+                        #show the high score screen
+                        
+                    
+                    
+            pygame.display.update()
+        
 
     def updateScore(self):
         #TODO
