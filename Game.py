@@ -3,7 +3,7 @@ Created on Fri Jan 11 08:09:12 2019
 
 @author: 
 """
-
+import sys
 import constants as const
 import colors
 import Level
@@ -247,7 +247,10 @@ class Game(object):
                 self.gameState = const.GAME_STATE_QUITTING
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.gameState = const.GAME_STATE_QUITTING
+                    if self.gameState != const.GAME_STATE_MENU:
+                        self.gameState = const.GAME_STATE_MENU
+                    else:
+                        self.gameState = const.GAME_STATE_QUITTING
                 elif event.key == pygame.K_f:
                     if self.screen.get_flags() & pygame.FULLSCREEN:
                         pygame.display.set_mode(self.screenSize)
@@ -278,26 +281,49 @@ class Game(object):
         graphicsDir = Path.cwd() / "graphics"
         print(graphicsDir)
         NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
-        newGameButt = pygame.image.load(NewGameButton)
+        newGameButt = pygame.image.load(NewGameGraph)
+        NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_Red.png"))
+        newGameButtRed = pygame.image.load(NewGameGraphRed)
         ngRect = pygame.Rect(newGameLocLeft,newGameLocTop,200,50)
         highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
         highScoreButt = pygame.image.load(highScoreGraph)
+        highScoreGraphRed = str(graphicsDir.joinpath("HighScores_Red.png"))
+        highScoreButtRed = pygame.image.load(highScoreGraphRed)
         hsRect = pygame.Rect(highScoreLocLeft,highScoreLocTop,200,50)
         mousex = 0
         mousey = 0
+        hoveringNG = False
+        hoveringHS = False
 
         #main menu loop
-        print('game state' , self.gameState)
+        #print('game state' , self.gameState)
         while self.gameState == const.GAME_STATE_MENU:
             mouseClicked = False
             
-            self.screen.blit(newGameButt,(newGameLocLeft,newGameLocTop))
-            self.screen.blit(highScoreButt,(highScoreLocLeft,highScoreLocTop))
+            if hoveringNG == False:
+                self.screen.blit(newGameButt,(newGameLocLeft,newGameLocTop))
+            if hoveringHS == False:
+                self.screen.blit(highScoreButt,(highScoreLocLeft,highScoreLocTop))
             #pygame.draw.rect(DISPLAYSURF,RED,ngRect)
+            #hoveringNG = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+
+                elif event.type == pygame.MOUSEMOTION:
+                    mousex,mousey = event.pos
+                    if ngRect.collidepoint(mousex,mousey):
+                        hoveringNG = True
+                        self.screen.blit(newGameButtRed,(newGameLocLeft,newGameLocTop))
+                    elif not ngRect.collidepoint(mousex,mousey):
+                        hoveringNG = False
+                    if hsRect.collidepoint(mousex,mousey):
+                        hoveringHS = True
+                        print('test')
+                        self.screen.blit(highScoreButtRed,(highScoreLocLeft,highScoreLocTop))
+                    elif not hsRect.collidepoint(mousex,mousey):
+                        hoveringHS = False
                 
                 elif event.type == pygame.MOUSEBUTTONUP:
                     mousex,mousey = event.pos
