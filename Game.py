@@ -36,7 +36,7 @@ class Game(object):
 
         #setup game state variables
         self.gameRunning = True
-        self.gameState = const.GAME_STATE_RUNNING
+        self.gameState = const.GAME_STATE_MENU
         self.musicOn = False
         self.soundOn = False
 
@@ -275,21 +275,24 @@ class Game(object):
         '''Will display the main menu.'''
         self.screen.fill(const.GREY)
 
-        NewGameButton = str(graphicsDir.joinpath("NewGameButton.png"))
+        graphicsDir = Path.cwd() / "graphics"
+        print(graphicsDir)
+        NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
         newGameButt = pygame.image.load(NewGameButton)
         ngRect = pygame.Rect(newGameLocLeft,newGameLocTop,200,50)
         highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
-        highScoreButt = pygame.image.load(NewGameButton)
+        highScoreButt = pygame.image.load(highScoreGraph)
         hsRect = pygame.Rect(highScoreLocLeft,highScoreLocTop,200,50)
         mousex = 0
         mousey = 0
 
         #main menu loop
-        while True:
+        print('game state' , self.gameState)
+        while self.gameState == const.GAME_STATE_MENU:
             mouseClicked = False
             
             self.screen.blit(newGameButt,(newGameLocLeft,newGameLocTop))
-            self.screen.blit(highScoreButt,((highScoreLocLeft,highScoreLocTop))
+            self.screen.blit(highScoreButt,(highScoreLocLeft,highScoreLocTop))
             #pygame.draw.rect(DISPLAYSURF,RED,ngRect)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -302,9 +305,11 @@ class Game(object):
                     if ngRect.collidepoint(mousex,mousey):
                         #TODO
                         #change game state and start the 1st level
+                        self.gameState = const.GAME_STATE_RUNNING
                     elif hsRect.collidepoint(mousex,mousey):
                         #TODO
                         #show the high score screen
+                        pass
                         
                     
                     

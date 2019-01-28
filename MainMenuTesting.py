@@ -61,10 +61,12 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+            '''
         elif event.type == pygame.MOUSEMOTION:
             mousex,mousey = event.pos
             if ngRect.collidepoint(mousex,mousey):
-                DISPLAYSURF.blit(newGameButtRed,(500,300))
+                DISPLAYSURF.blit(newGameButtRed,(500,200))
+'''
         elif event.type == pygame.MOUSEBUTTONUP:
             mousex,mousey = event.pos
             print(mousex,mousey)
