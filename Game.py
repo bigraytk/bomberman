@@ -278,7 +278,7 @@ class Game(object):
         graphicsDir = Path.cwd() / "graphics"
         print(graphicsDir)
         NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
-        newGameButt = pygame.image.load(NewGameButton)
+        newGameButt = pygame.image.load(NewGameGraph)
         ngRect = pygame.Rect(newGameLocLeft,newGameLocTop,200,50)
         highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
         highScoreButt = pygame.image.load(highScoreGraph)
