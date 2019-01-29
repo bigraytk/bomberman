@@ -62,11 +62,7 @@ ENEMY = 1
 GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
 PLAYER_SPEED = 3
-<<<<<<< HEAD
 PLAYER_NUM_BOMBS = 3  #number of starting bombs
-=======
-BOMB_COUNT = 4
->>>>>>> Fixed logic for bomb counts.  Initial code was adding multiple bombs/spK
 
 
 #character states
