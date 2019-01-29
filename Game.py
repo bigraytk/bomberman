@@ -9,6 +9,7 @@ import colors
 import Level
 import Wall
 import Character
+import MainMenu
 import random
 from pathlib import Path
 import pygame
@@ -47,6 +48,9 @@ class Game(object):
         self.screen = pygame.display.set_mode(self.screenSize)
         pygame.display.set_caption("BomberDude")
         self.screenImage = pygame.Surface(self.screenSize)    #used to store the screen to an image, useful for transparent menus
+
+        #
+        self.theMainMenu = MainMenu.MainMenu(self.screen, self.screenWidth, self.screenHeight)
 
         #load starting level
         self.levelNum = 1
@@ -189,8 +193,13 @@ class Game(object):
                 self.resetLevel()
 
         elif self.gameState == const.GAME_STATE_MENU:
-            self.mainMenu()
+            self.gameState = self.theMainMenu.showMenu()
+            if self.gameState == const.GAME_STATE_RUNNING:
+                self.levelNum = 1
+                self.resetLevel()
+        
         self.updateScreen()
+
         if self.gameState == const.GAME_STATE_QUITTING:
             self.quitGame()
 
@@ -203,9 +212,7 @@ class Game(object):
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
-        #self.spritePlayer = pygame.sprite.Group()
         self.spritePlayer.add(self.player)
-        #self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
         self.gameState = const.GAME_STATE_RUNNING
 
@@ -270,80 +277,11 @@ class Game(object):
 
 
     def mainMenu(self):
-
-        newGameLocLeft = 500
-        newGameLocTop = 200
-        highScoreLocLeft = 500
-        highScoreLocTop = 300
-        '''Will display the main menu.'''
-        self.screen.fill(const.GREY)
-
-        graphicsDir = Path.cwd() / "graphics"
-        print(graphicsDir)
-        NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
-        newGameButt = pygame.image.load(NewGameGraph)
-<<<<<<< HEAD
-        NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_Red.png"))
-        newGameButtRed = pygame.image.load(NewGameGraphRed)
-=======
->>>>>>> 8f8a43c77fefe308f0d3e4efdb651348c46b69f7
-        ngRect = pygame.Rect(newGameLocLeft,newGameLocTop,200,50)
-        highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
-        highScoreButt = pygame.image.load(highScoreGraph)
-        highScoreGraphRed = str(graphicsDir.joinpath("HighScores_Red.png"))
-        highScoreButtRed = pygame.image.load(highScoreGraphRed)
-        hsRect = pygame.Rect(highScoreLocLeft,highScoreLocTop,200,50)
-        mousex = 0
-        mousey = 0
-        hoveringNG = False
-        hoveringHS = False
-
-        #main menu loop
-        #print('game state' , self.gameState)
-        while self.gameState == const.GAME_STATE_MENU:
-            mouseClicked = False
-            
-            if hoveringNG == False:
-                self.screen.blit(newGameButt,(newGameLocLeft,newGameLocTop))
-            if hoveringHS == False:
-                self.screen.blit(highScoreButt,(highScoreLocLeft,highScoreLocTop))
-            #pygame.draw.rect(DISPLAYSURF,RED,ngRect)
-            #hoveringNG = False
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-
-                elif event.type == pygame.MOUSEMOTION:
-                    mousex,mousey = event.pos
-                    if ngRect.collidepoint(mousex,mousey):
-                        hoveringNG = True
-                        self.screen.blit(newGameButtRed,(newGameLocLeft,newGameLocTop))
-                    elif not ngRect.collidepoint(mousex,mousey):
-                        hoveringNG = False
-                    if hsRect.collidepoint(mousex,mousey):
-                        hoveringHS = True
-                        print('test')
-                        self.screen.blit(highScoreButtRed,(highScoreLocLeft,highScoreLocTop))
-                    elif not hsRect.collidepoint(mousex,mousey):
-                        hoveringHS = False
-                
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    mousex,mousey = event.pos
-                    print(mousex,mousey)
-                    if ngRect.collidepoint(mousex,mousey):
-                        #TODO
-                        #change game state and start the 1st level
-                        self.gameState = const.GAME_STATE_RUNNING
-                    elif hsRect.collidepoint(mousex,mousey):
-                        #TODO
-                        #show the high score screen
-                        pass
-                        
-                    
-                    
-            pygame.display.update()
-        
+        updateGameState = self.theMainMenu.showMenu()
+        if updateGameState == const.GAME_STATE_RUNNING:
+            self.levelNum = 1
+            self.resetLevel()
+            self.gameState = const.GAME_STATE_RUNNING
 
 
     def updateScore(self):
