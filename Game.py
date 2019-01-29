@@ -129,11 +129,40 @@ class Game(object):
                 self.updateScore()
                 if self.soundOn:
                     self.player.deathSound.play()
-
+        
         for bomb in self.spriteBombs:
-            if bomb.exploded:
+            if bomb.exploded and not isinstance(bomb, Bomb.Blast):
                 self.level, self.player = bomb.explode(self.level, self.player)
+                tX = bomb.x
+                tY = bomb.y
+                center = Bomb.Blast(tX,tY,1,str(Path.cwd() / "graphics" / "center-flame.png"),const.CENTER_FLAME)
+                self.spriteBombs.add(center)
+
+                if( tX > 0 and (not isinstance(self.level.layout[tY][tX-1], Wall.Wall) or(isinstance(self.level.layout[tY][tX-1], Wall.Wall) and self.level.layout[tY][tX-1].breakable))):
+                    left = Bomb.Blast(tX-1,tY,1,str(Path.cwd() / "graphics" / "left-point.png"),const.LEFT_FLAME)
+                    self.spriteBombs.add(left)
+
+                if( tX < (const.MAP_WIDTH - 1) and (not isinstance(self.level.layout[tY][tX+1], Wall.Wall) or (isinstance(self.level.layout[tY][tX+1], Wall.Wall) and self.level.layout[tY][tX+1].breakable))):
+                    right = Bomb.Blast(tX+1,tY,1,str(Path.cwd() / "graphics" / "right-point-flame.png"),const.LEFT_FLAME)
+                    self.spriteBombs.add(right)
+                
+                if( tY < (const.MAP_HEIGHT - 1) and (not isinstance(self.level.layout[tY+1][tX], Wall.Wall) or(isinstance(self.level.layout[tY+1][tX], Wall.Wall) and self.level.layout[tY+1][tX].breakable))):
+                    up = Bomb.Blast(tX,tY+1,1,str(Path.cwd() / "graphics" / "up-point.png"),const.UP_FLAME)
+                    self.spriteBombs.add(up)
+
+                if( tY > 0 and (not isinstance(self.level.layout[tY-1][tX], Wall.Wall) or (isinstance(self.level.layout[tY-1][tX], Wall.Wall) and self.level.layout[tY-1][tX].breakable))):
+                    down = Bomb.Blast(tX,tY-1,1,str(Path.cwd() / "graphics" / "down-point.png"),const.DOWN_FLAME)
+                    self.spriteBombs.add(down)
+
+
                 bomb.kill()
+                
+
+
+            if bomb.exploded and isinstance(bomb, Bomb.Blast):
+                bomb.kill()
+
+        
                 #TODO place blast here to destroy walls and kill enemies/player
 
         text1 = str(int(self.clock.get_fps()))
