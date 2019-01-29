@@ -55,12 +55,12 @@ class Bomb(pygame.sprite.Sprite):
         #change either xpos or ypos based on direction, stop when hit another object
         pass
     
-    class Blast (Bomb):
+class Blast (Bomb):
 
-        def __init__(self, x, y, range, imageFile,direction):
-            super().__init__(x,y,range)
-            self.image = pygame.image.load(imageFile).convert_alpha()
-            self.direction = direction
+    def __init__(self, x, y, range, imageFile,direction):
+        super().__init__(x,y,range)
+        self.image = pygame.image.load(imageFile).convert_alpha()
+        self.direction = direction
 
         
 
