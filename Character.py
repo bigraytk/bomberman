@@ -224,7 +224,6 @@ class PlayerCharacter(Character):
         if xDiff < 10 and yDiff < 10 and self.activeBombs < self.bombCount and level.layout[self.y][self.x] == None:
             newBomb = Bomb.Bomb(self.x, self.y, self.bombRange)
             self.changeActiveBombCount(1)
-            print(self.activeBombs)
             return newBomb
         else:
             return None
