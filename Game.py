@@ -9,6 +9,7 @@ import colors
 import Level
 import Wall
 import Character
+import Bomb
 import MainMenu
 import random
 from pathlib import Path
@@ -104,6 +105,8 @@ class Game(object):
         #Update and render enemies
         self.spriteEnemies.update(self.level, self.player)
         self.spriteEnemies.draw(self.screen)
+
+        self.spriteBombs.update()
         self.spriteBombs.draw(self.screen)
 
         #for enemy in self.spriteEnemies:
@@ -126,6 +129,12 @@ class Game(object):
                 self.updateScore()
                 if self.soundOn:
                     self.player.deathSound.play()
+
+        for bomb in self.spriteBombs:
+            if bomb.exploded:
+                self.level, self.player = bomb.explode(self.level, self.player)
+                bomb.kill()
+                #TODO place blast here to destroy walls and kill enemies/player
 
         text1 = str(int(self.clock.get_fps()))
         fps = self.font.render(text1, True, pygame.Color('white'))
@@ -242,9 +251,9 @@ class Game(object):
             if key[pygame.K_RIGHT]:
                 self.player.move(const.RIGHT, self.level)
             if key[pygame.K_SPACE]:
-                newBomb = self.player.dropBomb()
+                newBomb = self.player.dropBomb(self.level)
                 if newBomb:
-                    newBomb.timer = pygame.time.get_ticks()
+                    #newBomb.timer = pygame.time.get_ticks()
                     self.level.layout[newBomb.y][newBomb.x] = newBomb
                     self.spriteBombs.add(newBomb)
 
@@ -253,10 +262,11 @@ class Game(object):
     def getEvents(self):
         for event in pygame.event.get():
 
-            for bomb in self.spriteBombs:
-                if (pygame.time.get_ticks() - bomb.timer) > 4000:
-                    self.level.layout[bomb.y][bomb.x] = None
-                    bomb.kill()
+            #for bomb in self.spriteBombs:
+            #    if (pygame.time.get_ticks() - bomb.timer) > 4000:
+            #        self.level.layout[bomb.y][bomb.x] = None
+            #        bomb.kill()
+            #        self.player.changeActiveBombCount(-1)
 
             if event.type == pygame.QUIT:
                 self.gameState = const.GAME_STATE_QUITTING

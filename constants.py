@@ -62,6 +62,7 @@ ENEMY = 1
 GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
 PLAYER_SPEED = 3
+PLAYER_NUM_BOMBS = 3  #number of starting bombs
 
 
 #character states

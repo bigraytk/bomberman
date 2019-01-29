@@ -188,7 +188,7 @@ class PlayerCharacter(Character):
         '''Constructor'''
         facing = const.DOWN
         super().__init__(x, y, facing, const.PLAYER_SPEED, const.PC)
-        self.bombCount = 1
+        self.bombCount = const.PLAYER_NUM_BOMBS
         self.bombRange = 1
         #self.speed = 40 #placeholder
         self.activeBombs = 0
@@ -217,23 +217,28 @@ class PlayerCharacter(Character):
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
 
-    def dropBomb(self):
+    def dropBomb(self, level):
         '''Creates an instance of the bomb class at the PC's position'''
         xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
         yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
-        if xDiff < 10 and yDiff < 10:# and self.activeBombs < self.bombCount:
+        if xDiff < 10 and yDiff < 10 and self.activeBombs < self.bombCount and level.layout[self.y][self.x] == None:
             newBomb = Bomb.Bomb(self.x, self.y, self.bombRange)
-            self.changeBombCount(1)
+            self.changeActiveBombCount(1)
+            print(self.activeBombs)
             return newBomb
         else:
             return None
 
-    def changeBombCount(self,change):
+    def changeActiveBombCount(self,change):
         '''This method is how to change the value of self.activeBombs
         will be called by dropBomb method of the PlayerCharacter, and
         the explode method of the Bomb
         '''
         self.activeBombs = self.activeBombs + change
+        if self.activeBombs < 0:
+            self.activeBombs = 0
+        if self.activeBombs > self.bombCount:
+            self.activeBombs = self.bombCount
 
     def getPowerup(self,powerup):
         '''This method is called when the PC occupies the same space as a 
