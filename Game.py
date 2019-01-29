@@ -237,12 +237,20 @@ class Game(object):
             if key[pygame.K_SPACE]:
                 newBomb = self.player.dropBomb()
                 if newBomb:
+                    newBomb.timer = pygame.time.get_ticks()
+                    self.level.layout[newBomb.y][newBomb.x] = newBomb
                     self.spriteBombs.add(newBomb)
 
 
     #Event-driven input
     def getEvents(self):
         for event in pygame.event.get():
+
+            for bomb in self.spriteBombs:
+                if (pygame.time.get_ticks() - bomb.timer) > 4000:
+                    self.level.layout[bomb.y][bomb.x] = None
+                    bomb.kill()
+
             if event.type == pygame.QUIT:
                 self.gameState = const.GAME_STATE_QUITTING
             elif event.type == pygame.KEYDOWN:
@@ -282,11 +290,8 @@ class Game(object):
         print(graphicsDir)
         NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
         newGameButt = pygame.image.load(NewGameGraph)
-<<<<<<< HEAD
         NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_Red.png"))
         newGameButtRed = pygame.image.load(NewGameGraphRed)
-=======
->>>>>>> 8f8a43c77fefe308f0d3e4efdb651348c46b69f7
         ngRect = pygame.Rect(newGameLocLeft,newGameLocTop,200,50)
         highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
         highScoreButt = pygame.image.load(highScoreGraph)
@@ -323,14 +328,14 @@ class Game(object):
                         hoveringNG = False
                     if hsRect.collidepoint(mousex,mousey):
                         hoveringHS = True
-                        print('test')
+                        #print('test')
                         self.screen.blit(highScoreButtRed,(highScoreLocLeft,highScoreLocTop))
                     elif not hsRect.collidepoint(mousex,mousey):
                         hoveringHS = False
                 
                 elif event.type == pygame.MOUSEBUTTONUP:
                     mousex,mousey = event.pos
-                    print(mousex,mousey)
+                    #print(mousex,mousey)
                     if ngRect.collidepoint(mousex,mousey):
                         #TODO
                         #change game state and start the 1st level

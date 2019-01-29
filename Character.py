@@ -46,25 +46,25 @@ class Character(pygame.sprite.Sprite):
 
         
         if direction == const.UP:
-            if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
+            if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and not isinstance(layout[self.y - 1][self.x], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
                 self.y -= 1
                 self.state = const.STATE_MOVING_UP
             else:
                 pathBlocked = True
         elif direction == const.DOWN:
-            if self.y < const.MAP_HEIGHT - 1 and not isinstance(layout[self.y + 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_UP):
+            if self.y < const.MAP_HEIGHT - 1 and not isinstance(layout[self.y + 1][self.x], Wall.Wall) and not isinstance(layout[self.y + 1][self.x], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_UP):
                 self.y += 1
                 self.state = const.STATE_MOVING_DOWN
             else:
                 pathBlocked = True
         elif direction == const.LEFT:
-            if self.x > 0 and not isinstance(layout[self.y][self.x - 1], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_RIGHT):
+            if self.x > 0 and not isinstance(layout[self.y][self.x - 1], Wall.Wall) and not isinstance(layout[self.y][self.x - 1], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_RIGHT):
                 self.x -= 1
                 self.state = const.STATE_MOVING_LEFT
             else:
                 pathBlocked = True
         elif direction == const.RIGHT:
-            if self.x < const.MAP_WIDTH - 1 and not isinstance(layout[self.y][self.x + 1], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_LEFT):
+            if self.x < const.MAP_WIDTH - 1 and not isinstance(layout[self.y][self.x + 1], Wall.Wall) and not isinstance(layout[self.y][self.x + 1], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_LEFT):
                 self.x += 1
                 self.state = const.STATE_MOVING_RIGHT
             else:
