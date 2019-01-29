@@ -244,12 +244,20 @@ class Game(object):
             if key[pygame.K_SPACE]:
                 newBomb = self.player.dropBomb()
                 if newBomb:
+                    newBomb.timer = pygame.time.get_ticks()
+                    self.level.layout[newBomb.y][newBomb.x] = newBomb
                     self.spriteBombs.add(newBomb)
 
 
     #Event-driven input
     def getEvents(self):
         for event in pygame.event.get():
+
+            for bomb in self.spriteBombs:
+                if (pygame.time.get_ticks() - bomb.timer) > 4000:
+                    self.level.layout[bomb.y][bomb.x] = None
+                    bomb.kill()
+
             if event.type == pygame.QUIT:
                 self.gameState = const.GAME_STATE_QUITTING
             elif event.type == pygame.KEYDOWN:
@@ -274,14 +282,6 @@ class Game(object):
                     else:
                         self.soundOn = True
                 self.debug_mode(event)          #Testing purposeses  #TODO  remove
-
-
-    def mainMenu(self):
-        updateGameState = self.theMainMenu.showMenu()
-        if updateGameState == const.GAME_STATE_RUNNING:
-            self.levelNum = 1
-            self.resetLevel()
-            self.gameState = const.GAME_STATE_RUNNING
 
 
     def updateScore(self):
