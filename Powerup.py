@@ -13,8 +13,6 @@ class Powerup(pygame.sprite.Sprite):
 
     def __init__(self, powerupType, x, y):
         super().__init__()
-        if powerupType != const.POWERUP_RANGE and powerupType != const.POWERUP_COUNT and powerupType != const.POWERUP_BOOT:
-            raise RuntimeError(str(powerupType) + ' is not a valid kind of powerup')
 
         self.powerupType = powerupType
         self.x = x
@@ -22,7 +20,15 @@ class Powerup(pygame.sprite.Sprite):
         self.resx = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
         self.resy = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
 
-        imageFile = str(Path.cwd() / "graphics" / "powerup_range.png")
+        if self.powerupType == const.POWERUP_RANGE:
+            imageFile = str(Path.cwd() / "graphics" / "powerup_range.png")
+        elif self.powerupType == const.POWERUP_COUNT:
+            imageFile = str(Path.cwd() / "graphics" / "powerup_count.png")
+        elif self.powerupType == const.POWERUP_BOOT:
+            imageFile = str(Path.cwd() / "graphics" / "powerup_boot.png")
+        else:
+            raise RuntimeError(str(powerupType) + ' is not a valid kind of powerup')
+
         self.image = pygame.image.load(imageFile).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = self.resx
@@ -32,7 +38,7 @@ class Powerup(pygame.sprite.Sprite):
     def update(self):
         pass
 
-    def pickUp(self):
+    def pickUp(self, player):
         '''This method is called when a PC occupies the same space as a powerup.
         This returns the value of the powerup'''
         return self.powerupType

@@ -170,8 +170,8 @@ class Game(object):
 
         for powerup in self.spritePowerups:
             if powerup.rect.colliderect(self.player.hitbox):
+                self.player.getPowerup(powerup)
                 powerup.kill()
-                #TODO add picking up powerup
 
         text1 = str(int(self.clock.get_fps()))
         fps = self.font.render(text1, True, pygame.Color('white'))
@@ -364,6 +364,6 @@ class Game(object):
                 self.resetLevel()
         elif event.key == pygame.K_LSHIFT:
             if self.player.state == const.STATE_IDLE:
-                powerups = self.level.destroyWalls(self.player.x, self.player.y, self.level, 5)     #TODO powerups sprite group, add to
+                powerups = self.level.destroyWalls(self.player.x, self.player.y, self.level, self.player.bombRange)     #TODO powerups sprite group, add to
                 self.spritePowerups.add(powerups)
         

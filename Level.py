@@ -114,7 +114,7 @@ class Level(object):
         hitWallDown = False
         hitWallLeft = False
         hitWallRight = False
-        for i in range(blastRange):
+        for i in range(blastRange + 1):
             if y - i > 0 and not hitWallUp:
                 if isinstance(level.layout[y - i][x], Wall.Wall):
                     walls.append(level.layout[y - i][x])

@@ -188,7 +188,7 @@ class PlayerCharacter(Character):
         '''Constructor'''
         facing = const.DOWN
         super().__init__(x, y, facing, const.PLAYER_SPEED, const.PC)
-        self.bombCount = const.PLAYER_NUM_BOMBS
+        self.bombCount = const.PLAYER_DEFAULT_NUM_BOMBS
         self.bombRange = 1
         #self.speed = 40 #placeholder
         self.activeBombs = 0
@@ -217,6 +217,7 @@ class PlayerCharacter(Character):
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
 
+
     def dropBomb(self, level):
         '''Creates an instance of the bomb class at the PC's position'''
         xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
@@ -227,6 +228,7 @@ class PlayerCharacter(Character):
             return newBomb
         else:
             return None
+
 
     def changeActiveBombCount(self,change):
         '''This method is how to change the value of self.activeBombs
@@ -239,16 +241,20 @@ class PlayerCharacter(Character):
         if self.activeBombs > self.bombCount:
             self.activeBombs = self.bombCount
 
-    def getPowerup(self,powerup):
+
+    def getPowerup(self, powerup):
         '''This method is called when the PC occupies the same space as a 
         powerup. 
         '''
-        if powerup == const.RANGE and self.bombRange < 5:
+        if powerup.powerupType == const.POWERUP_RANGE and self.bombRange < 5:
             self.bombRange += 1
-        elif powerup == const.COUNT and self.bombCount < 5:
+        elif powerup.powerupType == const.POWERUP_COUNT and self.bombCount < 5:
             self.bombCount += 1
-        elif powerup == const.BOOT:
+        elif powerup.powerupType == const.POWERUP_BOOT:
             self.boot = True
+
+        print(self.bombCount, ':', self.bombRange)
+
     
     def changeDirection(self,direction):
         if direction == const.RIGHT and self.image != self.right: #and self.state == const.STATE_IDLE:

@@ -46,8 +46,8 @@ class Wall(object):
             else:
                 level.layout[self.y][self.x] = const.TILE_BACKGROUND
                 if random.randint(0, 10) > 5:
-                    #powerupType = random.choice(const.POWERUP_RANGE, const.POWERUP_COUNT, const.POWERUP_BOOT)  #TODO uncomment
-                    newPowerup = Powerup.Powerup(const.POWERUP_RANGE, self.x, self.y)     #TODO change parameter to random powerup
+                    powerupType = random.choice([const.POWERUP_RANGE, const.POWERUP_COUNT, const.POWERUP_BOOT])  #TODO uncomment
+                    newPowerup = Powerup.Powerup(powerupType, self.x, self.y)     #TODO change parameter to random powerup
                     return newPowerup
         return None
 
