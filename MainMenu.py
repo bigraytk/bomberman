@@ -15,10 +15,6 @@ class MainMenu(object):
         highScoreButtonX = screenWidth / 2
         highScoreButtonY = screenHeight / 3
 
-        newGameLocLeft = 500
-        newGameLocTop = 200
-        highScoreLocLeft = 500
-        highScoreLocTop = 300
         '''Will display the main menu.'''
         self.screen.fill(const.GREY)
 
@@ -37,9 +33,7 @@ class MainMenu(object):
         
         highScoreGraphRed = str(graphicsDir.joinpath("HighScores_Red.png"))
         self.btnHighScoreRed = pygame.image.load(highScoreGraphRed)
-        
-        mousex = 0
-        mousey = 0
+
         self.hoveringNG = False
         self.hoveringHS = False
 
@@ -48,7 +42,6 @@ class MainMenu(object):
         
         gameState = const.GAME_STATE_MENU
         while gameState == const.GAME_STATE_MENU:
-            mouseClicked = False
             
             self.screen.fill(const.GREY)
             if self.hoveringNG == False:
