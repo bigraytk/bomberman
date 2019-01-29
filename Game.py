@@ -10,6 +10,7 @@ import Level
 import Wall
 import Character
 import Bomb
+import Powerup
 import MainMenu
 import random
 from pathlib import Path
@@ -69,6 +70,7 @@ class Game(object):
         self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
         self.spriteBombs = pygame.sprite.Group()
+        self.spritePowerups = pygame.sprite.Group()
 
         #self.testsprite  = Level.tileSprite(self.level.backgroundImage, 1, 1)
 
@@ -109,6 +111,9 @@ class Game(object):
         self.spriteBombs.update()
         self.spriteBombs.draw(self.screen)
 
+        #self.spritePowerups.update()   #TODO uncomment when finished
+        self.spritePowerups.draw(self.screen)
+
         #for enemy in self.spriteEnemies:
         #    if enemy.logic == const.ADVANCED:
         #        if enemy.pursuePlayer:
@@ -122,8 +127,6 @@ class Game(object):
         #pygame.draw.rect(self.screen, (255, 255, 0), self.player.hitbox, 2)  #Draws player's collision box, for testing purposes
 
         for enemy in self.spriteEnemies:
-            if enemy.logic == const.ADVANCED:
-                pass
             if enemy.rect.colliderect(self.player.hitbox):
                 self.player.state = const.STATE_DEAD
                 self.updateScore()
@@ -164,6 +167,11 @@ class Game(object):
 
         
                 #TODO place blast here to destroy walls and kill enemies/player
+
+        for powerup in self.spritePowerups:
+            if powerup.rect.colliderect(self.player.hitbox):
+                powerup.kill()
+                #TODO add picking up powerup
 
         text1 = str(int(self.clock.get_fps()))
         fps = self.font.render(text1, True, pygame.Color('white'))
@@ -247,6 +255,8 @@ class Game(object):
             enemy.kill()
         for bomb in self.spriteBombs:
             bomb.kill()
+        for powerup in self.spritePowerups:
+            powerup.kill()
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
@@ -352,4 +362,8 @@ class Game(object):
             if self.levelNum < self.numLevels:
                 self.levelNum += 1
                 self.resetLevel()
+        elif event.key == pygame.K_LSHIFT:
+            if self.player.state == const.STATE_IDLE:
+                powerups = self.level.destroyWalls(self.player.x, self.player.y, self.level, 5)     #TODO powerups sprite group, add to
+                self.spritePowerups.add(powerups)
         

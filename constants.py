@@ -52,9 +52,9 @@ SPEED_LOW = 1
 ADVANCED_ENEMY_RANGE = 3    #how close an advanced enemy needs to be to player to persue
 
 # Power Up Constants
-RANGE = 0
-COUNT = 1
-BOOT = 2
+POWERUP_RANGE = 0
+POWERUP_COUNT = 1
+POWERUP_BOOT = 2
 
 #character constants
 PC = 0

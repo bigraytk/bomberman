@@ -143,8 +143,8 @@ class Character(pygame.sprite.Sprite):
             #self.changeDirection(self.facing)
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X - 2
             self.hitbox.y = self.rect.y + 4
-            self.rect.x += 0#8
-            self.rect.y -= 16
+            #self.rect.x += 0#8
+            self.rect.y -= 8
         else:
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X / 2
             self.hitbox.y = self.rect.y + const.HIT_BOX_OFFSET_Y / 2

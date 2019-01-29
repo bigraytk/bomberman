@@ -12,27 +12,30 @@ import pygame
 
 
 class Level(object):
-    backgroundImage = None
-    wallImage = None
-    breakableImage = None
-    doorOpenedImage = None
-    doorClosedImage = None
-    levelFile = None
-    layout = []
-    levelWidth = None
-    levelHeight = None
-    door = const.TILE_DOOR_HIDDEN
-    playerStartPosit = None
-    numEnemies = 0
-    enemyStartPosit = []
     
-    #@property
-    #def backgroundFile(self):
-    #    return self.__backgroundFile
+    def __init__(self, levelNum):
+        #set class variable
+        self.backgroundImage = None
+        self.wallImage = None
+        self.breakableImage = None
+        self.doorOpenedImage = None
+        self.doorClosedImage = None
+        self.levelFile = None
+        self.layout = []
+        self.levelWidth = None
+        self.levelHeight = None
+        self.door = const.TILE_DOOR_HIDDEN
+        self.playerStartPosit = None
+        self.numEnemies = 0
+        self.enemyStartPosit = []
 
-    #@backgroundFile.setter
-    #def backgroundFile(self, backgroundFile):
-    #    self.__backgroundFile = backgroundFile
+        # Set the current working directory, read and write:
+        dataDir = Path.cwd() / "data"
+
+        #Open csv level file to create level layout      
+        levelFile = dataDir.joinpath("level" + str(levelNum) + ".csv")
+        self.layout = self.levelParser(levelFile)
+    
     def levelParser(self, levelFile):
         layout = []
         graphicsDir = Path.cwd() / "graphics"
@@ -54,11 +57,11 @@ class Level(object):
                     if layout[y][x] == '':
                         layout[y][x] = None
                     elif layout[y][x] == const.TILE_WALL:
-                        layout[y][x] = Wall.Wall(False, 0)
+                        layout[y][x] = Wall.Wall(False, 0, x, y)
                     elif layout[y][x] == const.TILE_BREAKABLE:
-                        layout[y][x] = Wall.Wall(True, 0)
+                        layout[y][x] = Wall.Wall(True, 0, x, y)
                     elif layout[y][x] == const.TILE_DOOR_HIDDEN:
-                        layout[y][x] = Wall.Wall(True, 0, True)
+                        layout[y][x] = Wall.Wall(True, 0, x, y, True)
                     elif layout[y][x] == const.TILE_PLAYER_START:
                         layout[y][x] = None
                         self.playerStartPosit = (x, y)
@@ -104,28 +107,35 @@ class Level(object):
         door = const.TILE_DOOR_CLOSED
         
         
-    def __init__(self, levelNum):
-        #set class variable
-        self.backgroundImage = None
-        self.wallImage = None
-        self.breakableImage = None
-        self.doorOpenedImage = None
-        self.doorClosedImage = None
-        self.levelFile = None
-        self.layout = []
-        self.levelWidth = None
-        self.levelHeight = None
-        self.door = const.TILE_DOOR_HIDDEN
-        self.playerStartPosit = None
-        self.numEnemies = 0
-        self.enemyStartPosit = []
-
-        # Set the current working directory, read and write:
-        dataDir = Path.cwd() / "data"
-
-        #Open csv level file to create level layout      
-        levelFile = dataDir.joinpath("level" + str(levelNum) + ".csv")
-        self.layout = self.levelParser(levelFile)
+    def destroyWalls(self, x, y, level, blastRange):     #TODO make it so that "range" is utilized so walls in all four directions at that range are destroyed
+        walls = []
+        powerups = []
+        hitWallUp = False
+        hitWallDown = False
+        hitWallLeft = False
+        hitWallRight = False
+        for i in range(blastRange):
+            if y - i > 0 and not hitWallUp:
+                if isinstance(level.layout[y - i][x], Wall.Wall):
+                    walls.append(level.layout[y - i][x])
+                    hitWallUp = True
+            if y + i < level.levelHeight and not hitWallDown:
+                if isinstance(level.layout[y + i][x], Wall.Wall):
+                    walls.append(level.layout[y + i][x])
+                    hitWallDown = True
+            if x - i > 0 and not hitWallLeft:
+                if isinstance(level.layout[y][x - i], Wall.Wall):
+                    walls.append(level.layout[y][x - i])
+                    hitWallLeft = True
+            if x + i < level.levelWidth and not hitWallRight:
+                if isinstance(level.layout[y][x + i], Wall.Wall):
+                    walls.append(level.layout[y][x + i])
+                    hitWallRight = True
+        for theWall in walls:
+            result = theWall.destroy(level)
+            if result:
+                powerups.append(result)
+        return powerups
 
 
 #class tileSprite(pygame.sprite.DirtySprite):
