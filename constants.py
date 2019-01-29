@@ -99,3 +99,11 @@ YELLOW   = (255, 255,   0)
 ORANGE   = (255, 128,   0)
 PURPLE   = (255,   0, 255)
 CYAN     = (  0, 255, 255)
+
+#Blast Constants
+CENTER = 0
+RIGHT = 1
+LEFT = 2
+UP = 3
+VERT_EXTENDER = 4
+HOR_EXTENDER = 5
