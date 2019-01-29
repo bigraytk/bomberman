@@ -44,7 +44,7 @@ class Wall(object):
                 #create a door object
                 level.layout[self.y][self.x] = const.TILE_DOOR_CLOSED
             else:
-                level.layout[self.y][self.x] = const.TILE_BACKGROUND
+                level.layout[self.y][self.x] = None
                 if random.randint(0, 10) > 5:
                     powerupType = random.choice([const.POWERUP_RANGE, const.POWERUP_COUNT, const.POWERUP_BOOT])  #TODO uncomment
                     newPowerup = Powerup.Powerup(powerupType, self.x, self.y)     #TODO change parameter to random powerup

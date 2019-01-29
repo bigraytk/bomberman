@@ -253,8 +253,6 @@ class PlayerCharacter(Character):
         elif powerup.powerupType == const.POWERUP_BOOT:
             self.boot = True
 
-        print(self.bombCount, ':', self.bombRange)
-
     
     def changeDirection(self,direction):
         if direction == const.RIGHT and self.image != self.right: #and self.state == const.STATE_IDLE:

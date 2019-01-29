@@ -128,13 +128,16 @@ class Game(object):
 
         for enemy in self.spriteEnemies:
             if enemy.rect.colliderect(self.player.hitbox):
-                self.player.state = const.STATE_DEAD
-                self.updateScore()
-                if self.soundOn:
-                    self.player.deathSound.play()
+                self.killPlayer()
+            enemyBlastCollision = pygame.sprite.spritecollideany(enemy, self.spriteBombs, collided = None)
+            if enemyBlastCollision and isinstance(enemyBlastCollision, Bomb.Blast):
+                enemy.kill()
         
         for bomb in self.spriteBombs:
             if bomb.exploded and not isinstance(bomb, Bomb.Blast):
+                powerups = self.level.destroyWalls(bomb.x, bomb.y, self.level, self.player.bombRange)
+                self.spritePowerups.add(powerups)
+
                 self.level, self.player = bomb.explode(self.level, self.player)
                 tX = bomb.x
                 tY = bomb.y
@@ -157,13 +160,15 @@ class Game(object):
                     down = Bomb.Blast(tX,tY-1,1,str(Path.cwd() / "graphics" / "down-point-2.png"),const.DOWN_FLAME)
                     self.spriteBombs.add(down)
 
-
                 bomb.kill()
-                
+            elif isinstance(bomb, Bomb.Blast):
+                if bomb.rect.colliderect(self.player.hitbox):
+                    self.killPlayer()
 
 
             if bomb.exploded and isinstance(bomb, Bomb.Blast):
                 bomb.kill()
+                
 
         
                 #TODO place blast here to destroy walls and kill enemies/player
@@ -265,6 +270,13 @@ class Game(object):
         self.gameState = const.GAME_STATE_RUNNING
 
 
+    def killPlayer(self):
+        self.player.state = const.STATE_DEAD
+        self.updateScore()
+        if self.soundOn:
+            self.player.deathSound.play()
+
+    
     def checkPlayerProgress(self):
         if self.level.layout[self.player.y][self.player.x] == const.TILE_DOOR_OPENED and self.player.state == const.STATE_IDLE:
             if self.levelNum < self.numLevels:
