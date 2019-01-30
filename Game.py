@@ -137,12 +137,10 @@ class Game(object):
                 enemy.kill()
         if not self.spriteEnemies:  #check if no more enemies left
             self.level.openDoor()
-        
 
         for blast in self.spriteBombBlasts:
             if blast.rect.colliderect(self.player.hitbox):
                 self.killPlayer()
-
 
         for bomb in self.spriteBombs:
             if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None):
@@ -153,21 +151,6 @@ class Game(object):
                 self.spriteBombBlasts.add(blasts)
                 self.level, self.player = bomb.explode(self.level, self.player)
                 bomb.kill()
-
-        
-            
-#######TEST
- #           else:
- #               bombBlastCollision = pygame.sprite.spritecollideany(bomb, self.spriteBombs, collided = None)
- #               if bombBlastCollision and isinstance(bombBlastCollision, Bomb.Blast):
- #               bomb.exploded = True ##doesnt work, obviouosly
-###########
-            #if bomb.exploded and isinstance(bomb, Bomb.Blast):
-            #    bomb.kill()
-                
-
-        
-                #TODO place blast here to destroy walls and kill enemies/player
 
         for powerup in self.spritePowerups:
             if powerup.rect.colliderect(self.player.hitbox):

@@ -56,6 +56,8 @@ class Bomb(pygame.sprite.Sprite):
     
     def expiditeExplosion(self):            #make bomb explode sooner, for chain reactions
         self.timer = self.countdown() + const.BOMB_EXPIDITE
+
+        
     def kicked(self,direction):
         #change either xpos or ypos based on direction, stop when hit another object
         pass
