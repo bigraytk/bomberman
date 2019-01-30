@@ -172,6 +172,45 @@ class Game(object):
         fps = self.font.render(text1, True, pygame.Color('white'))
         self.screen.blit(fps, (25, 25))
 
+        #Active bomb status code
+        picture = pygame.image.load(str(Path.cwd() / "graphics" / "bomb.png")   )
+        picture = pygame.transform.scale(picture, (25, 25))
+        self.screen.blit(picture, (125, 25))
+
+        text1 = 'x'+ str(self.player.activeBombs)
+        fps = self.font.render(text1, True, pygame.Color('Yellow'))
+        self.screen.blit(fps, (155, 30))
+
+
+        #Active Boot Status
+        picture = pygame.image.load(str(Path.cwd() / "graphics" / "powerup_boot.png")   )
+        picture = pygame.transform.scale(picture, (30, 30))
+        self.screen.blit(picture, (175, 25))
+
+        if(self.player.boot):
+            text1 = 'x' +str(1)
+        else:
+            text1 = 'x' +str(0)
+        fps = self.font.render(text1, True, pygame.Color('yellow'))
+        self.screen.blit(fps, (205, 30))
+
+        #Active Range
+        picture = pygame.image.load(str(Path.cwd() / "graphics" / "powerup_range.png")   )
+        picture = pygame.transform.scale(picture, (25, 25))
+        self.screen.blit(picture, (225, 25))
+
+        text1 = 'x'+str(self.player.bombRange)
+        fps = self.font.render(text1, True, pygame.Color('yellow'))
+        self.screen.blit(fps, (255, 30))
+
+        #Active Bomb Count
+        picture = pygame.image.load(str(Path.cwd() / "graphics" / "powerup_count.png")   )
+        picture = pygame.transform.scale(picture, (25, 25))
+        self.screen.blit(picture, (275, 25))
+
+        text1 = 'x'+str(self.player.bombCount)
+        fps = self.font.render(text1, True, pygame.Color('yellow'))
+        self.screen.blit(fps, (305, 30))
 
     def checkCollision(self, sprite, spriteGroup):
         return pygame.sprite.spritecollide(sprite, spriteGroup, False)
