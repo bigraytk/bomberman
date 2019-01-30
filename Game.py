@@ -135,8 +135,9 @@ class Game(object):
         
         for bomb in self.spriteBombs:
             if bomb.exploded and not isinstance(bomb, Bomb.Blast):
-                powerups = self.level.destroyWalls(bomb.x, bomb.y, self.level, self.player.bombRange)
+                powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, self.player.bombRange)
                 self.spritePowerups.add(powerups)
+                self.spriteBombs.add(blasts)
 
                 self.level, self.player = bomb.explode(self.level, self.player)
                 tX = bomb.x
@@ -376,6 +377,6 @@ class Game(object):
                 self.resetLevel()
         elif event.key == pygame.K_LSHIFT:
             if self.player.state == const.STATE_IDLE:
-                powerups = self.level.destroyWalls(self.player.x, self.player.y, self.level, self.player.bombRange)     #TODO powerups sprite group, add to
+                powerups, blasts = self.level.destroyWalls(self.player.x, self.player.y, self.level, self.player.bombRange)     #TODO powerups sprite group, add to
                 self.spritePowerups.add(powerups)
         

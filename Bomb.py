@@ -57,7 +57,7 @@ class Bomb(pygame.sprite.Sprite):
     
 class Blast (Bomb):
 
-    def __init__(self, x, y, range, imageFile,direction):
+    def __init__(self, x, y, range, imageFile, direction):
         super().__init__(x,y,range)
         self.image = pygame.image.load(imageFile).convert_alpha()
         self.direction = direction

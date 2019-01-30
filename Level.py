@@ -7,6 +7,7 @@ Created on Sun Jan 13 13:17:57 2019
 import constants as const
 import Wall
 import Character
+import Bomb
 from pathlib import Path
 import pygame
 
@@ -114,28 +115,44 @@ class Level(object):
         hitWallDown = False
         hitWallLeft = False
         hitWallRight = False
+
+       
+        upImage = str(Path.cwd() / "graphics" / "up-point-2.png")
+        downImage = str(Path.cwd() / "graphics" / "down-point-2.png")
+        leftImage = str(Path.cwd() / "graphics" / "left-point-2.png")
+        rightImage = str(Path.cwd() / "graphics" / "right-point-2.png")
+        blasts = []
+
         for i in range(blastRange + 1):
             if y - i > 0 and not hitWallUp:
                 if isinstance(level.layout[y - i][x], Wall.Wall):
                     walls.append(level.layout[y - i][x])
                     hitWallUp = True
+                else:
+                    blasts.append(Bomb.Blast(x, y - i, 1, upImage, const.UP_FLAME))
             if y + i < level.levelHeight and not hitWallDown:
                 if isinstance(level.layout[y + i][x], Wall.Wall):
                     walls.append(level.layout[y + i][x])
                     hitWallDown = True
+                else:
+                    blasts.append(Bomb.Blast(x, y + i, 1, downImage, const.DOWN_FLAME))
             if x - i > 0 and not hitWallLeft:
                 if isinstance(level.layout[y][x - i], Wall.Wall):
                     walls.append(level.layout[y][x - i])
                     hitWallLeft = True
+                else:
+                    blasts.append(Bomb.Blast(x - i, y, 1, leftImage, const.LEFT_FLAME))
             if x + i < level.levelWidth and not hitWallRight:
                 if isinstance(level.layout[y][x + i], Wall.Wall):
                     walls.append(level.layout[y][x + i])
                     hitWallRight = True
+                else:
+                    blasts.append(Bomb.Blast(x + i, y, 1, rightImage, const.RIGHT_FLAME))
         for theWall in walls:
             result = theWall.destroy(level)
             if result:
                 powerups.append(result)
-        return powerups
+        return powerups, blasts
 
 
 #class tileSprite(pygame.sprite.DirtySprite):
