@@ -70,6 +70,7 @@ class Game(object):
         self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
         self.spriteBombs = pygame.sprite.Group()
+        self.spriteBombBlasts = pygame.sprite.Group()
         self.spritePowerups = pygame.sprite.Group()
 
         #self.testsprite  = Level.tileSprite(self.level.backgroundImage, 1, 1)
@@ -111,6 +112,9 @@ class Game(object):
         self.spriteBombs.update()
         self.spriteBombs.draw(self.screen)
 
+        self.spriteBombBlasts.update()
+        self.spriteBombBlasts.draw(self.screen)
+
         #self.spritePowerups.update()   #TODO uncomment when finished
         self.spritePowerups.draw(self.screen)
 
@@ -129,48 +133,37 @@ class Game(object):
         for enemy in self.spriteEnemies:
             if enemy.rect.colliderect(self.player.hitbox):
                 self.killPlayer()
-            enemyBlastCollision = pygame.sprite.spritecollideany(enemy, self.spriteBombs, collided = None)
-            if enemyBlastCollision and isinstance(enemyBlastCollision, Bomb.Blast):
+            if pygame.sprite.spritecollideany(enemy, self.spriteBombBlasts, collided = None):
                 enemy.kill()
         if not self.spriteEnemies:  #check if no more enemies left
             self.level.openDoor()
         
+
+        for blast in self.spriteBombBlasts:
+            if blast.rect.colliderect(self.player.hitbox):
+                self.killPlayer()
+
+
         for bomb in self.spriteBombs:
-            if bomb.exploded and not isinstance(bomb, Bomb.Blast):
+            if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None):
+                bomb.expiditeExplosion()
+            if bomb.exploded:
                 powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, self.player.bombRange)
                 self.spritePowerups.add(powerups)
-                self.spriteBombs.add(blasts)
-
+                self.spriteBombBlasts.add(blasts)
                 self.level, self.player = bomb.explode(self.level, self.player)
-                tX = bomb.x
-                tY = bomb.y
-                center = Bomb.Blast(tX,tY,1,str(Path.cwd() / "graphics" / "center-flame.png"),const.CENTER_FLAME)
-                self.spriteBombs.add(center)
-
-                if( tX > 0 and (not isinstance(self.level.layout[tY][tX-1], Wall.Wall) or(isinstance(self.level.layout[tY][tX-1], Wall.Wall) and self.level.layout[tY][tX-1].breakable))):
-                    left = Bomb.Blast(tX-1,tY,1,str(Path.cwd() / "graphics" / "left-point-2.png"),const.LEFT_FLAME)
-                    self.spriteBombs.add(left)
-
-                if( tX < (const.MAP_WIDTH - 1) and (not isinstance(self.level.layout[tY][tX+1], Wall.Wall) or (isinstance(self.level.layout[tY][tX+1], Wall.Wall) and self.level.layout[tY][tX+1].breakable))):
-                    right = Bomb.Blast(tX+1,tY,1,str(Path.cwd() / "graphics" / "right-point-2.png"),const.LEFT_FLAME)
-                    self.spriteBombs.add(right)
-                
-                if( tY < (const.MAP_HEIGHT - 1) and (not isinstance(self.level.layout[tY+1][tX], Wall.Wall) or(isinstance(self.level.layout[tY+1][tX], Wall.Wall) and self.level.layout[tY+1][tX].breakable))):
-                    up = Bomb.Blast(tX,tY+1,1,str(Path.cwd() / "graphics" / "up-point-2.png"),const.UP_FLAME)
-                    self.spriteBombs.add(up)
-
-                if( tY > 0 and (not isinstance(self.level.layout[tY-1][tX], Wall.Wall) or (isinstance(self.level.layout[tY-1][tX], Wall.Wall) and self.level.layout[tY-1][tX].breakable))):
-                    down = Bomb.Blast(tX,tY-1,1,str(Path.cwd() / "graphics" / "down-point-2.png"),const.DOWN_FLAME)
-                    self.spriteBombs.add(down)
-
                 bomb.kill()
-            elif isinstance(bomb, Bomb.Blast):
-                if bomb.rect.colliderect(self.player.hitbox):
-                    self.killPlayer()
 
-
-            if bomb.exploded and isinstance(bomb, Bomb.Blast):
-                bomb.kill()
+        
+            
+#######TEST
+ #           else:
+ #               bombBlastCollision = pygame.sprite.spritecollideany(bomb, self.spriteBombs, collided = None)
+ #               if bombBlastCollision and isinstance(bombBlastCollision, Bomb.Blast):
+ #               bomb.exploded = True ##doesnt work, obviouosly
+###########
+            #if bomb.exploded and isinstance(bomb, Bomb.Blast):
+            #    bomb.kill()
                 
 
         
@@ -259,16 +252,27 @@ class Game(object):
 
 
     def resetLevel(self):
-        for enemy in self.spriteEnemies:
-            enemy.kill()
-        for bomb in self.spriteBombs:
-            bomb.kill()
-        for powerup in self.spritePowerups:
-            powerup.kill()
+        #for enemy in self.spriteEnemies:
+        #    enemy.kill()
+        #for bomb in self.spriteBombs:
+        #    bomb.kill()
+        #for blast in self.spriteBombBlasts:
+        #    blast.kill()
+        #for powerup in self.spritePowerups:
+        #    powerup.kill()
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
+        self.spriteBombs.empty()
+        self.spriteBombBlasts.empty()
+        #oldPlayer = self.player
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+        #if oldPlayer.state != const.STATE_DEAD:         #player keeps powerups when going to next level, but not if player dies
+        #    self.player.bombCount = oldPlayer.bombCount        #TODO do we really want to have powerups persist between levels?
+        #    self.player.bombRange = oldPlayer.bombRange
+        #    self.player.boot = oldPlayer.boot
+        #oldPlayer.kill()
         self.spritePlayer.add(self.player)
+        self.player.state = const.STATE_IDLE
         self.spriteEnemies.add(self.enemies)
         self.gameState = const.GAME_STATE_RUNNING
 
@@ -326,10 +330,7 @@ class Game(object):
                 self.gameState = const.GAME_STATE_QUITTING
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    if self.gameState != const.GAME_STATE_MENU:
-                        self.gameState = const.GAME_STATE_MENU
-                    else:
-                        self.gameState = const.GAME_STATE_QUITTING
+                    self.gameState = const.GAME_STATE_MENU
                 elif event.key == pygame.K_f:
                     if self.screen.get_flags() & pygame.FULLSCREEN:
                         pygame.display.set_mode(self.screenSize)
@@ -381,4 +382,6 @@ class Game(object):
             if self.player.state == const.STATE_IDLE:
                 powerups, blasts = self.level.destroyWalls(self.player.x, self.player.y, self.level, self.player.bombRange)     #TODO powerups sprite group, add to
                 self.spritePowerups.add(powerups)
-        
+        elif event.key == pygame.K_q:
+            self.player.bombCount = 5
+            self.player.bombRange = 3
