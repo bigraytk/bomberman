@@ -92,6 +92,7 @@ LEFT = 3
 
 
 #            R    G    B
+BLACK    = (  0,   0,   0)
 GREY     = (100, 100, 100)
 NAVYBLUE = ( 60,  60, 100)
 WHITE    = (255, 255, 255)

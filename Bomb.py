@@ -38,7 +38,7 @@ class Bomb(pygame.sprite.Sprite):
         seconds = self.countdown()#calculate how many seconds
         if seconds > self.timer:
             self.exploded = True
-
+ 
 
     def countdown(self):
         return (pygame.time.get_ticks() - self.start_ticks) / const.SECOND 
@@ -57,7 +57,7 @@ class Bomb(pygame.sprite.Sprite):
     def expiditeExplosion(self):            #make bomb explode sooner, for chain reactions
         self.timer = self.countdown() + const.BOMB_EXPIDITE
 
-        
+
     def kicked(self,direction):
         #change either xpos or ypos based on direction, stop when hit another object
         pass
@@ -68,6 +68,7 @@ class Blast (Bomb):
 
     def __init__(self, x, y, direction, tail, center = False):
         super().__init__(x,y,range)
+        self.fade_out = 255
         if direction == const.CENTER_FLAME:
             imageFile = str(Path.cwd() / "graphics" / "flame_center.png")
         elif not tail:
@@ -84,7 +85,8 @@ class Blast (Bomb):
                 imageFile = str(Path.cwd() / "graphics" / "flame_left.png")
             elif direction == const.RIGHT_FLAME:
                 imageFile = str(Path.cwd() / "graphics" / "flame_right.png")
-        self.image = pygame.image.load(imageFile).convert_alpha()
+        self.image = pygame.image.load(imageFile).convert()
+        self.image.set_colorkey(const.BLACK)
         self.direction = direction
         self.timer = const.BLAST_TIMER
 
@@ -93,7 +95,8 @@ class Blast (Bomb):
         seconds = self.countdown() #calculate how many seconds
         if seconds > self.timer:
             self.kill()
-        
+        self.image.set_alpha(self.fade_out)
+        self.fade_out -= 4
 
 
         
