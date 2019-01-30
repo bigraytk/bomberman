@@ -132,6 +132,8 @@ class Game(object):
             enemyBlastCollision = pygame.sprite.spritecollideany(enemy, self.spriteBombs, collided = None)
             if enemyBlastCollision and isinstance(enemyBlastCollision, Bomb.Blast):
                 enemy.kill()
+        if not self.spriteEnemies:  #check if no more enemies left
+            self.level.openDoor()
         
         for bomb in self.spriteBombs:
             if bomb.exploded and not isinstance(bomb, Bomb.Blast):
