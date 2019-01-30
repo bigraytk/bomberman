@@ -1,5 +1,8 @@
 
-
+import Level
+import Powerup
+import constants as const
+import random
 
 class Wall(object):
 
@@ -9,7 +12,7 @@ class Wall(object):
     breakable and door are type bool, power is int in range 0-3. 
     '''
 
-    def __init__(self,breakable,power,door=False):
+    def __init__(self, breakable, power, x, y, door = False):
         '''Constructor
         breakable must be bool.
         power must be 0,1,2,3.
@@ -26,26 +29,26 @@ class Wall(object):
         self.breakable = breakable
         self.powerup = power
         self.door = door
+        self.x = x
+        self.y = y
 
-    def destroy(self):
-        '''This method is called to check if a wall would be destryoed by an explosion.
-        will return False if no, True if yes. 
+
+    def destroy(self, level):
+        '''This method is called to check if a wall would be destryoed by an explosion,
+        and destroy it if so.  Will return None for no powerup, otherwise return powerup.
         If the wall contained a powerup or door this method will instantiate an object 
         of that class
         '''
-        if self.breakable == False:
-            return False
-        if self.powerup != 0:
-            #create powerup object, pass number contained in self.power
-            pass
-        elif self.door == True:
-            #create a door object
-            pass
-        return True
+        if self.breakable:
+            if self.door == True:
+                #create a door object
+                level.layout[self.y][self.x] = const.TILE_DOOR_CLOSED
+            else:
+                level.layout[self.y][self.x] = None
+                if random.randint(0, 10) > 5:
+                    powerupType = random.choice([const.POWERUP_RANGE, const.POWERUP_COUNT, const.POWERUP_BOOT])  #TODO uncomment
+                    newPowerup = Powerup.Powerup(powerupType, self.x, self.y)     #TODO change parameter to random powerup
+                    return newPowerup
+        return None
 
-if __name__ == '__main__':
-    myWall = Wall(False,0,True)
-    print('breakable: ' ,myWall.breakable)
-    print('power: ' , myWall.powerup)
-    print('door: ' , myWall.door)
         

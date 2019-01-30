@@ -52,9 +52,9 @@ SPEED_LOW = 1
 ADVANCED_ENEMY_RANGE = 3    #how close an advanced enemy needs to be to player to persue
 
 # Power Up Constants
-RANGE = 0
-COUNT = 1
-BOOT = 2
+POWERUP_RANGE = 0
+POWERUP_COUNT = 1
+POWERUP_BOOT = 2
 
 #character constants
 PC = 0
@@ -62,6 +62,7 @@ ENEMY = 1
 GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
 PLAYER_SPEED = 3
+PLAYER_DEFAULT_NUM_BOMBS = 1  #number of starting bombs
 
 
 #character states
@@ -98,3 +99,12 @@ YELLOW   = (255, 255,   0)
 ORANGE   = (255, 128,   0)
 PURPLE   = (255,   0, 255)
 CYAN     = (  0, 255, 255)
+
+#Blast Constants
+CENTER_FLAME = 0
+RIGHT_FLAME = 1
+LEFT_FLAME = 2
+UP_FLAME = 3
+DOWN_FLAME = 6
+VERT_EXTENDER = 4
+HOR_EXTENDER = 5

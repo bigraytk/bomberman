@@ -13,5 +13,3 @@ game = Game.Game()
 
 while game.gameRunning:
     game.update()
-
-#exit()

@@ -9,6 +9,9 @@ import colors
 import Level
 import Wall
 import Character
+import Bomb
+import Powerup
+import MainMenu
 import random
 from pathlib import Path
 import pygame
@@ -48,6 +51,9 @@ class Game(object):
         pygame.display.set_caption("BomberDude")
         self.screenImage = pygame.Surface(self.screenSize)    #used to store the screen to an image, useful for transparent menus
 
+        #
+        self.theMainMenu = MainMenu.MainMenu(self.screen, self.screenWidth, self.screenHeight)
+
         #load starting level
         self.levelNum = 1
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
@@ -64,6 +70,7 @@ class Game(object):
         self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
         self.spriteBombs = pygame.sprite.Group()
+        self.spritePowerups = pygame.sprite.Group()
 
         #self.testsprite  = Level.tileSprite(self.level.backgroundImage, 1, 1)
 
@@ -100,7 +107,12 @@ class Game(object):
         #Update and render enemies
         self.spriteEnemies.update(self.level, self.player)
         self.spriteEnemies.draw(self.screen)
+
+        self.spriteBombs.update()
         self.spriteBombs.draw(self.screen)
+
+        #self.spritePowerups.update()   #TODO uncomment when finished
+        self.spritePowerups.draw(self.screen)
 
         #for enemy in self.spriteEnemies:
         #    if enemy.logic == const.ADVANCED:
@@ -115,13 +127,59 @@ class Game(object):
         #pygame.draw.rect(self.screen, (255, 255, 0), self.player.hitbox, 2)  #Draws player's collision box, for testing purposes
 
         for enemy in self.spriteEnemies:
-            if enemy.logic == const.ADVANCED:
-                pass
             if enemy.rect.colliderect(self.player.hitbox):
-                self.player.state = const.STATE_DEAD
-                self.updateScore()
-                if self.soundOn:
-                    self.player.deathSound.play()
+                self.killPlayer()
+            enemyBlastCollision = pygame.sprite.spritecollideany(enemy, self.spriteBombs, collided = None)
+            if enemyBlastCollision and isinstance(enemyBlastCollision, Bomb.Blast):
+                enemy.kill()
+        if not self.spriteEnemies:  #check if no more enemies left
+            self.level.openDoor()
+        
+        for bomb in self.spriteBombs:
+            if bomb.exploded and not isinstance(bomb, Bomb.Blast):
+                powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, self.player.bombRange)
+                self.spritePowerups.add(powerups)
+                self.spriteBombs.add(blasts)
+
+                self.level, self.player = bomb.explode(self.level, self.player)
+                tX = bomb.x
+                tY = bomb.y
+                center = Bomb.Blast(tX,tY,1,str(Path.cwd() / "graphics" / "center-flame.png"),const.CENTER_FLAME)
+                self.spriteBombs.add(center)
+
+                if( tX > 0 and (not isinstance(self.level.layout[tY][tX-1], Wall.Wall) or(isinstance(self.level.layout[tY][tX-1], Wall.Wall) and self.level.layout[tY][tX-1].breakable))):
+                    left = Bomb.Blast(tX-1,tY,1,str(Path.cwd() / "graphics" / "left-point-2.png"),const.LEFT_FLAME)
+                    self.spriteBombs.add(left)
+
+                if( tX < (const.MAP_WIDTH - 1) and (not isinstance(self.level.layout[tY][tX+1], Wall.Wall) or (isinstance(self.level.layout[tY][tX+1], Wall.Wall) and self.level.layout[tY][tX+1].breakable))):
+                    right = Bomb.Blast(tX+1,tY,1,str(Path.cwd() / "graphics" / "right-point-2.png"),const.LEFT_FLAME)
+                    self.spriteBombs.add(right)
+                
+                if( tY < (const.MAP_HEIGHT - 1) and (not isinstance(self.level.layout[tY+1][tX], Wall.Wall) or(isinstance(self.level.layout[tY+1][tX], Wall.Wall) and self.level.layout[tY+1][tX].breakable))):
+                    up = Bomb.Blast(tX,tY+1,1,str(Path.cwd() / "graphics" / "up-point-2.png"),const.UP_FLAME)
+                    self.spriteBombs.add(up)
+
+                if( tY > 0 and (not isinstance(self.level.layout[tY-1][tX], Wall.Wall) or (isinstance(self.level.layout[tY-1][tX], Wall.Wall) and self.level.layout[tY-1][tX].breakable))):
+                    down = Bomb.Blast(tX,tY-1,1,str(Path.cwd() / "graphics" / "down-point-2.png"),const.DOWN_FLAME)
+                    self.spriteBombs.add(down)
+
+                bomb.kill()
+            elif isinstance(bomb, Bomb.Blast):
+                if bomb.rect.colliderect(self.player.hitbox):
+                    self.killPlayer()
+
+
+            if bomb.exploded and isinstance(bomb, Bomb.Blast):
+                bomb.kill()
+                
+
+        
+                #TODO place blast here to destroy walls and kill enemies/player
+
+        for powerup in self.spritePowerups:
+            if powerup.rect.colliderect(self.player.hitbox):
+                self.player.getPowerup(powerup)
+                powerup.kill()
 
         text1 = str(int(self.clock.get_fps()))
         fps = self.font.render(text1, True, pygame.Color('white'))
@@ -189,8 +247,13 @@ class Game(object):
                 self.resetLevel()
 
         elif self.gameState == const.GAME_STATE_MENU:
-            self.mainMenu()
+            self.gameState = self.theMainMenu.showMenu()
+            if self.gameState == const.GAME_STATE_RUNNING:
+                self.levelNum = 1
+                self.resetLevel()
+        
         self.updateScreen()
+
         if self.gameState == const.GAME_STATE_QUITTING:
             self.quitGame()
 
@@ -200,16 +263,23 @@ class Game(object):
             enemy.kill()
         for bomb in self.spriteBombs:
             bomb.kill()
+        for powerup in self.spritePowerups:
+            powerup.kill()
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
-        #self.spritePlayer = pygame.sprite.Group()
         self.spritePlayer.add(self.player)
-        #self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
         self.gameState = const.GAME_STATE_RUNNING
 
 
+    def killPlayer(self):
+        self.player.state = const.STATE_DEAD
+        self.updateScore()
+        if self.soundOn:
+            self.player.deathSound.play()
+
+    
     def checkPlayerProgress(self):
         if self.level.layout[self.player.y][self.player.x] == const.TILE_DOOR_OPENED and self.player.state == const.STATE_IDLE:
             if self.levelNum < self.numLevels:
@@ -235,14 +305,23 @@ class Game(object):
             if key[pygame.K_RIGHT]:
                 self.player.move(const.RIGHT, self.level)
             if key[pygame.K_SPACE]:
-                newBomb = self.player.dropBomb()
+                newBomb = self.player.dropBomb(self.level)
                 if newBomb:
+                    #newBomb.timer = pygame.time.get_ticks()
+                    self.level.layout[newBomb.y][newBomb.x] = newBomb
                     self.spriteBombs.add(newBomb)
 
 
     #Event-driven input
     def getEvents(self):
         for event in pygame.event.get():
+
+            #for bomb in self.spriteBombs:
+            #    if (pygame.time.get_ticks() - bomb.timer) > 4000:
+            #        self.level.layout[bomb.y][bomb.x] = None
+            #        bomb.kill()
+            #        self.player.changeActiveBombCount(-1)
+
             if event.type == pygame.QUIT:
                 self.gameState = const.GAME_STATE_QUITTING
             elif event.type == pygame.KEYDOWN:
@@ -267,83 +346,6 @@ class Game(object):
                     else:
                         self.soundOn = True
                 self.debug_mode(event)          #Testing purposeses  #TODO  remove
-
-
-    def mainMenu(self):
-
-        newGameLocLeft = 500
-        newGameLocTop = 200
-        highScoreLocLeft = 500
-        highScoreLocTop = 300
-        '''Will display the main menu.'''
-        self.screen.fill(const.GREY)
-
-        graphicsDir = Path.cwd() / "graphics"
-        print(graphicsDir)
-        NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
-        newGameButt = pygame.image.load(NewGameGraph)
-<<<<<<< HEAD
-        NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_Red.png"))
-        newGameButtRed = pygame.image.load(NewGameGraphRed)
-=======
->>>>>>> 8f8a43c77fefe308f0d3e4efdb651348c46b69f7
-        ngRect = pygame.Rect(newGameLocLeft,newGameLocTop,200,50)
-        highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
-        highScoreButt = pygame.image.load(highScoreGraph)
-        highScoreGraphRed = str(graphicsDir.joinpath("HighScores_Red.png"))
-        highScoreButtRed = pygame.image.load(highScoreGraphRed)
-        hsRect = pygame.Rect(highScoreLocLeft,highScoreLocTop,200,50)
-        mousex = 0
-        mousey = 0
-        hoveringNG = False
-        hoveringHS = False
-
-        #main menu loop
-        #print('game state' , self.gameState)
-        while self.gameState == const.GAME_STATE_MENU:
-            mouseClicked = False
-            
-            if hoveringNG == False:
-                self.screen.blit(newGameButt,(newGameLocLeft,newGameLocTop))
-            if hoveringHS == False:
-                self.screen.blit(highScoreButt,(highScoreLocLeft,highScoreLocTop))
-            #pygame.draw.rect(DISPLAYSURF,RED,ngRect)
-            #hoveringNG = False
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-
-                elif event.type == pygame.MOUSEMOTION:
-                    mousex,mousey = event.pos
-                    if ngRect.collidepoint(mousex,mousey):
-                        hoveringNG = True
-                        self.screen.blit(newGameButtRed,(newGameLocLeft,newGameLocTop))
-                    elif not ngRect.collidepoint(mousex,mousey):
-                        hoveringNG = False
-                    if hsRect.collidepoint(mousex,mousey):
-                        hoveringHS = True
-                        print('test')
-                        self.screen.blit(highScoreButtRed,(highScoreLocLeft,highScoreLocTop))
-                    elif not hsRect.collidepoint(mousex,mousey):
-                        hoveringHS = False
-                
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    mousex,mousey = event.pos
-                    print(mousex,mousey)
-                    if ngRect.collidepoint(mousex,mousey):
-                        #TODO
-                        #change game state and start the 1st level
-                        self.gameState = const.GAME_STATE_RUNNING
-                    elif hsRect.collidepoint(mousex,mousey):
-                        #TODO
-                        #show the high score screen
-                        pass
-                        
-                    
-                    
-            pygame.display.update()
-        
 
 
     def updateScore(self):
@@ -375,4 +377,8 @@ class Game(object):
             if self.levelNum < self.numLevels:
                 self.levelNum += 1
                 self.resetLevel()
+        elif event.key == pygame.K_LSHIFT:
+            if self.player.state == const.STATE_IDLE:
+                powerups, blasts = self.level.destroyWalls(self.player.x, self.player.y, self.level, self.player.bombRange)     #TODO powerups sprite group, add to
+                self.spritePowerups.add(powerups)
         

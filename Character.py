@@ -46,25 +46,25 @@ class Character(pygame.sprite.Sprite):
 
         
         if direction == const.UP:
-            if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
+            if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and not isinstance(layout[self.y - 1][self.x], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
                 self.y -= 1
                 self.state = const.STATE_MOVING_UP
             else:
                 pathBlocked = True
         elif direction == const.DOWN:
-            if self.y < const.MAP_HEIGHT - 1 and not isinstance(layout[self.y + 1][self.x], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_UP):
+            if self.y < const.MAP_HEIGHT - 1 and not isinstance(layout[self.y + 1][self.x], Wall.Wall) and not isinstance(layout[self.y + 1][self.x], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_UP):
                 self.y += 1
                 self.state = const.STATE_MOVING_DOWN
             else:
                 pathBlocked = True
         elif direction == const.LEFT:
-            if self.x > 0 and not isinstance(layout[self.y][self.x - 1], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_RIGHT):
+            if self.x > 0 and not isinstance(layout[self.y][self.x - 1], Wall.Wall) and not isinstance(layout[self.y][self.x - 1], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_RIGHT):
                 self.x -= 1
                 self.state = const.STATE_MOVING_LEFT
             else:
                 pathBlocked = True
         elif direction == const.RIGHT:
-            if self.x < const.MAP_WIDTH - 1 and not isinstance(layout[self.y][self.x + 1], Wall.Wall) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_LEFT):
+            if self.x < const.MAP_WIDTH - 1 and not isinstance(layout[self.y][self.x + 1], Wall.Wall) and not isinstance(layout[self.y][self.x + 1], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_LEFT):
                 self.x += 1
                 self.state = const.STATE_MOVING_RIGHT
             else:
@@ -143,8 +143,8 @@ class Character(pygame.sprite.Sprite):
             #self.changeDirection(self.facing)
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X - 2
             self.hitbox.y = self.rect.y + 4
-            self.rect.x += 0#8
-            self.rect.y -= 16
+            #self.rect.x += 0#8
+            self.rect.y -= 8
         else:
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X / 2
             self.hitbox.y = self.rect.y + const.HIT_BOX_OFFSET_Y / 2
@@ -188,7 +188,7 @@ class PlayerCharacter(Character):
         '''Constructor'''
         facing = const.DOWN
         super().__init__(x, y, facing, const.PLAYER_SPEED, const.PC)
-        self.bombCount = 1
+        self.bombCount = const.PLAYER_DEFAULT_NUM_BOMBS
         self.bombRange = 1
         #self.speed = 40 #placeholder
         self.activeBombs = 0
@@ -217,34 +217,42 @@ class PlayerCharacter(Character):
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
 
-    def dropBomb(self):
+
+    def dropBomb(self, level):
         '''Creates an instance of the bomb class at the PC's position'''
         xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
         yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
-        if xDiff < 10 and yDiff < 10:# and self.activeBombs < self.bombCount:
+        if xDiff < 10 and yDiff < 10 and self.activeBombs < self.bombCount and level.layout[self.y][self.x] == None:
             newBomb = Bomb.Bomb(self.x, self.y, self.bombRange)
-            self.changeBombCount(1)
+            self.changeActiveBombCount(1)
             return newBomb
         else:
             return None
 
-    def changeBombCount(self,change):
+
+    def changeActiveBombCount(self,change):
         '''This method is how to change the value of self.activeBombs
         will be called by dropBomb method of the PlayerCharacter, and
         the explode method of the Bomb
         '''
         self.activeBombs = self.activeBombs + change
+        if self.activeBombs < 0:
+            self.activeBombs = 0
+        if self.activeBombs > self.bombCount:
+            self.activeBombs = self.bombCount
 
-    def getPowerup(self,powerup):
+
+    def getPowerup(self, powerup):
         '''This method is called when the PC occupies the same space as a 
         powerup. 
         '''
-        if powerup == const.RANGE and self.bombRange < 5:
+        if powerup.powerupType == const.POWERUP_RANGE and self.bombRange < 5:
             self.bombRange += 1
-        elif powerup == const.COUNT and self.bombCount < 5:
+        elif powerup.powerupType == const.POWERUP_COUNT and self.bombCount < 5:
             self.bombCount += 1
-        elif powerup == const.BOOT:
+        elif powerup.powerupType == const.POWERUP_BOOT:
             self.boot = True
+
     
     def changeDirection(self,direction):
         if direction == const.RIGHT and self.image != self.right: #and self.state == const.STATE_IDLE:
