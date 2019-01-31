@@ -114,7 +114,7 @@ class Game(object):
         self.spriteEnemies.update(self.level, self.player)
         self.spriteEnemies.draw(self.screen)
 
-        self.spriteBombs.update()
+        self.spriteBombs.update(self.level)
         self.spriteBombs.draw(self.screen)
 
         self.spriteBombBlasts.update()
@@ -301,7 +301,6 @@ class Game(object):
             if key[pygame.K_SPACE]:
                 newBomb = self.player.dropBomb(self.level)
                 if newBomb:
-                    #newBomb.timer = pygame.time.get_ticks()
                     self.level.layout[newBomb.y][newBomb.x] = newBomb
                     self.spriteBombs.add(newBomb)
 
@@ -309,13 +308,6 @@ class Game(object):
     #Event-driven input
     def getEvents(self):
         for event in pygame.event.get():
-
-            #for bomb in self.spriteBombs:
-            #    if (pygame.time.get_ticks() - bomb.timer) > 4000:
-            #        self.level.layout[bomb.y][bomb.x] = None
-            #        bomb.kill()
-            #        self.player.changeActiveBombCount(-1)
-
             if event.type == pygame.QUIT:
                 self.gameState = const.GAME_STATE_QUITTING
             elif event.type == pygame.KEYDOWN:

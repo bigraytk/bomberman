@@ -50,6 +50,7 @@ BASIC = 0
 RANDOM = 1
 ADVANCED = 2
 #SMART = 3      # < do we need this?  We can just use ADVANCED for the type and logic
+SPEED_BOMB_KICKED = 5
 SPEED_HIGH = 2.5
 SPEED_MED = 2
 SPEED_LOW = 1
@@ -69,13 +70,16 @@ PLAYER_SPEED = 3
 PLAYER_DEFAULT_NUM_BOMBS = 1  #number of starting bombs
 
 
-#character states
+#character/bomb states
 STATE_IDLE = 0
 STATE_MOVING_UP = 1
 STATE_MOVING_DOWN = 2
 STATE_MOVING_LEFT = 3
 STATE_MOVING_RIGHT = 4 
 STATE_DEAD = 5
+
+#bomb state
+STATE_KICKED = 6
 
 
 #game states

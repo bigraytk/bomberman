@@ -43,8 +43,8 @@ class Character(pygame.sprite.Sprite):
         layout = level.layout
         self.facing = direction
         pathBlocked = False
-
         
+
         if direction == const.UP:
             if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and not isinstance(layout[self.y - 1][self.x], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
                 self.y -= 1
@@ -73,6 +73,7 @@ class Character(pygame.sprite.Sprite):
         if self.kind == const.PC and not pathBlocked:
             self.changeDirection(direction)
         return pathBlocked
+
 
         #checks if able to move in direction
         #if no, stays in same square, but update self.facing
@@ -215,7 +216,26 @@ class PlayerCharacter(Character):
 
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
-        
+
+
+    def move(self, direction, level):
+        layout = level.layout
+        self.facing = direction
+        pathBlocked = False
+
+        #check for bomb to kick
+        if self.boot:
+            if direction == const.UP and isinstance(layout[self.y - 1][self.x], Bomb.Bomb): 
+                layout[self.y - 1][self.x].kick(direction, level)
+            if direction == const.DOWN and isinstance(layout[self.y + 1][self.x], Bomb.Bomb): 
+                layout[self.y + 1][self.x].kick(direction, level)
+            if direction == const.LEFT and isinstance(layout[self.y][self.x - 1], Bomb.Bomb): 
+                layout[self.y][self.x - 1].kick(direction, level)
+            if direction == const.RIGHT and isinstance(layout[self.y][self.x + 1], Bomb.Bomb): 
+                layout[self.y][self.x + 1].kick(direction, level)
+
+        super().move(direction, level)
+
 
     def dropBomb(self, level):
         '''Creates an instance of the bomb class at the PC's position'''
