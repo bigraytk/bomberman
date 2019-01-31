@@ -41,7 +41,7 @@ class Bomb(pygame.sprite.Sprite):
         if seconds > self.timer:
             self.exploded = True
         self.image.set_alpha(self.blink)
-        if int(seconds * 10) % 6 < 3:
+        if int(seconds * 10) % (const.BOMB_FLASH_SPEED * 2) < const.BOMB_FLASH_SPEED:
             self.blink = 100
         else:
             self.blink = 255
