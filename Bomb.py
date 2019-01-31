@@ -23,7 +23,9 @@ class Bomb(pygame.sprite.Sprite):
         self.resy = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
 
         imageFile = str(Path.cwd() / "graphics" / "bomb.png")
-        self.image = pygame.image.load(imageFile).convert_alpha()
+        self.image = pygame.image.load(imageFile).convert()
+        self.image.set_colorkey(const.BLACK)
+        self.blink = 255
         self.rect = self.image.get_rect()
         self.rect.x = self.resx
         self.rect.y = self.resy
@@ -33,11 +35,16 @@ class Bomb(pygame.sprite.Sprite):
         
 
     def update(self):
-        self.rect.x = (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE) + random.randint(-2, 2)   #make bomb shake
-        self.rect.y = (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE) + random.randint(-2, 2)
+        #self.rect.x = (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE) + random.randint(-2, 2)   #make bomb shake
+        #self.rect.y = (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE) + random.randint(-2, 2)
         seconds = self.countdown()#calculate how many seconds
         if seconds > self.timer:
             self.exploded = True
+        self.image.set_alpha(self.blink)
+        if int(seconds * 10) % 6 < 3:
+            self.blink = 100
+        else:
+            self.blink = 255
  
 
     def countdown(self):
@@ -56,7 +63,7 @@ class Bomb(pygame.sprite.Sprite):
     
     def expiditeExplosion(self):            #make bomb explode sooner, for chain reactions
         self.timer = self.countdown() + const.BOMB_EXPIDITE
-
+    
 
     def kicked(self,direction):
         #change either xpos or ypos based on direction, stop when hit another object

@@ -215,8 +215,7 @@ class PlayerCharacter(Character):
 
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
-        self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
-
+        
 
     def dropBomb(self, level):
         '''Creates an instance of the bomb class at the PC's position'''

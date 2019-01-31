@@ -27,10 +27,15 @@ class Game(object):
         #initialize pygame
         pygame.init()
 
-        #setup music
+        #setup music and sound
         file = str(Path.cwd() / "sounds" / "music1.mp3")
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.mixer.init()
         pygame.mixer.music.load(file)
+
+        self.explodeSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "bomb.wav"))
+        self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
+
 
         #setup misc pygame settings
         self.clock = pygame.time.Clock()
@@ -146,6 +151,8 @@ class Game(object):
             if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None):
                 bomb.expiditeExplosion()
             if bomb.exploded:
+                if self.soundOn:
+                    self.explodeSound.play()
                 powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, self.player.bombRange)
                 self.spritePowerups.add(powerups)
                 self.spriteBombBlasts.add(blasts)
@@ -235,14 +242,14 @@ class Game(object):
 
 
     def resetLevel(self):
-        #for enemy in self.spriteEnemies:
-        #    enemy.kill()
-        #for bomb in self.spriteBombs:
-        #    bomb.kill()
-        #for blast in self.spriteBombBlasts:
-        #    blast.kill()
-        #for powerup in self.spritePowerups:
-        #    powerup.kill()
+        for enemy in self.spriteEnemies:
+            enemy.kill()
+        for bomb in self.spriteBombs:
+            bomb.kill()
+        for blast in self.spriteBombBlasts:
+            blast.kill()
+        for powerup in self.spritePowerups:
+            powerup.kill()
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
         self.spriteBombs.empty()
@@ -264,7 +271,7 @@ class Game(object):
         self.player.state = const.STATE_DEAD
         self.updateScore()
         if self.soundOn:
-            self.player.deathSound.play()
+            self.deathSound.play()
 
     
     def checkPlayerProgress(self):
