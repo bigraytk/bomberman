@@ -34,7 +34,7 @@ FRAMERATE = 90
 SECOND = 1000  #1 second = 1000 milliseconds
 PLAYER_DEATH_SCREEN_TIMER = 1.5      #death screen is shown for 1.5 seconds
 BOMB_TIMER = 4
-BOMB_EXPIDITE = 0.015
+BOMB_EXPIDITE = 0.02#0.015
 BOMB_FLASH_SPEED = 2 #lower is faster
 BLAST_TIMER = 1
 SCREEN_OFFSET_X_LEFT = 32

@@ -25,7 +25,7 @@ class Bomb(pygame.sprite.Sprite):
         imageFile = str(Path.cwd() / "graphics" / "bomb.png")
         self.image = pygame.image.load(imageFile).convert()
         self.image.set_colorkey(const.BLACK)
-        self.blink = 255
+        self.blink = 255            #opacity of image, for flashing animation
         self.rect = self.image.get_rect()
         self.rect.x = self.xres
         self.rect.y = self.yres
