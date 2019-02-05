@@ -17,7 +17,7 @@ from pathlib import Path
 import pygame
 
 
-class Game_2(object):
+class Game(object):
 
     '''
     This is the game object
