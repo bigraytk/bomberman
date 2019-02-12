@@ -259,6 +259,7 @@ class PlayerCharacter(Character):
         will be called by dropBomb method of the PlayerCharacter, and
         the explode method of the Bomb
         '''
+        
         self.activeBombs = self.activeBombs + change
         if self.activeBombs < 0:
             self.activeBombs = 0
