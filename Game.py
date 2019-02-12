@@ -147,7 +147,6 @@ class Game(object):
                 self.player.increaseScore(const.ENEMY_DIED)
         if not self.spriteEnemies:  #check if no more enemies left
             self.level.openDoor()
-            self.player.increaseScore(const.LEVEL_CHANGE)
 
         for blast in self.spriteBombBlasts:
             if blast.rect.colliderect(self.player.hitbox):
@@ -321,6 +320,8 @@ class Game(object):
             blast.kill()
         for powerup in self.spritePowerups:
             powerup.kill()
+
+        tScore = self.player.score
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
         self.spriteBombs.empty()
@@ -332,6 +333,7 @@ class Game(object):
         #    self.player.bombRange = oldPlayer.bombRange
         #    self.player.boot = oldPlayer.boot
         #oldPlayer.kill()
+        self.player.increaseScore(tScore)
         self.spritePlayer.add(self.player)
         self.player.state = const.STATE_IDLE
         self.spriteEnemies.add(self.enemies)
@@ -347,9 +349,12 @@ class Game(object):
     
     def checkPlayerProgress(self):
         if self.level.layout[self.player.y][self.player.x] == const.TILE_DOOR_OPENED and self.player.state == const.STATE_IDLE:
+            self.player.increaseScore(const.LEVEL_CHANGE)
+
             if self.levelNum < self.numLevels:
                 self.levelNum += 1
                 self.resetLevel()
+
             else:
                 #TODO player wins game?
                 pass
