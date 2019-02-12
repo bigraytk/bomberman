@@ -195,7 +195,7 @@ class PlayerCharacter(Character):
         #self.speed = 40 #placeholder
         self.activeBombs = 0
         self.boot = False
-        
+        self.lives = const.LIVES
         
         #imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
         #self.image = pygame.image.load(imageFile).convert_alpha()

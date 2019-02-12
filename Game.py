@@ -215,9 +215,20 @@ class Game(object):
         fps = self.font.render(text1, True, pygame.Color('yellow'))
         self.screen.blit(fps, (305, 30))
 
+        #Score code
         text1 = 'Score: '+str(self.player.score)
         fps = self.font.render(text1, True, pygame.Color('yellow'))
         self.screen.blit(fps, (350, 30))
+
+        #Player Lives Count
+        picture = pygame.image.load(str(Path.cwd() / "graphics" / "front.png")   )
+        picture = pygame.transform.scale(picture, (25, 25))
+        self.screen.blit(picture, (70, 25))
+
+        text1 = 'x'+str(self.player.lives)
+        fps = self.font.render(text1, True, pygame.Color('yellow'))
+        self.screen.blit(fps, (100, 30))
+
 
 
 
@@ -328,6 +339,7 @@ class Game(object):
         self.spriteBombBlasts.empty()
         oldPlayer = self.player
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+        self.player.lives = oldPlayer.lives
         self.player.increaseScore(oldPlayer.score)
         self.player.increaseScore(const.PLAYER_DIED)
         #if oldPlayer.state != const.STATE_DEAD:         #player keeps powerups when going to next level, but not if player dies
@@ -344,6 +356,12 @@ class Game(object):
     def killPlayer(self):
         self.player.state = const.STATE_DEAD
         self.updateScore()
+        if self.player.lives == 0:
+            #we need to add something to load the main menu
+            pass
+        else:
+            self.player.lives -= 1
+            
         if self.soundOn:
             self.deathSound.play()
 
