@@ -190,10 +190,11 @@ class Blast (Bomb):
 	
     def update(self):
         seconds = self.countdown() #calculate how many seconds
-        if seconds > self.timer:
+        if self.fade_out < 0:
             self.kill()
         self.image.set_alpha(self.fade_out)
-        self.fade_out -= 4
+        if seconds > self.timer:
+            self.fade_out -= 6
 
         self.timer = const.INITIAL_BOMB_TIMER
 

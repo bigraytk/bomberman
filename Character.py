@@ -220,6 +220,8 @@ class PlayerCharacter(Character):
 
     def increaseScore(self,score):
         self.score += score
+        if self.score < 0:
+            self.score = 0
 
     def move(self, direction, level):
         layout = level.layout
