@@ -185,6 +185,16 @@ class Blast (Bomb):
         self.image = pygame.image.load(imageFile).convert()
         self.image.set_colorkey(const.BLACK)
         self.direction = direction
+        self.timer = const.BLAST_TIMER
+	
+	
+    def update(self):
+        seconds = self.countdown() #calculate how many seconds
+        if seconds > self.timer:
+            self.kill()
+        self.image.set_alpha(self.fade_out)
+        self.fade_out -= 4
+
         self.timer = const.INITIAL_BOMB_TIMER
 
         
