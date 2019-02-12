@@ -26,6 +26,7 @@ class Character(pygame.sprite.Sprite):
         self.facing = facing
         self.kind = kind
         self.state = const.STATE_IDLE
+        self.score = 0
         #if kind == const.PC:
             #self.Player = self.PlayerCharacter()
         #elif kind == const.ENEMY:
@@ -217,6 +218,8 @@ class PlayerCharacter(Character):
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
 
+    def increaseScore(self,score):
+        self.score += score
 
     def move(self, direction, level):
         layout = level.layout

@@ -144,8 +144,10 @@ class Game(object):
                 self.killPlayer()
             if pygame.sprite.spritecollideany(enemy, self.spriteBombBlasts, collided = None):
                 enemy.kill()
+                self.player.increaseScore(const.ENEMY_DIED)
         if not self.spriteEnemies:  #check if no more enemies left
             self.level.openDoor()
+            self.player.increaseScore(const.LEVEL_CHANGE)
 
         for blast in self.spriteBombBlasts:
             if blast.rect.colliderect(self.player.hitbox):
@@ -166,8 +168,10 @@ class Game(object):
         for powerup in self.spritePowerups:
             if powerup.rect.colliderect(self.player.hitbox):
                 self.player.getPowerup(powerup)
+                self.player.increaseScore(const.PICK_UP_POWER_UP)
                 powerup.kill()
 
+        #Frame Per Section update
         text1 = str(int(self.clock.get_fps()))
         fps = self.font.render(text1, True, pygame.Color('white'))
         self.screen.blit(fps, (25, 25))
@@ -211,6 +215,12 @@ class Game(object):
         text1 = 'x'+str(self.player.bombCount)
         fps = self.font.render(text1, True, pygame.Color('yellow'))
         self.screen.blit(fps, (305, 30))
+
+        text1 = 'Score: '+str(self.player.score)
+        fps = self.font.render(text1, True, pygame.Color('yellow'))
+        self.screen.blit(fps, (350, 30))
+
+
 
     def checkCollision(self, sprite, spriteGroup):
         return pygame.sprite.spritecollide(sprite, spriteGroup, False)
