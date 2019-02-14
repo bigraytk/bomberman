@@ -21,7 +21,7 @@ class Powerup(pygame.sprite.Sprite):
         self.resy = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
 
         if self.powerupType == const.POWERUP_RANGE:
-            imageFile = str(Path.cwd() / "graphics" / "powerup_range.png")
+            imageFile = str(Path.cwd() / "graphics" / "powerup_range_2.png")
         elif self.powerupType == const.POWERUP_COUNT:
             imageFile = str(Path.cwd() / "graphics" / "powerup_count.png")
         elif self.powerupType == const.POWERUP_BOOT:
