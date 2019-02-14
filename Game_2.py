@@ -12,13 +12,12 @@ import Character
 import Bomb
 import Powerup
 import MainMenu
-import StatusBar
 import random
 from pathlib import Path
 import pygame
 
 
-class Game(object):
+class Game_2(object):
 
     '''
     This is the game object
@@ -49,8 +48,6 @@ class Game(object):
 
         #setup game state variables
         self.gameRunning = True
-        self.gameOver = False
-        self.exitingToMenu = False
         self.gameState = const.GAME_STATE_MENU
         self.musicOn = False
         self.soundOn = False
@@ -85,13 +82,17 @@ class Game(object):
         self.spriteBombBlasts = pygame.sprite.Group()
         self.spritePowerups = pygame.sprite.Group()
 
+        #self.testsprite  = Level.tileSprite(self.level.backgroundImage, 1, 1)
+
+        #self.tile_group = pygame.sprite.LayeredDirty()  #dirty sprites can be used for optimized tilemaps, but I didn't see much improvement
+        #for y in range(self.level.levelHeight):
+        #    for x in range(self.level.levelWidth):
+        #        if isinstance(self.level.layout[y][x], Wall.Wall) and not self.level.layout[y][x].breakable:
+        #            tile  = Level.tileSprite(self.level.wallImage, x, y)
+        #        else:
+        #            tile  = Level.tileSprite(self.level.backgroundImage, x, y)
+        #        self.tile_group.add(tile)
         
-        self.statusBar = StatusBar.StatusBar(0, 0)
-        self.statusBar.addIcon("front.png", 70, 25, 25)
-        self.statusBar.addIcon("bomb.png", 125, 25, 25)
-        self.statusBar.addIcon("powerup_boot.png", 175, 20, 35)
-        self.statusBar.addIcon("powerup_range.png", 225, 25, 25)
-        self.statusBar.addIcon("powerup_count.png", 275, 25, 25)
 
 
         #player death screen
@@ -107,10 +108,11 @@ class Game(object):
     #redering/drawing, update frames functions
     def render(self):#level, player, enemies):
         #Render level
-
-        self.drawStatusBar()
-        #self.test.draw(self.screen)
-        self.drawLevel()
+        #for tile in self.tile_group:               ### could be used to optimize drawing tiles, but requires a lot of changes to do so
+        #    if pygame.sprite.spritecollideany(tile, self.enemies):     ### also, tested the optimization and it's not any faster
+        #        tile.dirty = True
+        #self.tile_group.draw(self.screen)
+        self.drawLevel()#self.level)
         
         #Update and render enemies
         self.spriteEnemies.update(self.level, self.player)
@@ -142,12 +144,11 @@ class Game(object):
                 self.killPlayer()
             if pygame.sprite.spritecollideany(enemy, self.spriteBombBlasts, collided = None):
                 enemy.kill()
-                self.player.increaseScore(const.ENEMY_DIED)
         if not self.spriteEnemies:  #check if no more enemies left
             self.level.openDoor()
 
         for blast in self.spriteBombBlasts:
-            if blast.rect.colliderect(self.player.hitbox) and blast.fade_out > const.BLAST_FADE_START / 2:
+            if blast.rect.colliderect(self.player.hitbox):
                 self.killPlayer()
 
         for bomb in self.spriteBombs:
@@ -165,40 +166,11 @@ class Game(object):
         for powerup in self.spritePowerups:
             if powerup.rect.colliderect(self.player.hitbox):
                 self.player.getPowerup(powerup)
-                self.player.increaseScore(const.PICK_UP_POWER_UP)
                 powerup.kill()
 
-        #Frame Per Section update
         text1 = str(int(self.clock.get_fps()))
         fps = self.font.render(text1, True, pygame.Color('white'))
         self.screen.blit(fps, (25, 25))
-
-
-    def drawStatusBar(self):
-        self.statusBar.getIconSpriteGroup().draw(self.screen)
-        
-        #Player Lives Count
-        self.drawText('x'+str(self.player.lives), 100, 30, const.YELLOW)
-
-        #Active bomb status
-        self.drawText('x'+ str(self.player.activeBombs), 155, 30, const.YELLOW)
-
-        #Active Boot Status
-        self.drawText('x' + str(int(self.player.boot)), 205, 30, const.YELLOW)
-
-        #Active Range
-        self.drawText('x'+ str(self.player.bombRange), 255, 30, const.YELLOW)
-
-        #Active Bomb Count
-        self.drawText('x'+ str(self.player.bombCount), 305, 30, const.YELLOW)
-
-        #Score
-        self.drawText('Score: '+str(self.player.score), 350, 30, const.YELLOW)
-
-
-    def drawText(self, text, x, y, color):
-        textSurface = self.font.render(text, True, color)
-        self.screen.blit(textSurface, (x, y))
 
 
     def checkCollision(self, sprite, spriteGroup):
@@ -270,18 +242,17 @@ class Game(object):
         self.screen.blit(self.screenImage, (0,0))
         self.screen.blit(self.death_test_image, self.death_test_rect)
         seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
-        newState = self.gameState
         if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
-            newState = self.resetLevel()
+            self.resetLevel()
 
-        return newState
+        return self.gameState
 
 
     def stateMainMenu(self):
         newState = self.theMainMenu.showMenu()
         if newState == const.GAME_STATE_RUNNING:
             self.levelNum = 1
-            newState = self.resetLevel()
+            self.resetLevel()
 
         return newState
 
@@ -301,60 +272,35 @@ class Game(object):
             blast.kill()
         for powerup in self.spritePowerups:
             powerup.kill()
-
         self.spritePlayer.empty()
         self.spriteEnemies.empty()
         self.spriteBombs.empty()
         self.spriteBombBlasts.empty()
-
-        tempPlayer = self.player
+        #oldPlayer = self.player
         self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
-        if self.gameOver or self.exitingToMenu:
-            self.gameOver = False
-            self.exitingToMenu = False
-            newState = const.GAME_STATE_MENU
-        else:
-            self.player.lives = tempPlayer.lives
-            self.player.increaseScore(tempPlayer.score)
-            if tempPlayer.state == const.STATE_DEAD:        #player keeps powerups when going to next level, but not if player dies
-                self.player.increaseScore(const.PLAYER_DIED)
-            elif self.gameState == const.GAME_STATE_MENU:
-                self.player.lives = const.LIVES
-                self.player.score = 0
-            else:
-                self.player.bombCount = tempPlayer.bombCount        #TODO do we really want to have powerups persist between levels?
-                self.player.bombRange = tempPlayer.bombRange
-                self.player.boot = tempPlayer.boot
-            self.spritePlayer.add(self.player)
-            self.player.state = const.STATE_IDLE
-            self.spriteEnemies.add(self.enemies)
-            newState = const.GAME_STATE_RUNNING
-        tempPlayer.kill()
-        return newState
+        #if oldPlayer.state != const.STATE_DEAD:         #player keeps powerups when going to next level, but not if player dies
+        #    self.player.bombCount = oldPlayer.bombCount        #TODO do we really want to have powerups persist between levels?
+        #    self.player.bombRange = oldPlayer.bombRange
+        #    self.player.boot = oldPlayer.boot
+        #oldPlayer.kill()
+        self.spritePlayer.add(self.player)
+        self.player.state = const.STATE_IDLE
+        self.spriteEnemies.add(self.enemies)
+        self.gameState = const.GAME_STATE_RUNNING
 
 
     def killPlayer(self):
         self.player.state = const.STATE_DEAD
         self.updateScore()
-        if self.player.lives == 0:
-            self.gameOver = True
-            #we need to add something to load the main menu
-            #pass
-        else:
-            self.player.lives -= 1
-            
         if self.soundOn:
             self.deathSound.play()
 
     
     def checkPlayerProgress(self):
         if self.level.layout[self.player.y][self.player.x] == const.TILE_DOOR_OPENED and self.player.state == const.STATE_IDLE:
-            self.player.increaseScore(const.LEVEL_CHANGE)
-
             if self.levelNum < self.numLevels:
                 self.levelNum += 1
-                self.gameState = self.resetLevel()
-
+                self.resetLevel()
             else:
                 #TODO player wins game?
                 pass
@@ -385,7 +331,7 @@ class Game(object):
     def getEvents(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.exitingToMenu = True
+                self.gameState = const.GAME_STATE_QUITTING
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.gameState = const.GAME_STATE_MENU
@@ -431,11 +377,11 @@ class Game(object):
         elif event.key == pygame.K_COMMA:
             if self.levelNum > 1:
                 self.levelNum -= 1
-                self.gameState = self.resetLevel()
+                self.resetLevel()
         elif event.key == pygame.K_PERIOD:
             if self.levelNum < self.numLevels:
                 self.levelNum += 1
-                self.gameState = self.resetLevel()
+                self.resetLevel()
         elif event.key == pygame.K_LSHIFT:
             if self.player.state == const.STATE_IDLE:
                 powerups, blasts = self.level.destroyWalls(self.player.x, self.player.y, self.level, self.player.bombRange)     #TODO powerups sprite group, add to

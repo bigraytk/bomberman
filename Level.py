@@ -115,65 +115,57 @@ class Level(object):
         hitWallDown = False
         hitWallLeft = False
         hitWallRight = False
-       
-        upImage = str(Path.cwd() / "graphics" / "up-point-2.png")
-        downImage = str(Path.cwd() / "graphics" / "down-point-2.png")
-        leftImage = str(Path.cwd() / "graphics" / "left-point-2.png")
-        rightImage = str(Path.cwd() / "graphics" / "right-point-2.png")
-        upTailImage = str(Path.cwd() / "graphics" / "up-point.png")
-        downTailImage = str(Path.cwd() / "graphics" / "down-point.png")
-        leftTailImage = str(Path.cwd() / "graphics" / "left-point.png")
-        rightTailImage = str(Path.cwd() / "graphics" / "right-point.png")
-        blasts = []
 
-        for i in range(blastRange + 1):
+        blasts = []
+        blasts.append(Bomb.Blast(x, y, const.CENTER_FLAME, True))
+        for i in range(1, blastRange + 1):
             if y - i > 0 and not hitWallUp:
                 if isinstance(level.layout[y - i][x], Wall.Wall):
                     walls.append(level.layout[y - i][x])
                     hitWallUp = True
                     if level.layout[y - i][x].breakable:
-                        blasts.append(Bomb.Blast(x, y - i, 1, upTailImage, const.UP_FLAME))
+                        blasts.append(Bomb.Blast(x, y - i, const.UP_FLAME, True))
                 if not hitWallUp:
                     if i < blastRange:
-                        blasts.append(Bomb.Blast(x, y - i, 1, upImage, const.UP_FLAME))
+                        blasts.append(Bomb.Blast(x, y - i, const.UP_FLAME, False))
                     else:
-                        blasts.append(Bomb.Blast(x, y - i, 1, upTailImage, const.UP_FLAME))
+                        blasts.append(Bomb.Blast(x, y - i, const.UP_FLAME, True))
             
             if y + i < level.levelHeight and not hitWallDown:
                 if isinstance(level.layout[y + i][x], Wall.Wall):
                     walls.append(level.layout[y + i][x])
                     hitWallDown = True
                     if level.layout[y + i][x].breakable:
-                        blasts.append(Bomb.Blast(x, y + i, 1, downTailImage, const.DOWN_FLAME))
+                        blasts.append(Bomb.Blast(x, y + i, const.DOWN_FLAME, True))
                 if not hitWallDown:
                     if i < blastRange:
-                        blasts.append(Bomb.Blast(x, y + i, 1, downImage, const.DOWN_FLAME))
+                        blasts.append(Bomb.Blast(x, y + i, const.DOWN_FLAME, False))
                     else:
-                        blasts.append(Bomb.Blast(x, y + i, 1, downTailImage, const.DOWN_FLAME))
+                        blasts.append(Bomb.Blast(x, y + i, const.DOWN_FLAME, True))
             
             if x - i > 0 and not hitWallLeft:
                 if isinstance(level.layout[y][x - i], Wall.Wall):
                     walls.append(level.layout[y][x - i])
                     hitWallLeft = True
                     if level.layout[y][x - i].breakable:
-                        blasts.append(Bomb.Blast(x - i, y, 1, leftTailImage, const.LEFT_FLAME))
+                        blasts.append(Bomb.Blast(x - i, y, const.LEFT_FLAME, True))
                 if not hitWallLeft:
                     if i < blastRange:
-                        blasts.append(Bomb.Blast(x - i, y, 1, leftImage, const.LEFT_FLAME))
+                        blasts.append(Bomb.Blast(x - i, y, const.LEFT_FLAME, False))
                     else:
-                        blasts.append(Bomb.Blast(x - i, y, 1, leftTailImage, const.LEFT_FLAME))
+                        blasts.append(Bomb.Blast(x - i, y, const.LEFT_FLAME, True))
             
             if x + i < level.levelWidth and not hitWallRight:
                 if isinstance(level.layout[y][x + i], Wall.Wall):
                     walls.append(level.layout[y][x + i])
                     hitWallRight = True
                     if level.layout[y][x + i].breakable:
-                        blasts.append(Bomb.Blast(x + i, y, 1, rightTailImage, const.RIGHT_FLAME))
+                        blasts.append(Bomb.Blast(x + i, y, const.RIGHT_FLAME, True))
                 if not hitWallRight:
                     if i < blastRange:
-                        blasts.append(Bomb.Blast(x + i, y, 1, rightImage, const.RIGHT_FLAME))
+                        blasts.append(Bomb.Blast(x + i, y, const.RIGHT_FLAME, False))
                     else:
-                        blasts.append(Bomb.Blast(x + i, y, 1, rightTailImage, const.RIGHT_FLAME))
+                        blasts.append(Bomb.Blast(x + i, y, const.RIGHT_FLAME, True))
         for theWall in walls:
             result = theWall.destroy(level)
             if result:

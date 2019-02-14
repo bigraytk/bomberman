@@ -33,6 +33,11 @@ MAP_HEIGHT  = 13
 FRAMERATE = 90
 SECOND = 1000  #1 second = 1000 milliseconds
 PLAYER_DEATH_SCREEN_TIMER = 1.5      #death screen is shown for 1.5 seconds
+BOMB_TIMER = 4
+BOMB_EXPIDITE = 0.02#0.015
+BOMB_FLASH_SPEED = 2 #lower is faster
+BLAST_TIMER = 0.1
+BLAST_FADE_START = 255
 SCREEN_OFFSET_X_LEFT = 32
 SCREEN_OFFSET_Y_TOP = 64
 SCREEN_OFFSET_X_RIGHT = 32
@@ -46,6 +51,7 @@ BASIC = 0
 RANDOM = 1
 ADVANCED = 2
 #SMART = 3      # < do we need this?  We can just use ADVANCED for the type and logic
+SPEED_BOMB_KICKED = 5
 SPEED_HIGH = 2.5
 SPEED_MED = 2
 SPEED_LOW = 1
@@ -63,15 +69,19 @@ GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
 PLAYER_SPEED = 3
 PLAYER_DEFAULT_NUM_BOMBS = 1  #number of starting bombs
+LIVES = 3
 
 
-#character states
+#character/bomb states
 STATE_IDLE = 0
 STATE_MOVING_UP = 1
 STATE_MOVING_DOWN = 2
 STATE_MOVING_LEFT = 3
 STATE_MOVING_RIGHT = 4 
 STATE_DEAD = 5
+
+#bomb state
+STATE_KICKED = 6
 
 
 #game states
@@ -89,6 +99,7 @@ LEFT = 3
 
 
 #            R    G    B
+BLACK    = (  0,   0,   0)
 GREY     = (100, 100, 100)
 NAVYBLUE = ( 60,  60, 100)
 WHITE    = (255, 255, 255)
@@ -108,3 +119,12 @@ UP_FLAME = 3
 DOWN_FLAME = 6
 VERT_EXTENDER = 4
 HOR_EXTENDER = 5
+INITIAL_BOMB_TIMER = 2
+
+#Score Constants
+PLAYER_DIED = -10
+ENEMY_DIED = 5
+PICK_UP_POWER_UP = 10
+BREAKABLE_WALL_DESTROYED = 20
+LEVEL_CHANGE = 100
+BOSS_DIED = 1000

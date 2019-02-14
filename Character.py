@@ -26,6 +26,7 @@ class Character(pygame.sprite.Sprite):
         self.facing = facing
         self.kind = kind
         self.state = const.STATE_IDLE
+        self.score = 0
         #if kind == const.PC:
             #self.Player = self.PlayerCharacter()
         #elif kind == const.ENEMY:
@@ -43,8 +44,8 @@ class Character(pygame.sprite.Sprite):
         layout = level.layout
         self.facing = direction
         pathBlocked = False
-
         
+
         if direction == const.UP:
             if self.y > 0 and not isinstance(layout[self.y - 1][self.x], Wall.Wall) and not isinstance(layout[self.y - 1][self.x], Bomb.Bomb) and (self.state == const.STATE_IDLE or self.state == const.STATE_MOVING_DOWN):
                 self.y -= 1
@@ -73,6 +74,7 @@ class Character(pygame.sprite.Sprite):
         if self.kind == const.PC and not pathBlocked:
             self.changeDirection(direction)
         return pathBlocked
+
 
         #checks if able to move in direction
         #if no, stays in same square, but update self.facing
@@ -193,7 +195,7 @@ class PlayerCharacter(Character):
         #self.speed = 40 #placeholder
         self.activeBombs = 0
         self.boot = False
-        
+        self.lives = const.LIVES
         
         #imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
         #self.image = pygame.image.load(imageFile).convert_alpha()
@@ -215,7 +217,29 @@ class PlayerCharacter(Character):
 
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
-        self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
+
+    def increaseScore(self,score):
+        self.score += score
+        if self.score < 0:
+            self.score = 0
+
+    def move(self, direction, level):
+        layout = level.layout
+        self.facing = direction
+        pathBlocked = False
+
+        #check for bomb to kick
+        if self.boot:
+            if direction == const.UP and isinstance(layout[self.y - 1][self.x], Bomb.Bomb): 
+                layout[self.y - 1][self.x].kick(direction, level)
+            if direction == const.DOWN and isinstance(layout[self.y + 1][self.x], Bomb.Bomb): 
+                layout[self.y + 1][self.x].kick(direction, level)
+            if direction == const.LEFT and isinstance(layout[self.y][self.x - 1], Bomb.Bomb): 
+                layout[self.y][self.x - 1].kick(direction, level)
+            if direction == const.RIGHT and isinstance(layout[self.y][self.x + 1], Bomb.Bomb): 
+                layout[self.y][self.x + 1].kick(direction, level)
+
+        super().move(direction, level)
 
 
     def dropBomb(self, level):
@@ -235,6 +259,7 @@ class PlayerCharacter(Character):
         will be called by dropBomb method of the PlayerCharacter, and
         the explode method of the Bomb
         '''
+        
         self.activeBombs = self.activeBombs + change
         if self.activeBombs < 0:
             self.activeBombs = 0
