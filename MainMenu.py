@@ -10,32 +10,46 @@ class MainMenu(object):
         self.screen = screen
         
         newGameButtonX = screenWidth / 2
-        newGameButtonY = screenHeight / 4
+        newGameButtonY = const.TILE_SIZE * 8
 
         highScoreButtonX = screenWidth / 2
-        highScoreButtonY = screenHeight / 3
+        highScoreButtonY = const.TILE_SIZE * 9
+
+        quitButtonX = screenWidth / 2
+        quitButtonY = const.TILE_SIZE * 10
 
         '''Will display the main menu.'''
         self.screen.fill(const.GREY)
 
         graphicsDir = Path.cwd() / "graphics"
 
+        imageFile = str(graphicsDir.joinpath("main_menu.png"))
+        self.background = pygame.image.load(imageFile)
+
         NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
         self.btnNewGame = pygame.image.load(NewGameGraph)
 
-        NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_Red.png"))
-        self.btnNewGameRed = pygame.image.load(NewGameGraphRed)
-        self.ngRect = self.btnNewGameRed.get_rect(center =(newGameButtonX, newGameButtonY))
+        NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_hover.png"))
+        self.btnNewGameHover = pygame.image.load(NewGameGraphRed)
+        self.ngRect = self.btnNewGameHover.get_rect(center =(newGameButtonX, newGameButtonY))
         
         highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
         self.btnHighScore = pygame.image.load(highScoreGraph)
         self.hsRect = self.btnHighScore.get_rect(center =(highScoreButtonX, highScoreButtonY))
         
-        highScoreGraphRed = str(graphicsDir.joinpath("HighScores_Red.png"))
-        self.btnHighScoreRed = pygame.image.load(highScoreGraphRed)
+        highScoreGraphRed = str(graphicsDir.joinpath("HighScores_hover.png"))
+        self.btnHighScoreHover = pygame.image.load(highScoreGraphRed)
+
+        imageFile = str(graphicsDir.joinpath("button_quit.png"))
+        self.btnQuit = pygame.image.load(imageFile)
+        self.quitRect = self.btnQuit.get_rect(center =(quitButtonX, quitButtonY))
+        
+        imageFile = str(graphicsDir.joinpath("button_quit_hover.png"))
+        self.btnQuitHover = pygame.image.load(imageFile)
 
         self.hoveringNG = False
         self.hoveringHS = False
+        self.hoveringQT = False
 
     #main menu loop
     def showMenu(self):
@@ -43,16 +57,22 @@ class MainMenu(object):
         gameState = const.GAME_STATE_MENU
         while gameState == const.GAME_STATE_MENU:
             
-            self.screen.fill(const.GREY)
+            #self.screen.fill(const.GREY)
+            self.screen.blit(self.background, (0,0))
             if self.hoveringNG == False:
                 self.screen.blit(self.btnNewGame, self.ngRect)
             else:
-                self.screen.blit(self.btnNewGameRed, self.ngRect)
+                self.screen.blit(self.btnNewGameHover, self.ngRect)
 
             if self.hoveringHS == False:
                 self.screen.blit(self.btnHighScore, self.hsRect)
             else:
-                self.screen.blit(self.btnHighScoreRed, self.hsRect)
+                self.screen.blit(self.btnHighScoreHover, self.hsRect)
+
+            if self.hoveringQT == False:
+                self.screen.blit(self.btnQuit, self.quitRect)
+            else:
+                self.screen.blit(self.btnQuitHover, self.quitRect)
 
 
             for event in pygame.event.get():
@@ -69,6 +89,10 @@ class MainMenu(object):
                         self.hoveringHS = True
                     elif not self.hsRect.collidepoint(mousex, mousey):
                         self.hoveringHS = False
+                    if self.quitRect.collidepoint(mousex, mousey):
+                        self.hoveringQT = True
+                    elif not self.quitRect.collidepoint(mousex, mousey):
+                        self.hoveringQT = False
                 
                 elif event.type == pygame.MOUSEBUTTONUP:
                     mousex, mousey = event.pos
@@ -78,6 +102,8 @@ class MainMenu(object):
                         #TODO
                         #show the high score screen
                         pass
+                    elif self.quitRect.collidepoint(mousex, mousey):
+                        gameState = const.GAME_STATE_QUITTING
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
