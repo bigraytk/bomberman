@@ -22,13 +22,19 @@ class StatusBar(object):
         self.spriteIcon = pygame.sprite.Group()
 
     
-    def addIcon(self, imageFileName, x, y, scale):
+    def addIcon(self, imageFileName, iconNum, scale = const.ICON_SCALE):
+        x = const.ICON_X + const.ICON_SPACING * iconNum
+        y = const.ICON_Y
         newIcon = Icon(imageFileName, x, y, scale)
         self.spriteIcon.add(newIcon)
 
 
     def getIconSpriteGroup(self):
         return self.spriteIcon
+
+
+    def getIconX(self, iconNum):
+        return const.ICON_X + const.ICON_SPACING * iconNum
 
 
 class Icon(pygame.sprite.Sprite):

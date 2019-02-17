@@ -87,11 +87,11 @@ class Game(object):
 
         
         self.statusBar = StatusBar.StatusBar(0, 0)
-        self.statusBar.addIcon("front.png", 70, 25, 25)
-        self.statusBar.addIcon("bomb.png", 125, 25, 25)
-        self.statusBar.addIcon("powerup_boot.png", 175, 20, 35)
-        self.statusBar.addIcon("powerup_range.png", 225, 25, 25)
-        self.statusBar.addIcon("powerup_count.png", 275, 25, 25)
+        self.statusBar.addIcon("front.png", 0)
+        #self.statusBar.addIcon("bomb.png", 1)
+        self.statusBar.addIcon("powerup_boot.png", 2, const.ICON_SCALE + 5)
+        self.statusBar.addIcon("powerup_range.png", 3)
+        self.statusBar.addIcon("powerup_count.png", 4)
 
 
         #player death screen
@@ -102,12 +102,15 @@ class Game(object):
         self.death_test_rect.x = int(self.screenWidth / 2 - self.death_test_rect.width / 2)
         self.death_test_rect.y = int(self.screenHeight / 2 - self.death_test_rect.height / 2)
         ################## Testing ########################## Testing ################# ^^^^^^
+        imageFile = str(Path.cwd() / "graphics" / "border.png")
+        self.borderImage = pygame.image.load(imageFile).convert()
 
 
     #redering/drawing, update frames functions
     def render(self):#level, player, enemies):
         #Render level
 
+        self.screen.blit(self.borderImage, (0, 0))
         self.drawStatusBar()
         #self.test.draw(self.screen)
         self.drawLevel()
@@ -169,31 +172,31 @@ class Game(object):
                 powerup.kill()
 
         #Frame Per Section update
-        text1 = str(int(self.clock.get_fps()))
-        fps = self.font.render(text1, True, pygame.Color('white'))
-        self.screen.blit(fps, (25, 25))
+        currentFPS = int(self.clock.get_fps())
+        if currentFPS >= 50:
+            fpsColor = const.GREEN
+        elif currentFPS >= 40:
+            fpsColor = const.YELLOW
+        else:
+            fpsColor = const.RED
+        text1 = str(currentFPS)
+        fps = self.font.render(text1, True, fpsColor)
+        self.screen.blit(fps, (self.screenWidth - 25, 5))
 
 
     def drawStatusBar(self):
         self.statusBar.getIconSpriteGroup().draw(self.screen)
+
+        textY = const.ICON_Y + 12
+        textXOffset = const.ICON_SCALE
         
-        #Player Lives Count
-        self.drawText('x'+str(self.player.lives), 100, 30, const.YELLOW)
-
-        #Active bomb status
-        self.drawText('x'+ str(self.player.activeBombs), 155, 30, const.YELLOW)
-
-        #Active Boot Status
-        self.drawText('x' + str(int(self.player.boot)), 205, 30, const.YELLOW)
-
-        #Active Range
-        self.drawText('x'+ str(self.player.bombRange), 255, 30, const.YELLOW)
-
-        #Active Bomb Count
-        self.drawText('x'+ str(self.player.bombCount), 305, 30, const.YELLOW)
-
-        #Score
-        self.drawText('Score: '+str(self.player.score), 350, 30, const.YELLOW)
+        #Text for Player Lives Count, active bombs, boot powerup, bomb range, bomb count, and score
+        self.drawText('x'+str(self.player.lives), self.statusBar.getIconX(0) + textXOffset, textY, const.YELLOW)
+        #self.drawText('x'+ str(self.player.activeBombs), self.statusBar.getIconX(1) + textXOffset, textY, const.YELLOW)
+        self.drawText('x' + str(int(self.player.boot)), self.statusBar.getIconX(2) + textXOffset, textY, const.YELLOW)
+        self.drawText('x'+ str(self.player.bombRange), self.statusBar.getIconX(3) + textXOffset, textY, const.YELLOW)
+        self.drawText('x'+ str(self.player.bombCount), self.statusBar.getIconX(4) + textXOffset, textY, const.YELLOW)
+        self.drawText('Score: '+str(self.player.score), const.SCORE_X, textY, const.YELLOW)
 
 
     def drawText(self, text, x, y, color):
