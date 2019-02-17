@@ -96,11 +96,14 @@ class Game(object):
 
         #player death screen
         ################## Testing ########################## Testing ################# vvvvvv
-        imageFile = str(Path.cwd() / "graphics" / "death_temp.png")     #placeholder
+        imageFile = str(Path.cwd() / "graphics" / "death_screen.png")     #placeholder
         self.death_test_image = pygame.image.load(imageFile).convert_alpha()
         self.death_test_rect = self.death_test_image.get_rect()
         self.death_test_rect.x = int(self.screenWidth / 2 - self.death_test_rect.width / 2)
         self.death_test_rect.y = int(self.screenHeight / 2 - self.death_test_rect.height / 2)
+
+        imageFile = str(Path.cwd() / "graphics" / "game_over_screen.png")     #placeholder
+        self.gameOverImage = pygame.image.load(imageFile).convert_alpha()
         ################## Testing ########################## Testing ################# ^^^^^^
         imageFile = str(Path.cwd() / "graphics" / "border.png")
         self.borderImage = pygame.image.load(imageFile).convert()
@@ -271,7 +274,10 @@ class Game(object):
     def statePlayerDead(self):
         #display death screen when player dies, then reset level
         self.screen.blit(self.screenImage, (0,0))
-        self.screen.blit(self.death_test_image, self.death_test_rect)
+        if not self.gameOver:#self.player.lives > 0:
+            self.screen.blit(self.death_test_image, self.death_test_rect)
+        else:
+            self.screen.blit(self.gameOverImage, self.death_test_rect)
         seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
         newState = self.gameState
         if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
