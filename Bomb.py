@@ -165,7 +165,7 @@ class Blast (Bomb):
 
     def __init__(self, x, y, direction, tail, center = False):
         super().__init__(x,y,range)
-        self.fade_out = 255
+        self.fade_out = const.FADE_START
         if direction == const.CENTER_FLAME:
             imageFile = str(Path.cwd() / "graphics" / "flame_center.png")
         elif not tail:

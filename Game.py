@@ -81,17 +81,18 @@ class Game(object):
         self.spritePlayer.add(self.player)
         self.spriteEnemies = pygame.sprite.Group()
         self.spriteEnemies.add(self.enemies)
+        #self.spriteDeadEnemies = pygame.sprite.Group()
         self.spriteBombs = pygame.sprite.Group()
         self.spriteBombBlasts = pygame.sprite.Group()
         self.spritePowerups = pygame.sprite.Group()
 
         
         self.statusBar = StatusBar.StatusBar(0, 0)
-        self.statusBar.addIcon("front.png", 0)
+        self.statusBar.addIcon("front.png", 0, True)
         #self.statusBar.addIcon("bomb.png", 1)
-        self.statusBar.addIcon("powerup_boot.png", 2, const.ICON_SCALE + 5)
-        self.statusBar.addIcon("powerup_range.png", 3)
-        self.statusBar.addIcon("powerup_count.png", 4)
+        self.statusBar.addIcon("powerup_boot.png", 2, False, const.ICON_SCALE + 5)
+        self.statusBar.addIcon("powerup_range.png", 3, False)
+        self.statusBar.addIcon("powerup_count.png", 4, False)
 
 
         #player death screen
@@ -128,7 +129,7 @@ class Game(object):
         self.spriteBombBlasts.update()
         self.spriteBombBlasts.draw(self.screen)
 
-        #self.spritePowerups.update()   #TODO uncomment when finished
+        self.spritePowerups.update()   #TODO uncomment when finished
         self.spritePowerups.draw(self.screen)
 
         #for enemy in self.spriteEnemies:
@@ -153,7 +154,7 @@ class Game(object):
             self.level.openDoor()
 
         for blast in self.spriteBombBlasts:
-            if blast.rect.colliderect(self.player.hitbox) and blast.fade_out > const.BLAST_FADE_START / 2:
+            if blast.rect.colliderect(self.player.hitbox) and blast.fade_out > const.FADE_START / 2:
                 self.killPlayer()
 
         for bomb in self.spriteBombs:
