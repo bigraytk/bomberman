@@ -29,6 +29,8 @@ class Level(object):
         self.playerStartPosit = None
         self.numEnemies = 0
         self.enemyStartPosit = []
+        self.bossLevel = None
+        self.bossStartPosit = None
 
         # Set the current working directory, read and write:
         dataDir = Path.cwd() / "data"
@@ -44,6 +46,7 @@ class Level(object):
             levelParams = f.readline().split(",")
             self.levelWidth = int(levelParams[const.LEVEL_WIDTH])
             self.levelHeight = int(levelParams[const.LEVEL_HEIGHT])
+            self.bossLevel = False
             backgroundNum = int(levelParams[const.LEVEL_BG_GFX])
             wallNum = int(levelParams[const.LEVEL_WALL_GFX])
             breakableNum = int(levelParams[const.LEVEL_BREAK_GFX])
@@ -70,7 +73,11 @@ class Level(object):
                         layout[y][x] = None
                         self.numEnemies += 1
                         self.enemyStartPosit.append((x, y))
-                         
+                    elif layout[y][x] == const.TILE_BOSS_SPAWN:
+                        layout[y][x] = None
+                        self.bossStartPosit = (x, y)
+                        self.bossLevel = True
+
         backgroundFile = str(graphicsDir.joinpath("back" + str(backgroundNum) + ".png"))
         self.backgroundImage = pygame.image.load(backgroundFile).convert()
          
@@ -88,6 +95,13 @@ class Level(object):
 
         enemyFile = str(graphicsDir.joinpath("enemy" + str(enemyNum) + ".png"))
         self.enemyImage = pygame.image.load(enemyFile).convert_alpha()
+
+        if self.bossLevel:
+            bossFile = str(graphicsDir.joinpath("boss.png"))
+            self.bossImage = pygame.image.load(bossFile).convert_alpha()
+        else:
+            self.bossImage = None
+
         
         return layout
 
@@ -193,8 +207,14 @@ def startNewLevel(num):
     x, y = level.playerStartPosit
     player = Character.PlayerCharacter(level, x, y)
     enemies = []
+    if level.bossLevel:
+        x, y = level.bossStartPosit
+        boss = Character.Boss(level, x, y)
+    else:
+        boss = None
+
     for i in range(level.numEnemies):
         x, y = level.enemyStartPosit[i]
         enemies.append(Character.Enemy(level, x, y))
-    
-    return (level, player, enemies)
+
+    return (level, player, enemies, boss)

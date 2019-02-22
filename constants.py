@@ -14,6 +14,7 @@ TILE_DOOR_CLOSED  = 'C'
 TILE_DOOR_OPENED  = 'O'
 TILE_PLAYER_START = 'P'
 TILE_ENEMY_SPAWN  = 'E'
+TILE_BOSS_SPAWN   = 'L'
 
 LEVEL_WIDTH       = 0
 LEVEL_HEIGHT      = 1
@@ -55,7 +56,7 @@ SCORE_X = 860
 BASIC = 0
 RANDOM = 1
 ADVANCED = 2
-#SMART = 3      # < do we need this?  We can just use ADVANCED for the type and logic
+
 SPEED_BOMB_KICKED = 5
 SPEED_HIGH = 2.5
 SPEED_MED = 2
@@ -70,6 +71,7 @@ POWERUP_BOOT = 2
 #character constants
 PC = 0
 ENEMY = 1
+BOSS = 2
 GRID_MOVE_SCALE = 1
 RES_MOVE_SCALE = 5
 PLAYER_SPEED = 3

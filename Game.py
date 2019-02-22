@@ -35,10 +35,10 @@ class Game(object):
         pygame.init()
 
         #setup music and sound
-        file = str(Path.cwd() / "sounds" / "music1.mp3")
+        musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.mixer.init()
-        pygame.mixer.music.load(file)
+        pygame.mixer.music.load(musicFile)
 
         self.explodeSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "bomb.wav"))
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
@@ -71,7 +71,7 @@ class Game(object):
 
         #load starting level
         self.levelNum = 1
-        self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+        self.level, self.player, self.enemies, self.boss = Level.startNewLevel(self.levelNum)
 
         #retreive total number of levels stored in data directory
         self.numLevels = 0
@@ -326,7 +326,7 @@ class Game(object):
         self.spriteBombBlasts.empty()
 
         tempPlayer = self.player
-        self.level, self.player, self.enemies = Level.startNewLevel(self.levelNum)
+        self.level, self.player, self.enemies, self.boss = Level.startNewLevel(self.levelNum)
         if self.gameOver or self.exitingToMenu:
             self.gameOver = False
             self.exitingToMenu = False
@@ -350,6 +350,13 @@ class Game(object):
             self.spritePlayer.add(self.player)
             self.player.state = const.STATE_IDLE
             self.spriteEnemies.add(self.enemies)
+            if self.boss:
+                self.spriteEnemies.add(self.boss)
+                musicFile = str(Path.cwd() / "sounds" / "musicBoss.mp3")
+                pygame.mixer.music.load(musicFile)
+            else:
+                musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
+                pygame.mixer.music.load(musicFile)
             newState = const.GAME_STATE_RUNNING
         tempPlayer.kill()
         return newState

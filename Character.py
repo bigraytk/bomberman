@@ -26,7 +26,6 @@ class Character(pygame.sprite.Sprite):
         self.facing = facing
         self.kind = kind
         self.state = const.STATE_IDLE
-        self.score = 0
         #if kind == const.PC:
             #self.Player = self.PlayerCharacter()
         #elif kind == const.ENEMY:
@@ -105,7 +104,23 @@ class Character(pygame.sprite.Sprite):
                     if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
                         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
                         self.move(self.direction, level)
-        
+        elif self.kind == const.BOSS:
+            #self.state = const.STATE_MOVING_RIGHT
+            #self.direction = const.RIGHT
+            #self.move(self.direction, level)
+
+            ####### TEMPORARY, NEED TO CHANGE THIS IMPLIMENTATION
+            if self.xres > const.SCREEN_OFFSET_X_LEFT + (level.levelWidth - 4) * const.TILE_SIZE:
+                self.direction = const.LEFT
+            if self.xres < const.SCREEN_OFFSET_X_LEFT + 1 * const.TILE_SIZE:
+                self.direction = const.RIGHT
+            if self.direction == const.RIGHT:
+                self.xres += const.SPEED_HIGH * 2
+            else:
+                self.xres -= const.SPEED_HIGH * 2
+            ######################################################
+            
+
         xDest = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
         yDest = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
         
@@ -196,6 +211,7 @@ class PlayerCharacter(Character):
         self.activeBombs = 0
         self.boot = False
         self.lives = const.LIVES
+        self.score = 0
         
         #imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
         #self.image = pygame.image.load(imageFile).convert_alpha()
@@ -307,7 +323,7 @@ class Enemy(Character):
         version = const.BASIC       #placeholder, maybe load enemy types from a list based on level #
         super().__init__(x, y, facing, 0, const.ENEMY)
         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
-        version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED]) 
+        version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED])
         self.pursuePlayer = False
 
         self.image = level.enemyImage
@@ -328,3 +344,15 @@ class Enemy(Character):
     def destroy(self):
         #gets called if something destroys an enemy
         pass
+
+
+class Boss(Character):
+    def __init__(self, level, x, y):#version):
+        '''Constructor'''
+        facing = const.DOWN
+        super().__init__(x, y, facing, 0, const.BOSS)
+        self.direction = random.choice([const.LEFT, const.RIGHT])
+
+        self.image = level.bossImage
+        self.rect = self.image.get_rect()
+        self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
