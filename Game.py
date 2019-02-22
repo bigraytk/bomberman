@@ -28,7 +28,8 @@ class Game(object):
         self.states = {const.GAME_STATE_MENU : self.stateMainMenu,
           const.GAME_STATE_RUNNING           : self.stateGameRunning,
           const.GAME_STATE_PLAYER_DEAD       : self.statePlayerDead,
-          const.GAME_STATE_QUITTING          : self.stateQuitting}
+          const.GAME_STATE_QUITTING          : self.stateQuitting,
+          const.GAME_STATE_HIGHSCORES        : self.stateHighScores}
 
         #initialize pygame
         pygame.init()
@@ -294,9 +295,12 @@ class Game(object):
         if newState == const.GAME_STATE_RUNNING:
             self.levelNum = 1
             newState = self.resetLevel()
-        elif newState == const.GAME_STATE_HIGHSCORES:
-            self.highScores.display()
 
+        return newState
+
+
+    def stateHighScores(self):
+        newState = self.highScores.display()
         return newState
 
 
@@ -326,7 +330,11 @@ class Game(object):
         if self.gameOver or self.exitingToMenu:
             self.gameOver = False
             self.exitingToMenu = False
-            newState = const.GAME_STATE_MENU
+            if self.gameOver:
+                self.updateScore()
+                newState = const.GAME_STATE_HIGHSCORES
+            else:
+                newState = const.GAME_STATE_MENU
         else:
             self.player.lives = tempPlayer.lives
             self.player.increaseScore(tempPlayer.score)
@@ -349,11 +357,10 @@ class Game(object):
 
     def killPlayer(self):
         self.player.state = const.STATE_DEAD
-        self.updateScore()
         if self.player.lives == 0:
             self.gameOver = True
-            #we need to add something to load the main menu
-            #pass
+            self.updateScore(self.player.score)
+            
         else:
             self.player.lives -= 1
             
@@ -421,9 +428,8 @@ class Game(object):
                 self.debug_mode(event)          #Testing purposeses  #TODO  remove
 
 
-    def updateScore(self):
-        #TODO
-        pass
+    def updateScore(self,score):
+        self.highScores.newScore(score)
     
 
     def quitGame(self):

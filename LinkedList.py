@@ -89,22 +89,23 @@ class LinkedList(object):
         self.numberOfNodes = 0
 
 
-    def readData(self, index):
-        ''' Returns data at the provided index, or None if index beyond the end. '''
+    def readData(self):
+        ''' Returns all the data in the nodes as a list. '''
 
         if self.head:
+            answer = []
             current = self.head
             i = 0
-            while i < index and current.nextNode:
+            
+            while current:
+                print('current: ' , current)
+                data = (current.score,current.name)
+                answer.append(data)
+                print('data: ' , data)
                 current = current.nextNode
-                i += 1
 
-            if i == index:
-                answer = (current.score,current.name)
-            else:
-                answer = None
         else:
-            answer = None
+            answer = []
             
         return answer
 
@@ -156,7 +157,7 @@ class LinkedList(object):
     
     def append(self,score,name):
         '''Appends new data Node to the end of the list. '''
-            
+        self.numberOfNodes += 1   
         newNode = self.Node(score,name)
         if self.tail == None:
             self.head = newNode
@@ -166,12 +167,10 @@ class LinkedList(object):
             newNode.prevNode = self.tail
             self.tail = newNode
             
-        
-
-
 
     def insertAtIndex(self, index, score, name):
         '''Inserts new Node at index, appends to end if index beyond end. '''
+        self.numberOfNodes += 1
 
         newNode = self.Node(score,name)
         #print('insterting new node: ' , newNode)
@@ -293,9 +292,16 @@ def saveBlankList():
 
 
 if __name__=="__main__":
+    
+
+    
     filePath = str(Path.cwd() / "HighScores" / "Scores.pickle")
     test = loadList(filePath)
     print(test)
+    array = test.readData()
+    print(array)
+    print(test.numberOfNodes)
+    
     
 
     '''

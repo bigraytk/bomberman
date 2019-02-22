@@ -9,6 +9,8 @@ import constants as const
 class InputBox:
 
     def __init__(self, screen, x, y, w, h, fontSize, colorInactive, colorActive, text=''):
+        '''
+        '''
         self.colorInactive = colorInactive
         self.colorActive = colorActive
         self.rect = pygame.Rect(x, y, w, h)
@@ -78,7 +80,7 @@ def run():
             if userInput == 'QUIT':
                 finished = True
 
-        screen.fill(const.BLACK)
+        self.screen.fill(const.BLACK)
         inputBox.draw(self.screen)
 
         pygame.display.flip()

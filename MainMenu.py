@@ -18,9 +18,6 @@ class MainMenu(object):
         quitButtonX = screenWidth / 2
         quitButtonY = const.TILE_SIZE * 10
 
-        '''Will display the main menu.'''
-        self.screen.fill(const.GREY)
-
         graphicsDir = Path.cwd() / "graphics"
 
         imageFile = str(graphicsDir.joinpath("main_menu.png"))
@@ -99,9 +96,8 @@ class MainMenu(object):
                     if self.ngRect.collidepoint(mousex, mousey):      #clicked on new game: start level 1
                         gameState = const.GAME_STATE_RUNNING
                     elif self.hsRect.collidepoint(mousex, mousey):    #clicked on high score: show high score screen
-                        #TODO
-                        #show the high score screen
-                        pass
+                        gameState = const.GAME_STATE_HIGHSCORES
+                        
                     elif self.quitRect.collidepoint(mousex, mousey):
                         gameState = const.GAME_STATE_QUITTING
 
