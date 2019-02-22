@@ -106,13 +106,14 @@ scoreString = scoreFile.read()
 print(scoreString)
 
 ans = tokenizer(scoreString)
+print(ans)
 entry = ('JLW',100)
 
 updatedList = newScore(ans,entry)
-scoreFile.close()
+#scoreFile.close()
 
 
-writeScores(ans,filePath)
+#writeScores(ans,filePath)
 
 
 

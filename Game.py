@@ -16,6 +16,7 @@ import StatusBar
 import random
 from pathlib import Path
 import pygame
+import HighScore
 
 
 class Game(object):
@@ -63,8 +64,9 @@ class Game(object):
         pygame.display.set_caption("BomberDude")
         self.screenImage = pygame.Surface(self.screenSize)    #used to store the screen to an image, useful for transparent menus
 
-        #
+        #sets up the MainMenu and High scores Screen
         self.theMainMenu = MainMenu.MainMenu(self.screen, self.screenWidth, self.screenHeight)
+        self.highScores = HighScore.HighScore(self.screen, self.screenWidth, self.screenHeight)
 
         #load starting level
         self.levelNum = 1
@@ -282,6 +284,8 @@ class Game(object):
         if newState == const.GAME_STATE_RUNNING:
             self.levelNum = 1
             newState = self.resetLevel()
+        elif newState == const.GAME_STATE_HIGHSCORES:
+            self.highScores.display()
 
         return newState
 
