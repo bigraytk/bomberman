@@ -22,8 +22,10 @@ class StatusBar(object):
         self.spriteIcon = pygame.sprite.Group()
 
     
-    def addIcon(self, imageFileName, x, y, scale):
-        newIcon = Icon(imageFileName, x, y, scale)
+    def addIcon(self, imageFileName, iconNum, alpha, scale = const.ICON_SCALE):
+        x = const.ICON_X + const.ICON_SPACING * iconNum
+        y = const.ICON_Y
+        newIcon = Icon(imageFileName, x, y, scale, alpha)
         self.spriteIcon.add(newIcon)
 
 
@@ -31,17 +33,25 @@ class StatusBar(object):
         return self.spriteIcon
 
 
+    def getIconX(self, iconNum):
+        return const.ICON_X + const.ICON_SPACING * iconNum
+
+
 class Icon(pygame.sprite.Sprite):
     '''
     This class encompasess all icons that
     can appear on the status bar
     '''
-    def __init__(self, imageFileName, x, y, scale):
+    def __init__(self, imageFileName, x, y, scale, alpha):
         '''Constructor'''
         pygame.sprite.Sprite.__init__(self)
 
         imageFile = str(Path.cwd() / "graphics" / imageFileName)
-        self.image = pygame.image.load(imageFile).convert_alpha()
+        if alpha:
+            self.image = pygame.image.load(imageFile).convert_alpha()
+        else:
+            self.image = pygame.image.load(imageFile).convert()
+            self.image.set_colorkey(const.TRAN_COL)
         self.image = pygame.transform.scale(self.image, (scale, scale))
         self.rect = self.image.get_rect()
         self.rect.x = x

@@ -32,18 +32,23 @@ MAP_HEIGHT  = 13
 # Game specifications
 FRAMERATE = 90
 SECOND = 1000  #1 second = 1000 milliseconds
-PLAYER_DEATH_SCREEN_TIMER = 1.5      #death screen is shown for 1.5 seconds
+PLAYER_DEATH_SCREEN_TIMER = 2      #death screen is shown for 2 seconds
 BOMB_TIMER = 4
 BOMB_EXPIDITE = 0.02#0.015
 BOMB_FLASH_SPEED = 2 #lower is faster
 BLAST_TIMER = 0.1
-BLAST_FADE_START = 255
+FADE_START = 255
 SCREEN_OFFSET_X_LEFT = 32
 SCREEN_OFFSET_Y_TOP = 64
 SCREEN_OFFSET_X_RIGHT = 32
 SCREEN_OFFSET_Y_BOTTOM = 32
 HIT_BOX_OFFSET_X = 20
 HIT_BOX_OFFSET_Y = 28
+ICON_X = 32
+ICON_Y = 20
+ICON_SPACING = 70
+ICON_SCALE = 40
+SCORE_X = 860
 
 
 # Enemy Constants
@@ -112,6 +117,7 @@ YELLOW   = (255, 255,   0)
 ORANGE   = (255, 128,   0)
 PURPLE   = (255,   0, 255)
 CYAN     = (  0, 255, 255)
+TRAN_COL = (255,   0, 255)
 
 #Blast Constants
 CENTER_FLAME = 0

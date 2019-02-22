@@ -29,14 +29,30 @@ class Powerup(pygame.sprite.Sprite):
         else:
             raise RuntimeError(str(powerupType) + ' is not a valid kind of powerup')
 
-        self.image = pygame.image.load(imageFile).convert_alpha()
+        self.image = pygame.image.load(imageFile).convert()
+        self.image.set_colorkey(const.TRAN_COL)
         self.rect = self.image.get_rect()
         self.rect.x = self.resx
         self.rect.y = self.resy
+        self.fade = const.FADE_START
+        self.fadeIncrease = False
+        self.fadeSpeed = 6
+        self.fadeMinimum = 120
 
 
     def update(self):
-        pass
+        if self.fadeIncrease:
+            self.fade += self.fadeSpeed
+        else:
+            self.fade -= self.fadeSpeed
+        if self.fade > const.FADE_START:
+            self.fade = const.FADE_START
+            self.fadeIncrease = False
+        if self.fade < self.fadeMinimum:
+            self.fade = self.fadeMinimum
+            self.fadeIncrease = True
+            
+        self.image.set_alpha(self.fade)
 
     def pickUp(self, player):
         '''This method is called when a PC occupies the same space as a powerup.
