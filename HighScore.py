@@ -3,7 +3,7 @@
 import InputBox
 from pathlib import Path
 import constants as const
-from LinkedList import *
+import LinkedList as LL
 import pygame
 
 
@@ -20,7 +20,7 @@ class HighScore(object):
         
         
 
-        self.filePath = str(Path.cwd() / "HighScores" / "Scores.pickle")
+        self.scoreFile = str(Path.cwd() / "HighScores" / "Scores.pickle")
 
         graphicsDir = Path.cwd() / "graphics"
 
@@ -39,9 +39,8 @@ class HighScore(object):
 
         self.hoveringMM = False
 
-
         #unpickle the file into the tree
-        self.scoreList = loadList(self.filePath)
+        self.scoreList = LL.loadList(self.scoreFile)
 
         
     def newScore(self, value):
@@ -59,6 +58,7 @@ class HighScore(object):
 
                 #add the newName and the score to the data structure
                 self.scoreList.insertInOrder(value, newName)
+                LL.saveList(self.scoreList, self.scoreFile)
         else:
             #have user input initials to go with the score
             fontSize = 64
@@ -67,6 +67,7 @@ class HighScore(object):
 
             #add the newName and the score to the data structure
             self.scoreList.insertInOrder(value,newName)
+            LL.saveList(self.scoreList, self.scoreFile)
 
 
     def drawText(self, text, x, y, color):
