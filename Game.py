@@ -324,7 +324,7 @@ class Game(object):
         self.spriteEnemies.empty()
         self.spriteBombs.empty()
         self.spriteBombBlasts.empty()
-
+        
         tempPlayer = self.player
         self.level, self.player, self.enemies, self.boss = Level.startNewLevel(self.levelNum)
         if self.exitingToMenu:
@@ -332,18 +332,20 @@ class Game(object):
             newState = const.GAME_STATE_MENU
         elif self.gameOver:
             self.gameOver = False
-            self.updateScore(self.player.score)
+            print(self.player.score)
+            self.updateScore(tempPlayer.score)
             newState = const.GAME_STATE_HIGHSCORES
         else:
             self.player.lives = tempPlayer.lives
             self.player.increaseScore(tempPlayer.score)
             if tempPlayer.state == const.STATE_DEAD:        #player keeps powerups when going to next level, but not if player dies
-                self.player.increaseScore(const.PLAYER_DIED)
+                #self.player.increaseScore(const.PLAYER_DIED)
+                pass
             elif self.gameState == const.GAME_STATE_MENU:
                 self.player.lives = const.LIVES
                 self.player.score = 0
             else:
-                self.player.bombCount = tempPlayer.bombCount        #TODO do we really want to have powerups persist between levels?
+                self.player.bombCount = tempPlayer.bombCount
                 self.player.bombRange = tempPlayer.bombRange
                 self.player.boot = tempPlayer.boot
             self.spritePlayer.add(self.player)
@@ -362,11 +364,10 @@ class Game(object):
 
 
     def killPlayer(self):
+        self.player.increaseScore(const.PLAYER_DIED)
         self.player.state = const.STATE_DEAD
         if self.player.lives == 0:
             self.gameOver = True
-            #self.updateScore(self.player.score)
-            
         else:
             self.player.lives -= 1
             

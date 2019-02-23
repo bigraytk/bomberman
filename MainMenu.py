@@ -54,7 +54,6 @@ class MainMenu(object):
         gameState = const.GAME_STATE_MENU
         while gameState == const.GAME_STATE_MENU:
             
-            #self.screen.fill(const.GREY)
             self.screen.blit(self.background, (0,0))
             if self.hoveringNG == False:
                 self.screen.blit(self.btnNewGame, self.ngRect)

@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 import constants as const
 
 
@@ -19,10 +20,15 @@ class InputBox(object):
         self.maxChars = 3
         self.font = pygame.font.Font(None, fontSize)
         self.textSurface = self.font.render(text, True, self.color)
-        self.label = self.font.render("Enter your name", True, const.BLUE)
         self.textX = self.rect.x + self.rect.width / 2 - self.textSurface.get_width() / 2
         self.returnValue = None
         self.screen = screen
+
+        graphicsDir = Path.cwd() / "graphics"
+
+        imageFile = str(graphicsDir.joinpath("new_high_score.png"))
+        self.background = pygame.image.load(imageFile)
+
 
     def handle_event(self, event):
         #if event.type == pygame.MOUSEBUTTONDOWN:
@@ -51,8 +57,9 @@ class InputBox(object):
 
         return self.returnValue
 
+
     def draw(self, screen):
-        screen.blit(self.label, (self.rect.x, self.rect.y -25))
+        self.screen.blit(self.background, (0,0))
         screen.blit(self.textSurface, (self.rect.x + self.rect.width / 2 - self.textSurface.get_width() / 2, self.rect.y + 5))
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
