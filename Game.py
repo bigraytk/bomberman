@@ -148,11 +148,15 @@ class Game(object):
         #pygame.draw.rect(self.screen, (255, 255, 0), self.player.hitbox, 2)  #Draws player's collision box, for testing purposes
 
         for enemy in self.spriteEnemies:
-            if enemy.rect.colliderect(self.player.hitbox):
+            if enemy.rect.colliderect(self.player.hitbox) and enemy.state != const.STATE_DYING:
                 self.killPlayer()
             if pygame.sprite.spritecollideany(enemy, self.spriteBombBlasts, collided = None):
-                enemy.kill()
-                self.player.increaseScore(const.ENEMY_DIED)
+                if enemy.kind == const.BOSS:
+                    if enemy.takeDamage():
+                      self.player.increaseScore(const.ENEMY_DIED)  
+                else:
+                    enemy.destroy()
+                    self.player.increaseScore(const.ENEMY_DIED)
         if not self.spriteEnemies:  #check if no more enemies left
             self.level.openDoor()
 

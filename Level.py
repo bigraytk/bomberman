@@ -93,14 +93,14 @@ class Level(object):
         doorClosedFile = str(graphicsDir.joinpath("door_closed.png"))
         self.doorClosedImage = pygame.image.load(doorClosedFile).convert_alpha()
 
-        enemyFile = str(graphicsDir.joinpath("enemy" + str(enemyNum) + ".png"))
-        self.enemyImage = pygame.image.load(enemyFile).convert_alpha()
+        self.enemyFile = str(graphicsDir.joinpath("enemy" + str(enemyNum) + ".png"))
+        #self.enemyImage = pygame.image.load(enemyFile).convert()
+        #self.enemyImage.set_colorkey(const.TRAN_COL)
 
-        if self.bossLevel:
-            bossFile = str(graphicsDir.joinpath("boss.png"))
-            self.bossImage = pygame.image.load(bossFile).convert_alpha()
-        else:
-            self.bossImage = None
+        #if self.bossLevel:
+        #    self.bossFile = str(graphicsDir.joinpath("boss.png"))
+        #else:
+        #    self.bossFile = None
 
         
         return layout

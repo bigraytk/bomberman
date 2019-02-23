@@ -84,41 +84,54 @@ class Character(pygame.sprite.Sprite):
         '''
         Updates character position when a character is moving towards a grid position
         '''
-        if self.kind == const.ENEMY and self.state == const.STATE_IDLE:
-            if self.logic == const.RANDOM:
-                self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
-                self.move(self.direction, level)
-            elif self.logic == const.BASIC:
-                pathBlocked = self.move(self.direction, level)
-                if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
+        if self.kind == const.ENEMY:
+            if self.state == const.STATE_IDLE:
+                if self.logic == const.RANDOM:
                     self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
                     self.move(self.direction, level)
-            elif self.logic == const.ADVANCED and player != None:
-                if abs(self.x - player.x) < const.ADVANCED_ENEMY_RANGE and abs(self.y - player.y) < const.ADVANCED_ENEMY_RANGE:
-                    self.pursuePlayer = True
-                    self.speed = const.SPEED_HIGH
-                if self.pursuePlayer:
-                    self.advancedMovement(level, player)
-                else:
+                elif self.logic == const.BASIC:
                     pathBlocked = self.move(self.direction, level)
                     if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
                         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
                         self.move(self.direction, level)
+                elif self.logic == const.ADVANCED and player != None:
+                    if abs(self.x - player.x) < const.ADVANCED_ENEMY_RANGE and abs(self.y - player.y) < const.ADVANCED_ENEMY_RANGE:
+                        self.pursuePlayer = True
+                        self.speed = const.SPEED_HIGH
+                    if self.pursuePlayer:
+                        self.advancedMovement(level, player)
+                    else:
+                        pathBlocked = self.move(self.direction, level)
+                        if pathBlocked or random.randint(0, 50) > 45:   #enemy walks until path blocked, or randomly decides to turn
+                            self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
+                            self.move(self.direction, level)
+            elif self.state == const.STATE_DYING:
+                self.fade_out -= 8
+                self.image.set_alpha(self.fade_out)
+                if self.fade_out < 0:
+                    self.kill()
         elif self.kind == const.BOSS:
-            #self.state = const.STATE_MOVING_RIGHT
-            #self.direction = const.RIGHT
-            #self.move(self.direction, level)
+            if self.state == const.STATE_IDLE:
 
-            ####### TEMPORARY, NEED TO CHANGE THIS IMPLIMENTATION
-            if self.xres > const.SCREEN_OFFSET_X_LEFT + (level.levelWidth - 4) * const.TILE_SIZE:
-                self.direction = const.LEFT
-            if self.xres < const.SCREEN_OFFSET_X_LEFT + 1 * const.TILE_SIZE:
-                self.direction = const.RIGHT
-            if self.direction == const.RIGHT:
-                self.xres += const.SPEED_HIGH * 2
-            else:
-                self.xres -= const.SPEED_HIGH * 2
-            ######################################################
+                pathBlocked = self.move(self.direction, level)
+                if pathBlocked or self.x > const.MAP_WIDTH - 5:
+                    if self.direction == const.LEFT:
+                        self.direction = const.RIGHT
+                    else:
+                        self.direction = const.LEFT
+            
+            
+            #if random.randint(0, 1000) < 4:
+                #self.state = const.STATE_DROPPING_BOMB
+                #self.dropBomb(level)
+
+            if self.health < 0:
+                self.state = const.STATE_DYING
+            if self.state == const.STATE_DYING:
+                self.fade_out -= 4
+                self.image.set_alpha(self.fade_out)
+                if self.fade_out < 0:
+                    self.kill()
             
 
         xDest = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
@@ -326,9 +339,11 @@ class Enemy(Character):
         version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED])
         self.pursuePlayer = False
 
-        self.image = level.enemyImage
+        self.image = pygame.image.load(level.enemyFile).convert()
+        self.image.set_colorkey(const.TRAN_COL)
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
+        self.fade_out = const.FADE_START
         
         if version == const.RANDOM: #BASIC is some value that we have not mapped yet
             self.speed = const.SPEED_LOW
@@ -339,11 +354,11 @@ class Enemy(Character):
         elif version == const.ADVANCED:
             self.speed = const.SPEED_LOW    #advanced enemies start slow but speed up when in pursuit
             self.logic = const.ADVANCED
-        
 
+    
     def destroy(self):
         #gets called if something destroys an enemy
-        pass
+        self.state = const.STATE_DYING
 
 
 class Boss(Character):
@@ -352,7 +367,37 @@ class Boss(Character):
         facing = const.DOWN
         super().__init__(x, y, facing, 0, const.BOSS)
         self.direction = random.choice([const.LEFT, const.RIGHT])
+        self.speed = const.SPEED_HIGH
 
-        self.image = level.bossImage
+        graphicsDir = Path.cwd() / "graphics"
+
+        imageFile = str(graphicsDir.joinpath("boss.png"))
+        self.imageNormal = pygame.image.load(imageFile).convert()
+        self.imageNormal.set_colorkey(const.TRAN_COL)
+        self.image = self.imageNormal
+        imageFile = str(graphicsDir.joinpath("boss_mouth_open.png"))
+        self.imageMouth = pygame.image.load(imageFile).convert()
+        self.imageMouth.set_colorkey(const.TRAN_COL)
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
+        self.fade_out = const.FADE_START
+
+        self.health = 3
+
+
+    def dropBomb(self, level):
+        pass
+        #TODO
+            #self.image = self.imageMouth
+            #else:
+            #    self.image = self.imageNormal
+
+    def countdown(self):
+        return (pygame.time.get_ticks() - self.start_ticks) / const.SECOND 
+
+
+    def takeDamage(self):
+        self.health -= 1
+        
+        #TODO implement taking damage, temporary invincibility (so boss doesn't take consecutive hits from same bomb)
+        return True
