@@ -9,7 +9,7 @@ def loadList(filePath):
     scoreFile.close()
     return scoreList
 
-def saveList(scoreList,filePath):
+def saveList(scoreList, filePath):
     scoreFile = open(filePath,'wb')
     pickle.dump(scoreList,scoreFile)
     scoreFile.close()
@@ -29,7 +29,7 @@ class LinkedList(object):
 
         '''
 
-        def __init__(self, score,name):
+        def __init__(self, score, name):
             ''' Constructor. -dataIn may not be None'''
             if score == None or name == None:
                 raise RuntimeError('data item to put in Node is None.')
@@ -116,7 +116,7 @@ class LinkedList(object):
             return None
 
    
-    def indexOf(self, value,name):
+    def indexOf(self, value, name):
         '''Returns index of first matching value, or None if value not found.'''
         
         if self.head:
@@ -155,7 +155,7 @@ class LinkedList(object):
         return answer
 
     
-    def append(self,score,name):
+    def append(self, score, name):
         '''Appends new data Node to the end of the list. '''
         self.numberOfNodes += 1   
         newNode = self.Node(score,name)
@@ -202,7 +202,7 @@ class LinkedList(object):
             self.tail = newNode
 
 
-    def insertInOrder(self,score,name):
+    def insertInOrder(self, score, name):
         '''Inserts new Node in order, highest score at the head, lowest at the tail '''
         index = self.indexOfSmallerScore(score)
         if index == None:

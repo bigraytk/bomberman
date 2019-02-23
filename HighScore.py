@@ -25,10 +25,10 @@ class HighScore(object):
         mainMenuButtonX = screenWidth / 2
         mainMenuButtonY = const.TILE_SIZE * 9
 
-        mainMenuGraph = str(graphicsDir.joinpath("NewGameButton.png"))
+        mainMenuGraph = str(graphicsDir.joinpath("MainMenuButton.png"))
         self.btnMainMenu = pygame.image.load(mainMenuGraph)
 
-        mainMenuGraphRed = str(graphicsDir.joinpath("NewGameButton_hover.png"))
+        mainMenuGraphRed = str(graphicsDir.joinpath("MainMenuButton_hover.png"))
         self.btnMainMenuHover = pygame.image.load(mainMenuGraphRed)
         self.mmRect = self.btnMainMenuHover.get_rect(center =(mainMenuButtonX, mainMenuButtonY))
 
@@ -43,7 +43,7 @@ class HighScore(object):
         #TODO
 
         
-    def newScore(self,value):
+    def newScore(self, value):
         '''checks to see if the passed value is a high score. If it is, will update the scoreList and ask 
         for user input for the name.'''
         #check data structure to see where the new score goes
@@ -54,18 +54,18 @@ class HighScore(object):
                 #have user input initials to go with the score
                 fontSize = 32
                 inputBox = InputBox.InputBox(self.screen, 320, 240, 58, 32, fontSize, const.GREY, const.GREEN)
-                newName = InputBox.run()
+                newName = inputBox.run()
 
                 #add the newName and the score to the data structure
-                self.scoreList.instertInOrder(value,newName)
+                self.scoreList.instertInOrder(value, newName)
         else:
             #have user input initials to go with the score
             fontSize = 32
             inputBox = InputBox.InputBox(self.screen, 320, 240, 58, 32, fontSize, const.GREY, const.GREEN)
-            newName = InputBox.run()
+            newName = inputBox.run()
 
             #add the newName and the score to the data structure
-            self.scoreList.instertInOrder(value,newName)
+            self.scoreList.insertInOrder(value,newName)
 
     def drawText(self, text, x, y, color):
         textSurface = self.font.render(text, True, color)

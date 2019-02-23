@@ -327,14 +327,13 @@ class Game(object):
 
         tempPlayer = self.player
         self.level, self.player, self.enemies, self.boss = Level.startNewLevel(self.levelNum)
-        if self.gameOver or self.exitingToMenu:
-            self.gameOver = False
+        if self.exitingToMenu:
             self.exitingToMenu = False
-            if self.gameOver:
-                self.updateScore()
-                newState = const.GAME_STATE_HIGHSCORES
-            else:
-                newState = const.GAME_STATE_MENU
+            newState = const.GAME_STATE_MENU
+        elif self.gameOver:
+            self.gameOver = False
+            self.updateScore(self.player.score)
+            newState = const.GAME_STATE_HIGHSCORES
         else:
             self.player.lives = tempPlayer.lives
             self.player.increaseScore(tempPlayer.score)
@@ -366,7 +365,7 @@ class Game(object):
         self.player.state = const.STATE_DEAD
         if self.player.lives == 0:
             self.gameOver = True
-            self.updateScore(self.player.score)
+            #self.updateScore(self.player.score)
             
         else:
             self.player.lives -= 1
@@ -449,9 +448,9 @@ class Game(object):
     #TODO  remove before release
     def debug_mode(self, event):
         if event.key == pygame.K_z:     #testing code for door
-            self.level.showDoor()
-        elif event.key == pygame.K_x:
-            self.level.openDoor()
+            self.killPlayer()
+        elif event.key == pygame.K_x:   #reduce lives to 0 for quick testing of highscore
+            self.player.lives = 0
         elif event.key == pygame.K_k:   #kill all enemies on screen
             for enemy in self.spriteEnemies:
                 enemy.kill()
