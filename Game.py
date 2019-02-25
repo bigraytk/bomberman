@@ -3,7 +3,7 @@ Created on Fri Jan 11 08:09:12 2019
 
 @author: 
 """
-import sys
+#import sys
 import constants as const
 import colors
 import Level
@@ -13,10 +13,10 @@ import Bomb
 import Powerup
 import MainMenu
 import StatusBar
+import HighScore
 import random
 from pathlib import Path
 import pygame
-import HighScore
 
 
 class Game(object):

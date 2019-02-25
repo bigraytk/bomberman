@@ -121,7 +121,7 @@ class Character(pygame.sprite.Sprite):
                         self.direction = const.LEFT
             
             
-            #if random.randint(0, 1000) < 4:
+            #if random.randint(0, 100) < 4:
                 #self.state = const.STATE_DROPPING_BOMB
                 #self.dropBomb(level)
 

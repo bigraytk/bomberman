@@ -8,7 +8,6 @@ Main program
 """
 
 import Game
-from LinkedList import *
 
 game = Game.Game()
 

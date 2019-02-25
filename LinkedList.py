@@ -18,8 +18,6 @@ class LinkedList(object):
     
     '''Linked-List Class.
     '''
-
-
     class Node(object):
 
         '''Node Class
