@@ -225,7 +225,6 @@ class Character(pygame.sprite.Sprite):
                 self.startTicksBomb = pygame.time.get_ticks()
             return newBomb
         else:
-            print("test")
             return None
 
 
@@ -343,6 +342,7 @@ class Enemy(Character):
         facing = const.DOWN
         version = const.BASIC       #placeholder, maybe load enemy types from a list based on level #
         super().__init__(x, y, facing, 0, const.ENEMY)
+        self.yres += 10
         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
         version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED])
         self.pursuePlayer = False
@@ -418,6 +418,11 @@ class Boss(Character):
         seconds = self.countdownDropBomb()#calculate how many seconds
         if seconds > self.timerBomb:
             self.readyDropBomb = True
+
+        if self.readyDropBomb:
+            self.image = self.imageMouth
+        else:
+            self.image = self.imageNormal
     
    #def countdown(self):
    #     return (pygame.time.get_ticks() - self.start_ticks) / const.SECOND
