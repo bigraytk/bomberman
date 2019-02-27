@@ -19,14 +19,12 @@ class LinkedList(object):
     '''Linked-List Class.
     '''
     class Node(object):
-
         '''Node Class
 
         This is an internally defined class, indicating it is not a thing to be
         used willy-nilly elsewhere in the code.
 
         '''
-
         def __init__(self, score, name):
             ''' Constructor. -dataIn may not be None'''
             if score == None or name == None:
@@ -96,10 +94,10 @@ class LinkedList(object):
             i = 0
             
             while current:
-                print('current: ' , current)
+                #print('current: ' , current)
                 data = (current.score,current.name)
                 answer.append(data)
-                print('data: ' , data)
+                #print('data: ' , data)
                 current = current.nextNode
 
         else:
@@ -237,9 +235,9 @@ class LinkedList(object):
             self.head = None
             self.tail = None
         else:
-            print('deleting: ' , self.tail)
+            #print('deleting: ' , self.tail)
             self.tail = self.tail.prevNode
-            print('new tail is : ' , self.tail)
+            #print('new tail is : ' , self.tail)
             self.tail.nextNode = None
         
 

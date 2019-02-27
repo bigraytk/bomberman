@@ -87,6 +87,7 @@ class Game(object):
         #self.spriteDeadEnemies = pygame.sprite.Group()
         self.spriteBombs = pygame.sprite.Group()
         self.spriteBombBlasts = pygame.sprite.Group()
+        self.spriteBossBombBlasts = pygame.sprite.Group()
         self.spritePowerups = pygame.sprite.Group()
 
         
@@ -132,6 +133,9 @@ class Game(object):
         self.spriteBombBlasts.update()
         self.spriteBombBlasts.draw(self.screen)
 
+        self.spriteBossBombBlasts.update()
+        self.spriteBossBombBlasts.draw(self.screen)
+
         self.spritePowerups.update()   #TODO uncomment when finished
         self.spritePowerups.draw(self.screen)
 
@@ -153,7 +157,7 @@ class Game(object):
             if pygame.sprite.spritecollideany(enemy, self.spriteBombBlasts, collided = None):
                 if enemy.kind == const.BOSS:
                     if enemy.takeDamage():
-                      self.player.increaseScore(const.ENEMY_DIED)  
+                      self.player.increaseScore(const.ENEMY_DIED) 
                 else:
                     enemy.destroy()
                     self.player.increaseScore(const.ENEMY_DIED)
@@ -164,16 +168,25 @@ class Game(object):
             if blast.rect.colliderect(self.player.hitbox) and blast.fade_out > const.FADE_START / 2:
                 self.killPlayer()
 
+        for blast in self.spriteBossBombBlasts:
+            if blast.rect.colliderect(self.player.hitbox) and blast.fade_out > const.FADE_START / 2:
+                self.killPlayer()
+
         for bomb in self.spriteBombs:
             if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None):
                 bomb.expiditeExplosion()
             if bomb.exploded:
                 if self.soundOn:
                     self.explodeSound.play()
-                powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, self.player.bombRange)
-                self.spritePowerups.add(powerups)
-                self.spriteBombBlasts.add(blasts)
-                self.level, self.player = bomb.explode(self.level, self.player)
+                if not bomb.bossBomb:
+                    powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, bomb.range)
+                    self.spritePowerups.add(powerups)
+                    self.spriteBombBlasts.add(blasts)
+                    self.level, self.player = bomb.explode(self.level, self.player)
+                else:
+                    powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, bomb.range)
+                    self.spriteBossBombBlasts.add(blasts)
+                    self.level, self.boss = bomb.explode(self.level, self.boss)
                 bomb.kill()
 
         for powerup in self.spritePowerups:
@@ -242,6 +255,16 @@ class Game(object):
         self.screen.blit(image, (xres, yres))
 
 
+    def updateBoss(self):
+        #if self.boss.
+        if self.boss.readyDropBomb and random.randint(0, 20) < 15:
+            newBomb = self.boss.dropBomb(self.level)
+            if newBomb:
+                self.level.layout[newBomb.y][newBomb.x] = newBomb
+                self.spriteBombs.add(newBomb)
+                newBomb.kick(const.DOWN, self.level)
+    
+    
     def updateScreen(self):
         pygame.display.update()
         self.screen.fill(colors.Black)
@@ -255,6 +278,8 @@ class Game(object):
         else:
             pygame.mixer.music.stop()
 
+        if self.level.bossLevel:
+            self.updateBoss()
         self.getUserInput()
 
         #stateFunction = self.states[self.gameState]
@@ -312,14 +337,14 @@ class Game(object):
         return const.GAME_STATE_QUITTING
 
 
-
-
     def resetLevel(self):
         for enemy in self.spriteEnemies:
             enemy.kill()
         for bomb in self.spriteBombs:
             bomb.kill()
         for blast in self.spriteBombBlasts:
+            blast.kill()
+        for blast in self.spriteBossBombBlasts:
             blast.kill()
         for powerup in self.spritePowerups:
             powerup.kill()
@@ -328,6 +353,7 @@ class Game(object):
         self.spriteEnemies.empty()
         self.spriteBombs.empty()
         self.spriteBombBlasts.empty()
+        self.spriteBossBombBlasts.empty()
         
         tempPlayer = self.player
         self.level, self.player, self.enemies, self.boss = Level.startNewLevel(self.levelNum)
@@ -336,7 +362,6 @@ class Game(object):
             newState = const.GAME_STATE_MENU
         elif self.gameOver:
             self.gameOver = False
-            print(self.player.score)
             self.updateScore(tempPlayer.score)
             newState = const.GAME_STATE_HIGHSCORES
         else:
@@ -474,3 +499,10 @@ class Game(object):
         elif event.key == pygame.K_q:
             self.player.bombCount = 5
             self.player.bombRange = 3
+            self.player.boot = True
+        elif event.key == pygame.K_b:
+            newBomb = self.boss.dropBomb(self.level)
+            if newBomb:
+                self.level.layout[newBomb.y][newBomb.x] = newBomb
+                self.spriteBombs.add(newBomb)
+                self.level.layout[newBomb.y][newBomb.x].kick(const.DOWN, self.level)

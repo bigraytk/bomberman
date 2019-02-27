@@ -25,6 +25,9 @@ class Character(pygame.sprite.Sprite):
         self.speed = speed
         self.facing = facing
         self.kind = kind
+        self.activeBombs = 0
+        self.bombCount = 0
+        self.bombRange = 0
         self.state = const.STATE_IDLE
         #if kind == const.PC:
             #self.Player = self.PlayerCharacter()
@@ -119,11 +122,6 @@ class Character(pygame.sprite.Sprite):
                         self.direction = const.RIGHT
                     else:
                         self.direction = const.LEFT
-            
-            
-            #if random.randint(0, 100) < 4:
-                #self.state = const.STATE_DROPPING_BOMB
-                #self.dropBomb(level)
 
             if self.health < 0:
                 self.state = const.STATE_DYING
@@ -207,6 +205,42 @@ class Character(pygame.sprite.Sprite):
             self.move(self.direction, level)
 
 
+    def dropBomb(self, level):
+        '''Creates an instance of the bomb class at the PC's position'''
+        xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
+        yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
+        if self.kind == const.BOSS:
+            isBoss = True
+            offsetX = 1
+            offsetY = 2
+        else:
+            isBoss = False
+            offsetX = 0
+            offsetY = 0
+        if xDiff < 10 and yDiff < 10 and self.activeBombs < self.bombCount and level.layout[self.y][self.x] == None:
+            newBomb = Bomb.Bomb(self.x + offsetX, self.y + offsetY, self.bombRange, isBoss)
+            self.changeActiveBombCount(1)
+            if isBoss:
+                self.readyDropBomb = False
+                self.startTicksBomb = pygame.time.get_ticks()
+            return newBomb
+        else:
+            print("test")
+            return None
+
+
+    def changeActiveBombCount(self, change):
+        '''This method is how to change the value of self.activeBombs
+        will be called by dropBomb method of the PlayerCharacter, and
+        the explode method of the Bomb
+        '''
+        self.activeBombs = self.activeBombs + change
+        if self.activeBombs < 0:
+            self.activeBombs = 0
+        if self.activeBombs > self.bombCount:
+            self.activeBombs = self.bombCount
+
+
 class PlayerCharacter(Character):
     
     '''
@@ -221,7 +255,6 @@ class PlayerCharacter(Character):
         self.bombCount = const.PLAYER_DEFAULT_NUM_BOMBS
         self.bombRange = 1
         #self.speed = 40 #placeholder
-        self.activeBombs = 0
         self.boot = False
         self.lives = const.LIVES
         self.score = 0
@@ -269,31 +302,6 @@ class PlayerCharacter(Character):
                 layout[self.y][self.x + 1].kick(direction, level)
 
         super().move(direction, level)
-
-
-    def dropBomb(self, level):
-        '''Creates an instance of the bomb class at the PC's position'''
-        xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
-        yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
-        if xDiff < 10 and yDiff < 10 and self.activeBombs < self.bombCount and level.layout[self.y][self.x] == None:
-            newBomb = Bomb.Bomb(self.x, self.y, self.bombRange)
-            self.changeActiveBombCount(1)
-            return newBomb
-        else:
-            return None
-
-
-    def changeActiveBombCount(self,change):
-        '''This method is how to change the value of self.activeBombs
-        will be called by dropBomb method of the PlayerCharacter, and
-        the explode method of the Bomb
-        '''
-        
-        self.activeBombs = self.activeBombs + change
-        if self.activeBombs < 0:
-            self.activeBombs = 0
-        if self.activeBombs > self.bombCount:
-            self.activeBombs = self.bombCount
 
 
     def getPowerup(self, powerup):
@@ -368,6 +376,11 @@ class Boss(Character):
         super().__init__(x, y, facing, 0, const.BOSS)
         self.direction = random.choice([const.LEFT, const.RIGHT])
         self.speed = const.SPEED_HIGH
+        self.readyDropBomb = True
+        self.timerBomb = 1  #TODO constant
+        self.bombCount = 3
+        self.bombRange = max(level.levelHeight, level.levelWidth)
+        self.startTicksBomb = 0
 
         graphicsDir = Path.cwd() / "graphics"
 
@@ -385,15 +398,33 @@ class Boss(Character):
         self.health = 3
 
 
-    def dropBomb(self, level):
-        pass
+    #def dropBomb(self, level):
+    #    '''Creates an instance of the bomb class at the boss' position'''
+    #    xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
+    #    yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
+    #    if xDiff < 10 and yDiff < 10 and  self.activeBombs < self.bombCount and level.layout[self.y][self.x] == None:
+    #        newBomb = Bomb.Bomb(self.x + 1, self.y + 2, max(level.levelHeight, level.levelWidth), True)
+    #        return newBomb
+    #    else:
+    #        return None
+
         #TODO
             #self.image = self.imageMouth
             #else:
             #    self.image = self.imageNormal
 
-    def countdown(self):
-        return (pygame.time.get_ticks() - self.start_ticks) / const.SECOND 
+    def update(self, level, player = None):
+        super().update(level)
+        seconds = self.countdownDropBomb()#calculate how many seconds
+        if seconds > self.timerBomb:
+            self.readyDropBomb = True
+    
+   #def countdown(self):
+   #     return (pygame.time.get_ticks() - self.start_ticks) / const.SECOND
+
+
+    def countdownDropBomb(self):
+        return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND 
 
 
     def takeDamage(self):

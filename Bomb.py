@@ -13,14 +13,15 @@ class Bomb(pygame.sprite.Sprite):
 
     '''
 
-    def __init__(self, x, y, range):
+    def __init__(self, x, y, theRange, bossBomb = False):
         super().__init__()
         self.timer = const.BOMB_TIMER
-        self.range = range  #range of blast
+        self.range = theRange  #range of blast
         self.x = x
         self.y = y
         self.xres = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
         self.yres = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
+        self.bossBomb = bossBomb
 
         imageFile = str(Path.cwd() / "graphics" / "bomb.png")
         self.image = pygame.image.load(imageFile).convert()
@@ -97,14 +98,14 @@ class Bomb(pygame.sprite.Sprite):
         return (pygame.time.get_ticks() - self.start_ticks) / const.SECOND 
 
 
-    def explode(self, level, player):
+    def explode(self, level, character):
         #explode centered at xpos and ypos, range of explosion equals self.blastSize
         #need to call animation for explosion, and initiate destroy checks on all
         #objects in range.
         #also needs to call the changeBombCount method from the PlayerCharacter class
         level.layout[self.y][self.x] = None
-        player.changeActiveBombCount(-1)
-        return level, player
+        character.changeActiveBombCount(-1)
+        return level, character
 
     
     def expiditeExplosion(self):            #make bomb explode sooner, for chain reactions
@@ -164,7 +165,7 @@ class Bomb(pygame.sprite.Sprite):
 class Blast (Bomb):
 
     def __init__(self, x, y, direction, tail, center = False):
-        super().__init__(x,y,range)
+        super().__init__(x, y, 1, False)
         self.fade_out = const.FADE_START
         if direction == const.CENTER_FLAME:
             imageFile = str(Path.cwd() / "graphics" / "flame_center.png")
