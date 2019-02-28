@@ -291,14 +291,18 @@ class PlayerCharacter(Character):
 
         #check for bomb to kick
         if self.boot:
-            if direction == const.UP and isinstance(layout[self.y - 1][self.x], Bomb.Bomb): 
-                layout[self.y - 1][self.x].kick(direction, level)
+            bomb = None
+            if direction == const.UP and isinstance(layout[self.y - 1][self.x], Bomb.Bomb):
+                bomb = layout[self.y - 1][self.x]
             if direction == const.DOWN and isinstance(layout[self.y + 1][self.x], Bomb.Bomb): 
-                layout[self.y + 1][self.x].kick(direction, level)
+                bomb = layout[self.y + 1][self.x]
             if direction == const.LEFT and isinstance(layout[self.y][self.x - 1], Bomb.Bomb): 
-                layout[self.y][self.x - 1].kick(direction, level)
+                bomb = layout[self.y][self.x - 1]
             if direction == const.RIGHT and isinstance(layout[self.y][self.x + 1], Bomb.Bomb): 
-                layout[self.y][self.x + 1].kick(direction, level)
+                bomb = layout[self.y][self.x + 1]
+            if bomb and not bomb.bossBomb:
+                bomb.kick(direction, level)
+                
 
         super().move(direction, level)
 
@@ -342,7 +346,6 @@ class Enemy(Character):
         facing = const.DOWN
         version = const.BASIC       #placeholder, maybe load enemy types from a list based on level #
         super().__init__(x, y, facing, 0, const.ENEMY)
-        self.yres += 10
         self.direction = random.choice([const.UP, const.DOWN, const.LEFT, const.RIGHT])
         version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED])
         self.pursuePlayer = False
@@ -374,11 +377,12 @@ class Boss(Character):
         '''Constructor'''
         facing = const.DOWN
         super().__init__(x, y, facing, 0, const.BOSS)
+        self.yres += 5 #TODO constant
         self.direction = random.choice([const.LEFT, const.RIGHT])
         self.speed = const.SPEED_HIGH
         self.readyDropBomb = True
-        self.timerBomb = 1  #TODO constant
-        self.bombCount = 3
+        self.timerBomb = 1.5  #TODO constant
+        self.bombCount = 3  #TODO constant
         self.bombRange = max(level.levelHeight, level.levelWidth)
         self.startTicksBomb = 0
 
@@ -416,7 +420,7 @@ class Boss(Character):
     def update(self, level, player = None):
         super().update(level)
         seconds = self.countdownDropBomb()#calculate how many seconds
-        if seconds > self.timerBomb:
+        if seconds > self.timerBomb and self.health > 0:
             self.readyDropBomb = True
 
         if self.readyDropBomb:

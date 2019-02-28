@@ -153,9 +153,10 @@ class Game(object):
 
         for enemy in self.spriteEnemies:
             if enemy.rect.colliderect(self.player.hitbox) and enemy.state != const.STATE_DYING:
-                self.killPlayer()
-            if pygame.sprite.spritecollideany(enemy, self.spriteBombBlasts, collided = None):
-                if enemy.kind == const.BOSS:
+                if pygame.sprite.spritecollide(enemy, self.spritePlayer, False, pygame.sprite.collide_circle): #TODO TESTESTEST
+                    self.killPlayer()
+            if pygame.sprite.spritecollide(enemy, self.spriteBombBlasts, False, pygame.sprite.collide_circle):
+                if enemy.kind == const.BOSS:# and pygame.sprite.spritecollide(enemy, blast, False, pygame.sprite.collide_circle):
                     if enemy.takeDamage():
                       self.player.increaseScore(const.ENEMY_DIED) 
                 else:
