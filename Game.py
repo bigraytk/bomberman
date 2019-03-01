@@ -36,10 +36,10 @@ class Game(object):
         pygame.init()
 
         #setup music and sound
-        musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
+        self.musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.mixer.init()
-        pygame.mixer.music.load(musicFile)
+        pygame.mixer.music.load(self.musicFile)
 
         self.explodeSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "bomb.wav"))
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
@@ -56,8 +56,8 @@ class Game(object):
         self.playerWins = False
         self.exitingToMenu = False
         self.gameState = const.GAME_STATE_MENU
-        self.musicOn = False
-        self.soundOn = False
+        self.musicOn = True
+        self.soundOn = True
 
         #setup screen
         self.screenWidth = const.MAP_WIDTH * const.TILE_SIZE + const.SCREEN_OFFSET_X_LEFT + const.SCREEN_OFFSET_X_RIGHT
@@ -165,7 +165,6 @@ class Game(object):
                     if enemy.takeDamage():
                       self.player.increaseScore(const.ENEMY_DIED)
                       self.bossDieSound.play()
-                      pygame.mixer.music.stop()
                 else:
                     enemy.destroy()
                     self.player.increaseScore(const.ENEMY_DIED)
@@ -337,6 +336,11 @@ class Game(object):
 
 
     def stateMainMenu(self):
+        print("test")
+        if self.musicOn and self.musicFile != str(Path.cwd() / "sounds" / "musicMainMenu.mp3"):
+            self.musicFile = str(Path.cwd() / "sounds" / "musicMainMenu.mp3")
+            pygame.mixer.music.load(self.musicFile)
+            pygame.mixer.music.play()
         newState = self.theMainMenu.showMenu()
         if newState == const.GAME_STATE_RUNNING:
             self.levelNum = 1
@@ -399,11 +403,13 @@ class Game(object):
             self.spriteEnemies.add(self.enemies)
             if self.boss:
                 self.spriteEnemies.add(self.boss)
-                musicFile = str(Path.cwd() / "sounds" / "musicBoss.mp3")
-                pygame.mixer.music.load(musicFile)
+                if self.musicOn and self.musicFile != str(Path.cwd() / "sounds" / "musicBoss.mp3"):
+                    self.musicFile = str(Path.cwd() / "sounds" / "musicBoss.mp3")
+                    pygame.mixer.music.load(self.musicFile)
             else:
-                musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
-                pygame.mixer.music.load(musicFile)
+                if self.musicOn and self.musicFile != str(Path.cwd() / "sounds" / "music1.mp3"):
+                    self.musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
+                    pygame.mixer.music.load(self.musicFile)
             newState = const.GAME_STATE_RUNNING
         tempPlayer.kill()
         return newState
