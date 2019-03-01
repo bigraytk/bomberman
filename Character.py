@@ -123,7 +123,7 @@ class Character(pygame.sprite.Sprite):
                     else:
                         self.direction = const.LEFT
 
-            if self.health < 0:
+            if self.health <= 0:
                 self.state = const.STATE_DYING
             if self.state == const.STATE_DYING:
                 self.fade_out -= 4
@@ -386,6 +386,9 @@ class Boss(Character):
         self.bombCount = 3  #TODO constant
         self.bombRange = max(level.levelHeight, level.levelWidth)
         self.startTicksBomb = 0
+        self.timerTakeDamage = 3 #TODO constant
+        self.canTakeDamage = True
+        self.startTicksTakeDamage = 0
 
         graphicsDir = Path.cwd() / "graphics"
 
@@ -420,6 +423,11 @@ class Boss(Character):
 
     def update(self, level, player):
         super().update(level, player)
+
+        seconds = self.countdownTakeDamage()#calculate how many seconds
+        if seconds > self.timerTakeDamage:
+            self.canTakeDamage = True
+
         seconds = self.countdownDropBomb()#calculate how many seconds
         if seconds > self.timerBomb and self.health > 0:
             self.readyDropBomb = True
@@ -434,11 +442,20 @@ class Boss(Character):
 
 
     def countdownDropBomb(self):
-        return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND 
+        return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND
+
+
+    def countdownTakeDamage(self):
+        return (pygame.time.get_ticks() - self.startTicksTakeDamage) / const.SECOND 
 
 
     def takeDamage(self):
-        self.health -= 1
-        
-        #TODO implement taking damage, temporary invincibility (so boss doesn't take consecutive hits from same bomb)
-        return True
+        if self.canTakeDamage:
+            self.health -= 1
+            self.canTakeDamage = False
+            self.startTicksTakeDamage = pygame.time.get_ticks()
+
+        if self.health > 0:
+            return False
+        else:
+            return True
