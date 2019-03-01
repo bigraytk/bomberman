@@ -418,6 +418,10 @@ class Boss(Character):
         self.imageMouthDamaged_2 = pygame.image.load(imageFile).convert()
         self.imageMouthDamaged_2.set_colorkey(const.TRAN_COL)
 
+        imageFile = str(graphicsDir.joinpath("boss_dead.png"))
+        self.imageDead = pygame.image.load(imageFile).convert()
+        self.imageDead.set_colorkey(const.TRAN_COL)
+
         self.fade_out = const.FADE_START
         self.health = const.BOSS_HEALTH
 
@@ -477,6 +481,9 @@ class Boss(Character):
             elif self.health == const.BOSS_HEALTH - 2:
                 self.imageNormal = self.imageDamaged_2
                 self.imageMouth = self.imageMouthDamaged_2
+            elif self.health <= 0:
+                self.imageNormal = self.imageDead
+                self.imageMouth = self.imageDead
 
         if self.health > 0:
             return False
