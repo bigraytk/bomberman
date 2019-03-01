@@ -401,9 +401,25 @@ class Boss(Character):
         self.imageMouth.set_colorkey(const.TRAN_COL)
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
-        self.fade_out = const.FADE_START
 
-        self.health = 3
+        imageFile = str(graphicsDir.joinpath("boss_damaged_1.png"))
+        self.imageDamaged_1 = pygame.image.load(imageFile).convert()
+        self.imageDamaged_1.set_colorkey(const.TRAN_COL)
+
+        imageFile = str(graphicsDir.joinpath("boss_damaged_1_mouth_open.png"))
+        self.imageMouthDamaged_1 = pygame.image.load(imageFile).convert()
+        self.imageMouthDamaged_1.set_colorkey(const.TRAN_COL)
+
+        imageFile = str(graphicsDir.joinpath("boss_damaged_2.png"))
+        self.imageDamaged_2 = pygame.image.load(imageFile).convert()
+        self.imageDamaged_2.set_colorkey(const.TRAN_COL)
+
+        imageFile = str(graphicsDir.joinpath("boss_damaged_2_mouth_open.png"))
+        self.imageMouthDamaged_2 = pygame.image.load(imageFile).convert()
+        self.imageMouthDamaged_2.set_colorkey(const.TRAN_COL)
+
+        self.fade_out = const.FADE_START
+        self.health = const.BOSS_HEALTH
 
 
     #def dropBomb(self, level):
@@ -454,6 +470,13 @@ class Boss(Character):
             self.health -= 1
             self.canTakeDamage = False
             self.startTicksTakeDamage = pygame.time.get_ticks()
+
+            if self.health == const.BOSS_HEALTH - 1:
+                self.imageNormal = self.imageDamaged_1
+                self.imageMouth = self.imageMouthDamaged_1
+            elif self.health == const.BOSS_HEALTH - 2:
+                self.imageNormal = self.imageDamaged_2
+                self.imageMouth = self.imageMouthDamaged_2
 
         if self.health > 0:
             return False

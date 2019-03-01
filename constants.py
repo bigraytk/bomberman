@@ -77,6 +77,7 @@ RES_MOVE_SCALE = 5
 PLAYER_SPEED = 3
 PLAYER_DEFAULT_NUM_BOMBS = 1  #number of starting bombs
 LIVES = 3
+BOSS_HEALTH = 3
 
 
 #character/bomb states

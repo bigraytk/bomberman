@@ -511,9 +511,9 @@ class Game(object):
         self.gameRunning = False
 
 
-    #TODO  remove before release
+    #Debug mode, for testing purposes
     def debug_mode(self, event):
-        if event.key == pygame.K_z:     #testing code for door
+        if event.key == pygame.K_z:     #kills player
             self.killPlayer()
         elif event.key == pygame.K_x:   #reduce lives to 0 for quick testing of highscore
             self.player.lives = 0
