@@ -83,7 +83,7 @@ class Character(pygame.sprite.Sprite):
         #if yes, move to correct square and update self.facing
         
         
-    def update(self, level, player = None):
+    def update(self, level, player):
         '''
         Updates character position when a character is moving towards a grid position
         '''
@@ -130,6 +130,7 @@ class Character(pygame.sprite.Sprite):
                 self.image.set_alpha(self.fade_out)
                 if self.fade_out < 0:
                     self.kill()
+                    player.state = const.STATE_PLAYER_WINS
             
 
         xDest = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
@@ -417,8 +418,8 @@ class Boss(Character):
             #else:
             #    self.image = self.imageNormal
 
-    def update(self, level, player = None):
-        super().update(level)
+    def update(self, level, player):
+        super().update(level, player)
         seconds = self.countdownDropBomb()#calculate how many seconds
         if seconds > self.timerBomb and self.health > 0:
             self.readyDropBomb = True

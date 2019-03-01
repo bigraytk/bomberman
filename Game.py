@@ -28,6 +28,7 @@ class Game(object):
         self.states = {const.GAME_STATE_MENU : self.stateMainMenu,
           const.GAME_STATE_RUNNING           : self.stateGameRunning,
           const.GAME_STATE_PLAYER_DEAD       : self.statePlayerDead,
+          const.GAME_STATE_PLAYER_WINS       : self.statePlayerWins,
           const.GAME_STATE_QUITTING          : self.stateQuitting,
           const.GAME_STATE_HIGHSCORES        : self.stateHighScores}
 
@@ -52,6 +53,7 @@ class Game(object):
         #setup game state variables
         self.gameRunning = True
         self.gameOver = False
+        self.playerWins = False
         self.exitingToMenu = False
         self.gameState = const.GAME_STATE_MENU
         self.musicOn = False
@@ -101,14 +103,17 @@ class Game(object):
 
         #player death screen
         ################## Testing ########################## Testing ################# vvvvvv
-        imageFile = str(Path.cwd() / "graphics" / "death_screen.png")     #placeholder
+        imageFile = str(Path.cwd() / "graphics" / "death_screen.png")
         self.death_test_image = pygame.image.load(imageFile).convert_alpha()
         self.death_test_rect = self.death_test_image.get_rect()
         self.death_test_rect.x = int(self.screenWidth / 2 - self.death_test_rect.width / 2)
         self.death_test_rect.y = int(self.screenHeight / 2 - self.death_test_rect.height / 2)
 
-        imageFile = str(Path.cwd() / "graphics" / "game_over_screen.png")     #placeholder
+        imageFile = str(Path.cwd() / "graphics" / "game_over_screen.png")    
         self.gameOverImage = pygame.image.load(imageFile).convert_alpha()
+
+        imageFile = str(Path.cwd() / "graphics" / "you_win_screen.png")
+        self.playerWinsImage = pygame.image.load(imageFile).convert_alpha()
         ################## Testing ########################## Testing ################# ^^^^^^
         imageFile = str(Path.cwd() / "graphics" / "border.png")
         self.borderImage = pygame.image.load(imageFile).convert()
@@ -147,7 +152,7 @@ class Game(object):
         #            pygame.draw.rect(self.screen, (255, 255, 0), enemy.hitbox, 2)  #Draws player's collision box, for testing purposes
 
         #Update and render player
-        self.spritePlayer.update(self.level)
+        self.spritePlayer.update(self.level, self.player)
         self.spritePlayer.draw(self.screen)
         #pygame.draw.rect(self.screen, (255, 255, 0), self.player.hitbox, 2)  #Draws player's collision box, for testing purposes
 
@@ -158,7 +163,7 @@ class Game(object):
             if pygame.sprite.spritecollide(enemy, self.spriteBombBlasts, False, pygame.sprite.collide_circle):
                 if enemy.kind == const.BOSS:# and pygame.sprite.spritecollide(enemy, blast, False, pygame.sprite.collide_circle):
                     if enemy.takeDamage():
-                      self.player.increaseScore(const.ENEMY_DIED) 
+                      self.player.increaseScore(const.ENEMY_DIED)
                 else:
                     enemy.destroy()
                     self.player.increaseScore(const.ENEMY_DIED)
@@ -295,12 +300,8 @@ class Game(object):
 
     def stateGameRunning(self):
             self.render()
-            self.checkPlayerProgress()
-            newState = self.gameState
-            if self.player.state == const.STATE_DEAD:
-                self.screenImage.blit(self.screen, (0,0), ((0,0), self.screenSize))    #take a snapshot of the screen
-                newState = const.GAME_STATE_PLAYER_DEAD
-                self.start_ticks = pygame.time.get_ticks() #starter tick
+            newState = self.checkPlayerProgress()
+            #newState = self.gameState
 
             return newState
 
@@ -316,6 +317,19 @@ class Game(object):
         newState = self.gameState
         if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
             newState = self.resetLevel()
+
+        return newState
+
+
+    def statePlayerWins(self):
+        #display win screen when player wins, then go to high score
+        self.screen.blit(self.screenImage, (0,0))
+        self.screen.blit(self.playerWinsImage, self.death_test_rect)
+        seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
+        newState = self.gameState
+        if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
+            newState = const.GAME_STATE_HIGHSCORES
+            self.updateScore(self.player.score)
 
         return newState
 
@@ -416,6 +430,19 @@ class Game(object):
             else:
                 #TODO player wins game?
                 pass
+
+        newState = self.gameState
+        if self.player.state == const.STATE_DEAD:
+                self.screenImage.blit(self.screen, (0,0), ((0,0), self.screenSize))    #take a snapshot of the screen
+                newState = const.GAME_STATE_PLAYER_DEAD
+                self.start_ticks = pygame.time.get_ticks() #starter tick
+
+        if self.player.state == const.STATE_PLAYER_WINS:
+            self.screenImage.blit(self.screen, (0,0), ((0,0), self.screenSize))    #take a snapshot of the screen
+            newState = const.GAME_STATE_PLAYER_WINS
+            self.start_ticks = pygame.time.get_ticks() #starter tick
+
+        return newState
 
 
     #User keyboard input, game controls
