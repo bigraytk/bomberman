@@ -43,7 +43,7 @@ class Game(object):
 
         self.explodeSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "bomb.wav"))
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
-
+        self.bossDieSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "boss_no.wav"))
 
         #setup misc pygame settings
         self.clock = pygame.time.Clock()
@@ -164,6 +164,8 @@ class Game(object):
                 if enemy.kind == const.BOSS:# and pygame.sprite.spritecollide(enemy, blast, False, pygame.sprite.collide_circle):
                     if enemy.takeDamage():
                       self.player.increaseScore(const.ENEMY_DIED)
+                      self.bossDieSound.play()
+                      pygame.mixer.music.stop()
                 else:
                     enemy.destroy()
                     self.player.increaseScore(const.ENEMY_DIED)
