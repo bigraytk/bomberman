@@ -180,7 +180,7 @@ class Game(object):
                 self.killPlayer()
 
         for bomb in self.spriteBombs:
-            if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None):
+            if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None) or pygame.sprite.spritecollideany(bomb, self.spriteBossBombBlasts, collided = None):
                 bomb.expiditeExplosion()
             if bomb.exploded:
                 if self.soundOn:
@@ -336,12 +336,11 @@ class Game(object):
 
 
     def stateMainMenu(self):
-        print("test")
         if self.musicOn and self.musicFile != str(Path.cwd() / "sounds" / "musicMainMenu.mp3"):
             self.musicFile = str(Path.cwd() / "sounds" / "musicMainMenu.mp3")
             pygame.mixer.music.load(self.musicFile)
             pygame.mixer.music.play()
-        newState = self.theMainMenu.showMenu()
+        newState = self.theMainMenu.showMenu(self.musicOn)
         if newState == const.GAME_STATE_RUNNING:
             self.levelNum = 1
             newState = self.resetLevel()

@@ -426,21 +426,6 @@ class Boss(Character):
         self.health = const.BOSS_HEALTH
 
 
-    #def dropBomb(self, level):
-    #    '''Creates an instance of the bomb class at the boss' position'''
-    #    xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
-    #    yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
-    #    if xDiff < 10 and yDiff < 10 and  self.activeBombs < self.bombCount and level.layout[self.y][self.x] == None:
-    #        newBomb = Bomb.Bomb(self.x + 1, self.y + 2, max(level.levelHeight, level.levelWidth), True)
-    #        return newBomb
-    #    else:
-    #        return None
-
-        #TODO
-            #self.image = self.imageMouth
-            #else:
-            #    self.image = self.imageNormal
-
     def update(self, level, player):
         super().update(level, player)
 
@@ -457,10 +442,7 @@ class Boss(Character):
         else:
             self.image = self.imageNormal
     
-   #def countdown(self):
-   #     return (pygame.time.get_ticks() - self.start_ticks) / const.SECOND
-
-
+    
     def countdownDropBomb(self):
         return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND
 
