@@ -20,8 +20,8 @@ class Character(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
-        self.xres = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE#init this by running self.x through the grid_to_res conversion function
-        self.yres = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE#same but for y
+        self.xres = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE #init this by running self.x through the grid_to_res conversion function
+        self.yres = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE #same but for y
         self.speed = speed
         self.facing = facing
         self.kind = kind
@@ -29,19 +29,125 @@ class Character(pygame.sprite.Sprite):
         self.bombCount = 0
         self.bombRange = 0
         self.state = const.STATE_IDLE
-        #if kind == const.PC:
-            #self.Player = self.PlayerCharacter()
-        #elif kind == const.ENEMY:
-            #self.Enemy = self.Enemy()
-        #else:
-            #raise RuntimeError(kind + ' is not a valid kind of character')
         
         
+    @property
+    def x(self):
+        return self.__x
+
+    @property
+    def y(self):
+        return self.__y
+
+    @property
+    def xres(self):
+        return self.__xres
+
+    @property
+    def yres(self):
+        return self.__yres
+
+    @property
+    def speed(self):
+        return self.__speed
+
+    @property
+    def facing(self):
+        return self.__facing
+    
+    @property
+    def kind(self):
+        return self.__kind
+
+    @property
+    def activeBombs(self):
+        return self.__activeBombs
+
+    @property
+    def bombCount(self):
+        return self.__bombCount
+
+    @property
+    def bombRange(self):
+        return self.__bombRange
+
+    @property
+    def state(self):
+        return self.__state
+
+    @x.setter
+    def x(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__x = val
+
+    @y.setter
+    def y(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__y = val
+
+    @xres.setter
+    def xres(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__xres = val
+
+    @yres.setter
+    def yres(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__yres = val
+
+    @speed.setter
+    def speed(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__speed = val
+
+    @facing.setter
+    def facing(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__facing = val
+    
+    @kind.setter
+    def kind(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__kind = val
+
+    @activeBombs.setter
+    def activeBombs(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__activeBombs = val
+
+    @bombCount.setter
+    def bombCount(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__bombCount = val
+
+    @bombRange.setter
+    def bombRange(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__bombRange = val
+
+    @state.setter
+    def state(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__state = val
+         
     def move(self, direction, level):
         '''
         Controls movement of a character. Takes a direcetion as input, if character
         is able to move in that direction, will update the character's position and 
         facing. Else, will just update facing.
+        -direction, specifies the direction the character should move
+        -level, contains the object that allows for validation of colisions during character movement 
         ''' 
         layout = level.layout
         self.facing = direction
@@ -76,16 +182,12 @@ class Character(pygame.sprite.Sprite):
         if self.kind == const.PC and not pathBlocked:
             self.changeDirection(direction)
         return pathBlocked
-
-
-        #checks if able to move in direction
-        #if no, stays in same square, but update self.facing
-        #if yes, move to correct square and update self.facing
         
         
     def update(self, level, player):
         '''
         Updates character position when a character is moving towards a grid position
+        -level
         '''
         if self.kind == const.ENEMY:
             if self.state == const.STATE_IDLE:
