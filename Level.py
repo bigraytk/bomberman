@@ -212,7 +212,7 @@ class Level(object):
             with levelFile.open() as f:
                 levelParams = f.readline().split(",")
                 self.__levelWidth = int(levelParams[const.LEVEL_WIDTH])
-                self.levelHeight = int(levelParams[const.LEVEL_HEIGHT])
+                self.__levelHeight = int(levelParams[const.LEVEL_HEIGHT])
                 self.bossLevel = False
                 backgroundNum = int(levelParams[const.LEVEL_BG_GFX])
                 wallNum = int(levelParams[const.LEVEL_WALL_GFX])

@@ -193,8 +193,8 @@ class Game(object):
                     bomb.collision = True
             if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None) or pygame.sprite.spritecollideany(bomb, self.spriteBossBombBlasts, collided = None):
                 bomb.expiditeExplosion()
-            if pygame.sprite.spritecollideany(bomb, self.spriteEnemies) and bomb.state != const.STATE_IDLE:
-                bomb.collision = True
+            #if pygame.sprite.spritecollideany(bomb, self.spriteEnemies) and bomb.state != const.STATE_IDLE:
+            #    bomb.collision = True
             if bomb.exploded:
                 if self.soundOn:
                     self.explodeSound.play()
