@@ -13,18 +13,27 @@ import pygame
 import sys
 
 
+'''
+Desc: Verifies an image file is valid
+Args: imageFile - file location of image to be loaded, in pathlib format
+      convertAlpha - if true, use convert_alpha() instead of convert(), for png files with transparency
+'''
 def openImage(imageFile, convertAlpha = False):
+    if imageFile and not imageFile.is_file():
+        raise RuntimeError(str(imageFile) + ' is not a valid image file.')
+
     try:
         if convertAlpha:
-            image = pygame.image.load(imageFile).convert_alpha()
+            image = pygame.image.load(str(imageFile)).convert_alpha()
         else:
-            image = pygame.image.load(imageFile).convert()
+            image = pygame.image.load(str(imageFile)).convert()
         return image
     except IOError:
         pygame.mixer.music.stop()
         pygame.display.quit()
         pygame.quit()
         raise RuntimeError('Error: File ' + str(imageFile) + " does not exist!")
+
 
 
 class Level(object):
@@ -36,10 +45,9 @@ class Level(object):
         self.breakableImage = None
         self.doorOpenedImage = None
         self.doorClosedImage = None
-        self.levelFile = None
-        self.layout = []
-        self.levelWidth = None
-        self.levelHeight = None
+        self.__layout = []
+        self.__levelWidth = None
+        self.__levelHeight = None
         self.door = const.TILE_DOOR_HIDDEN
         self.playerStartPosit = None
         self.numEnemies = 0
@@ -54,13 +62,156 @@ class Level(object):
         levelFile = dataDir.joinpath("level" + str(levelNum) + ".csv")
         self.layout = self.levelParser(levelFile)
     
+    
+    @property
+    def backgroundImage(self):
+        ''' Accessor. '''
+        return self.__backgroundImage
+
+    @backgroundImage.setter
+    def backgroundImage(self, backgroundImage):
+        '''Sets the background tile image. Allows None or an image'''
+        if backgroundImage and not isinstance(backgroundImage, pygame.SurfaceType):
+            raise RuntimeError(str(backgroundImage) + ' is not a valid pygame image.')
+        self.__backgroundImage = backgroundImage
+
+
+    @property
+    def wallImage(self):
+        ''' Accessor. '''
+        return self.__wallImage
+
+    @wallImage.setter
+    def wallImage(self, wallImage):
+        '''Sets the wall tile image. Allows None or an image'''
+        if wallImage and not isinstance(wallImage, pygame.SurfaceType):
+            raise RuntimeError(str(wallImage) + ' is not a valid pygame image.')
+        self.__wallImage = wallImage
+
+
+    @property
+    def breakableImage(self):
+        ''' Accessor. '''
+        return self.__breakableImage
+
+    @breakableImage.setter
+    def breakableImage(self, breakableImage):
+        '''Sets the breakable wall tile image. Allows None or an image'''
+        if breakableImage and not isinstance(breakableImage, pygame.SurfaceType):
+            raise RuntimeError(str(breakableImage) + ' is not a valid pygame image.')
+        self.__breakableImage = breakableImage
+
+
+    @property
+    def doorOpenedImage(self):
+        ''' Accessor. '''
+        return self.__doorOpenedImage
+
+    @doorOpenedImage.setter
+    def doorOpenedImage(self, doorOpenedImage):
+        '''Sets the open door image. Allows None or an image'''
+        if doorOpenedImage and not isinstance(doorOpenedImage, pygame.SurfaceType):
+            raise RuntimeError(str(doorOpenedImage) + ' is not a valid pygame image.')
+        self.__doorOpenedImage = doorOpenedImage
+
+
+    @property
+    def doorClosedImage(self):
+        ''' Accessor. '''
+        return self.__doorClosedImage
+
+    @doorClosedImage.setter
+    def doorClosedImage(self, doorClosedImage):
+        '''Sets the closed door image. Allows None or an image'''
+        if doorClosedImage and not isinstance(doorClosedImage, pygame.SurfaceType):
+            raise RuntimeError(str(doorClosedImage) + ' is not a valid pygame image.')
+        self.__doorClosedImage = doorClosedImage
+
+
+    @property
+    def layout(self):
+        ''' Accessor. '''
+        return self.__layout
+
+    @layout.setter
+    def layout(self, layout):
+        ''' Prevents other classes from attempting to change level layout '''
+        if layout == None:
+            raise RuntimeError('Unauthorized attempt to alter the level layout matrix')
+        self.__layout = layout
+
+
+    @property
+    def levelWidth(self):
+        ''' Accessor. '''
+        return self.__levelWidth
+
+    #@levelWidth.setter
+    #def levelWidth(self, levelWidth):
+    #    ''' Prevents negative value for level width '''
+    #    if levelWidth and levelWidth < 0:
+    #        raise RuntimeError(levelWidth, ' is not a valid level width.')
+    #    self.__levelWidth = levelWidth
+
+
+    @property
+    def levelHeight(self):
+        ''' Accessor. '''
+        return self.__levelHeight
+
+    #@levelHeight.setter
+    #def levelHeight(self, levelHeight):
+    #    ''' Prevents negative value for level height '''
+    #    if levelHeight and levelHeight < 0:
+    #        raise RuntimeError(levelHeight, ' is not a valid level height.')
+    #    self.__levelHeight = levelHeight
+    
+
+    @property
+    def door(self):
+        ''' Accessor. '''
+        return self.__door
+
+    @door.setter
+    def door(self, door):
+        '''Sets the value of door, used for showing, opening and closing the door '''
+        if door != const.TILE_DOOR_CLOSED and door != const.TILE_DOOR_OPENED and door != const.TILE_DOOR_HIDDEN:
+            raise RuntimeError(str(door) + ' is not a valid valid value for door.')
+        self.__door = door
+
+
+    @property
+    def playerStartPosit(self):
+        ''' Accessor. '''
+        return self.__playerStartPosit
+
+    @playerStartPosit.setter
+    def playerStartPosit(self, playerStartPosit):
+        '''Sets the player starting position '''
+        if playerStartPosit and (not isinstance(playerStartPosit, tuple) or len(playerStartPosit) != 2):
+            raise RuntimeError(str(playerStartPosit) + ' is not a valid valid value for player starting position. Must be a tuple containing x and y.')
+        elif playerStartPosit and (playerStartPosit[0] < 0 or playerStartPosit[1] < 0):
+            raise RuntimeError(str(playerStartPosit) + ' is not a valid valid value for player starting position. Both x and y must be greater than 0.')
+        self.__playerStartPosit = playerStartPosit
+
+
+
+       # 
+       # self.numEnemies = 0
+       # self.enemyStartPosit = []
+      #  self.bossLevel = None
+      #  self.bossStartPosit = None
+
+    
     def levelParser(self, levelFile):
         layout = []
         graphicsDir = Path.cwd() / "graphics"
+        if levelFile and not levelFile.is_file():
+            raise RuntimeError(str(levelFile) + ' is not a valid file.')
         try:
-            with levelFile.open() as f: 
+            with levelFile.open() as f:
                 levelParams = f.readline().split(",")
-                self.levelWidth = int(levelParams[const.LEVEL_WIDTH])
+                self.__levelWidth = int(levelParams[const.LEVEL_WIDTH])
                 self.levelHeight = int(levelParams[const.LEVEL_HEIGHT])
                 self.bossLevel = False
                 backgroundNum = int(levelParams[const.LEVEL_BG_GFX])
@@ -100,22 +251,22 @@ class Level(object):
             pygame.quit()
             raise RuntimeError('Error: File ' + str(levelFile) + " does not exist!")
 
-        backgroundFile = str(graphicsDir.joinpath("back" + str(backgroundNum) + ".png"))
+        backgroundFile = graphicsDir.joinpath("back" + str(backgroundNum) + ".png")
         self.backgroundImage = openImage(backgroundFile)
          
-        wallFile = str(graphicsDir.joinpath("wall" + str(wallNum) + ".png"))
+        wallFile = graphicsDir.joinpath("wall" + str(wallNum) + ".png")
         self.wallImage = openImage(wallFile)
          
-        breakableFile = str(graphicsDir.joinpath("break" + str(breakableNum) + ".png"))
+        breakableFile = graphicsDir.joinpath("break" + str(breakableNum) + ".png")
         self.breakableImage = openImage(breakableFile)
 
-        doorOpenedFile = str(graphicsDir.joinpath("door_opened.png"))
+        doorOpenedFile = graphicsDir.joinpath("door_opened.png")
         self.doorOpenedImage = openImage(doorOpenedFile, True)
          
-        doorClosedFile = str(graphicsDir.joinpath("door_closed.png"))
+        doorClosedFile = graphicsDir.joinpath("door_closed.png")
         self.doorClosedImage = openImage(doorClosedFile, True)
 
-        self.enemyFile = str(graphicsDir.joinpath("enemy" + str(enemyNum) + ".png"))
+        self.enemyFile = graphicsDir.joinpath("enemy" + str(enemyNum) + ".png")
 
         
         return layout
@@ -137,7 +288,7 @@ class Level(object):
         door = const.TILE_DOOR_CLOSED
         
         
-    def destroyWalls(self, x, y, level, blastRange):     #TODO make it so that "range" is utilized so walls in all four directions at that range are destroyed
+    def destroyWalls(self, x, y, level, blastRange):
         walls = []
         powerups = []
         hitWallUp = False

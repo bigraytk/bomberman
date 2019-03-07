@@ -380,6 +380,7 @@ class PlayerCharacter(Character):
 
 
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
 
     def increaseScore(self,score):
@@ -453,9 +454,10 @@ class Enemy(Character):
         version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED])
         self.pursuePlayer = False
 
-        self.image = pygame.image.load(level.enemyFile).convert()
+        self.image = pygame.image.load(str(level.enemyFile)).convert()
         self.image.set_colorkey(const.TRAN_COL)
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         self.fade_out = const.FADE_START
         
@@ -524,6 +526,8 @@ class Boss(Character):
         self.imageDead = pygame.image.load(imageFile).convert()
         self.imageDead.set_colorkey(const.TRAN_COL)
 
+        self.mask = pygame.mask.from_surface(self.image)
+        
         self.fade_out = const.FADE_START
         self.health = const.BOSS_HEALTH
 
@@ -544,7 +548,7 @@ class Boss(Character):
         else:
             self.image = self.imageNormal
     
-    
+
     def countdownDropBomb(self):
         return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND
 

@@ -19,9 +19,12 @@ class Bomb(pygame.sprite.Sprite):
         self.range = theRange  #range of blast
         self.x = x
         self.y = y
+        self.oldX = x
+        self.oldY = y
         self.xres = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
         self.yres = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
         self.bossBomb = bossBomb
+        self.collision = False
 
         imageFile = str(Path.cwd() / "graphics" / "bomb.png")
         self.image = pygame.image.load(imageFile).convert()
@@ -30,6 +33,7 @@ class Bomb(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.xres
         self.rect.y = self.yres
+        self.mask = pygame.mask.from_surface(self.image)
 
         self.start_ticks = pygame.time.get_ticks() #starter tick
         self.exploded = False
@@ -54,13 +58,18 @@ class Bomb(pygame.sprite.Sprite):
             xDest = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
             yDest = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
             
+            #if self.state == const.STATE_STOPPING:
+               # self.xres = xDest
+               # self.yres = yDest
+               # self.state = const.STATE_IDLE
+
             if self.state == const.STATE_MOVING_UP:
                 if self.yres > yDest:
                     self.yres -= self.speed
                 else:
                     self.yres = yDest
                     pathBlocked = self.move(const.UP, level)
-                    if pathBlocked:
+                    if pathBlocked or self.collision:
                         self.state = const.STATE_IDLE
                     
             if self.state == const.STATE_MOVING_DOWN:
@@ -69,7 +78,7 @@ class Bomb(pygame.sprite.Sprite):
                 else:
                     self.yres = yDest
                     pathBlocked = self.move(const.DOWN, level)
-                    if pathBlocked:
+                    if pathBlocked or self.collision:
                         self.state = const.STATE_IDLE
                     
             if self.state == const.STATE_MOVING_LEFT:
@@ -78,7 +87,7 @@ class Bomb(pygame.sprite.Sprite):
                 else:
                     self.xres = xDest
                     pathBlocked = self.move(const.LEFT, level)
-                    if pathBlocked:
+                    if pathBlocked or self.collision:
                         self.state = const.STATE_IDLE
                     
             if self.state == const.STATE_MOVING_RIGHT:
@@ -87,8 +96,14 @@ class Bomb(pygame.sprite.Sprite):
                 else:
                     self.xres = xDest
                     pathBlocked = self.move(const.RIGHT, level)
-                    if pathBlocked:
+                    if pathBlocked or self.collision:
                         self.state = const.STATE_IDLE
+
+            if self.state == const.STATE_IDLE:
+                level.layout[self.y][self.x] = None
+                self.x = self.oldX
+                self.y = self.oldY
+                level.layout[self.y][self.x] = self
                     
             self.rect.x = self.xres
             self.rect.y = self.yres
@@ -124,7 +139,8 @@ class Bomb(pygame.sprite.Sprite):
         layout = level.layout
         pathBlocked = False
         
-
+        self.oldX = self.x
+        self.oldY = self.y
         if direction == const.UP:
             if self.y > 0 and layout[self.y - 1][self.x] == None:
                 layout[self.y][self.x] = None
@@ -185,6 +201,7 @@ class Blast (Bomb):
                 imageFile = str(Path.cwd() / "graphics" / "flame_right.png")
         self.image = pygame.image.load(imageFile).convert()
         self.image.set_colorkey(const.BLACK)
+        self.mask = pygame.mask.from_surface(self.image)
         self.direction = direction
         self.timer = const.BLAST_TIMER
 	
