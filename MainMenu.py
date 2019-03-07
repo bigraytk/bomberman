@@ -54,10 +54,15 @@ class MainMenu(object):
         self.hoveringQT = False
 
     #main menu loop
-    def showMenu(self):
+    def showMenu(self, musicOn):
         
         gameState = const.GAME_STATE_MENU
         while gameState == const.GAME_STATE_MENU:
+            if musicOn:
+                if not pygame.mixer.music.get_busy():
+                    pygame.mixer.music.play(-1)
+            else:
+                pygame.mixer.music.stop()
             
             self.__screen__.blit(self.__background__, (0,0))
             if self.hoveringNG == False:

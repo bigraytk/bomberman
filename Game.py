@@ -28,6 +28,7 @@ class Game(object):
         self.states = {const.GAME_STATE_MENU : self.stateMainMenu,
           const.GAME_STATE_RUNNING           : self.stateGameRunning,
           const.GAME_STATE_PLAYER_DEAD       : self.statePlayerDead,
+          const.GAME_STATE_PLAYER_WINS       : self.statePlayerWins,
           const.GAME_STATE_QUITTING          : self.stateQuitting,
           const.GAME_STATE_HIGHSCORES        : self.stateHighScores}
 
@@ -35,14 +36,14 @@ class Game(object):
         pygame.init()
 
         #setup music and sound
-        musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
+        self.musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.mixer.init()
-        pygame.mixer.music.load(musicFile)
+        pygame.mixer.music.load(self.musicFile)
 
         self.explodeSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "bomb.wav"))
         self.deathSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "yell.wav"))
-
+        self.bossDieSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "boss_no.wav"))
 
         #setup misc pygame settings
         self.clock = pygame.time.Clock()
@@ -52,10 +53,11 @@ class Game(object):
         #setup game state variables
         self.gameRunning = True
         self.gameOver = False
+        self.playerWins = False
         self.exitingToMenu = False
         self.gameState = const.GAME_STATE_MENU
-        self.musicOn = False
-        self.soundOn = False
+        self.musicOn = True
+        self.soundOn = True
 
         #setup screen
         self.screenWidth = const.MAP_WIDTH * const.TILE_SIZE + const.SCREEN_OFFSET_X_LEFT + const.SCREEN_OFFSET_X_RIGHT
@@ -101,14 +103,17 @@ class Game(object):
 
         #player death screen
         ################## Testing ########################## Testing ################# vvvvvv
-        imageFile = str(Path.cwd() / "graphics" / "death_screen.png")     #placeholder
+        imageFile = str(Path.cwd() / "graphics" / "death_screen.png")
         self.death_test_image = pygame.image.load(imageFile).convert_alpha()
         self.death_test_rect = self.death_test_image.get_rect()
         self.death_test_rect.x = int(self.screenWidth / 2 - self.death_test_rect.width / 2)
         self.death_test_rect.y = int(self.screenHeight / 2 - self.death_test_rect.height / 2)
 
-        imageFile = str(Path.cwd() / "graphics" / "game_over_screen.png")     #placeholder
+        imageFile = str(Path.cwd() / "graphics" / "game_over_screen.png")    
         self.gameOverImage = pygame.image.load(imageFile).convert_alpha()
+
+        imageFile = str(Path.cwd() / "graphics" / "you_win_screen.png")
+        self.playerWinsImage = pygame.image.load(imageFile).convert_alpha()
         ################## Testing ########################## Testing ################# ^^^^^^
         imageFile = str(Path.cwd() / "graphics" / "border.png")
         self.borderImage = pygame.image.load(imageFile).convert()
@@ -147,7 +152,7 @@ class Game(object):
         #            pygame.draw.rect(self.screen, (255, 255, 0), enemy.hitbox, 2)  #Draws player's collision box, for testing purposes
 
         #Update and render player
-        self.spritePlayer.update(self.level)
+        self.spritePlayer.update(self.level, self.player)
         self.spritePlayer.draw(self.screen)
         #pygame.draw.rect(self.screen, (255, 255, 0), self.player.hitbox, 2)  #Draws player's collision box, for testing purposes
 
@@ -158,7 +163,8 @@ class Game(object):
             if pygame.sprite.spritecollide(enemy, self.spriteBombBlasts, False, pygame.sprite.collide_circle):
                 if enemy.kind == const.BOSS:# and pygame.sprite.spritecollide(enemy, blast, False, pygame.sprite.collide_circle):
                     if enemy.takeDamage():
-                      self.player.increaseScore(const.ENEMY_DIED) 
+                      self.player.increaseScore(const.ENEMY_DIED)
+                      self.bossDieSound.play()
                 else:
                     enemy.destroy()
                     self.player.increaseScore(const.ENEMY_DIED)
@@ -174,7 +180,7 @@ class Game(object):
                 self.killPlayer()
 
         for bomb in self.spriteBombs:
-            if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None):
+            if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None) or pygame.sprite.spritecollideany(bomb, self.spriteBossBombBlasts, collided = None):
                 bomb.expiditeExplosion()
             if bomb.exploded:
                 if self.soundOn:
@@ -295,12 +301,8 @@ class Game(object):
 
     def stateGameRunning(self):
             self.render()
-            self.checkPlayerProgress()
-            newState = self.gameState
-            if self.player.state == const.STATE_DEAD:
-                self.screenImage.blit(self.screen, (0,0), ((0,0), self.screenSize))    #take a snapshot of the screen
-                newState = const.GAME_STATE_PLAYER_DEAD
-                self.start_ticks = pygame.time.get_ticks() #starter tick
+            newState = self.checkPlayerProgress()
+            #newState = self.gameState
 
             return newState
 
@@ -320,8 +322,25 @@ class Game(object):
         return newState
 
 
+    def statePlayerWins(self):
+        #display win screen when player wins, then go to high score
+        self.screen.blit(self.screenImage, (0,0))
+        self.screen.blit(self.playerWinsImage, self.death_test_rect)
+        seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
+        newState = self.gameState
+        if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
+            newState = const.GAME_STATE_HIGHSCORES
+            self.updateScore(self.player.score)
+
+        return newState
+
+
     def stateMainMenu(self):
-        newState = self.theMainMenu.showMenu()
+        if self.musicOn and self.musicFile != str(Path.cwd() / "sounds" / "musicMainMenu.mp3"):
+            self.musicFile = str(Path.cwd() / "sounds" / "musicMainMenu.mp3")
+            pygame.mixer.music.load(self.musicFile)
+            pygame.mixer.music.play()
+        newState = self.theMainMenu.showMenu(self.musicOn)
         if newState == const.GAME_STATE_RUNNING:
             self.levelNum = 1
             newState = self.resetLevel()
@@ -383,11 +402,13 @@ class Game(object):
             self.spriteEnemies.add(self.enemies)
             if self.boss:
                 self.spriteEnemies.add(self.boss)
-                musicFile = str(Path.cwd() / "sounds" / "musicBoss.mp3")
-                pygame.mixer.music.load(musicFile)
+                if self.musicOn and self.musicFile != str(Path.cwd() / "sounds" / "musicBoss.mp3"):
+                    self.musicFile = str(Path.cwd() / "sounds" / "musicBoss.mp3")
+                    pygame.mixer.music.load(self.musicFile)
             else:
-                musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
-                pygame.mixer.music.load(musicFile)
+                if self.musicOn and self.musicFile != str(Path.cwd() / "sounds" / "music1.mp3"):
+                    self.musicFile = str(Path.cwd() / "sounds" / "music1.mp3")
+                    pygame.mixer.music.load(self.musicFile)
             newState = const.GAME_STATE_RUNNING
         tempPlayer.kill()
         return newState
@@ -416,6 +437,19 @@ class Game(object):
             else:
                 #TODO player wins game?
                 pass
+
+        newState = self.gameState
+        if self.player.state == const.STATE_DEAD:
+                self.screenImage.blit(self.screen, (0,0), ((0,0), self.screenSize))    #take a snapshot of the screen
+                newState = const.GAME_STATE_PLAYER_DEAD
+                self.start_ticks = pygame.time.get_ticks() #starter tick
+
+        if self.player.state == const.STATE_PLAYER_WINS:
+            self.screenImage.blit(self.screen, (0,0), ((0,0), self.screenSize))    #take a snapshot of the screen
+            newState = const.GAME_STATE_PLAYER_WINS
+            self.start_ticks = pygame.time.get_ticks() #starter tick
+
+        return newState
 
 
     #User keyboard input, game controls
@@ -476,9 +510,9 @@ class Game(object):
         self.gameRunning = False
 
 
-    #TODO  remove before release
+    #Debug mode, for testing purposes
     def debug_mode(self, event):
-        if event.key == pygame.K_z:     #testing code for door
+        if event.key == pygame.K_z:     #kills player
             self.killPlayer()
         elif event.key == pygame.K_x:   #reduce lives to 0 for quick testing of highscore
             self.player.lives = 0

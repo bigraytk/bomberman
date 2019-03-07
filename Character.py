@@ -20,8 +20,8 @@ class Character(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
-        self.xres = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE#init this by running self.x through the grid_to_res conversion function
-        self.yres = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE#same but for y
+        self.xres = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE #init this by running self.x through the grid_to_res conversion function
+        self.yres = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE #same but for y
         self.speed = speed
         self.facing = facing
         self.kind = kind
@@ -29,19 +29,125 @@ class Character(pygame.sprite.Sprite):
         self.bombCount = 0
         self.bombRange = 0
         self.state = const.STATE_IDLE
-        #if kind == const.PC:
-            #self.Player = self.PlayerCharacter()
-        #elif kind == const.ENEMY:
-            #self.Enemy = self.Enemy()
-        #else:
-            #raise RuntimeError(kind + ' is not a valid kind of character')
         
         
+    @property
+    def x(self):
+        return self.__x
+
+    @property
+    def y(self):
+        return self.__y
+
+    @property
+    def xres(self):
+        return self.__xres
+
+    @property
+    def yres(self):
+        return self.__yres
+
+    @property
+    def speed(self):
+        return self.__speed
+
+    @property
+    def facing(self):
+        return self.__facing
+    
+    @property
+    def kind(self):
+        return self.__kind
+
+    @property
+    def activeBombs(self):
+        return self.__activeBombs
+
+    @property
+    def bombCount(self):
+        return self.__bombCount
+
+    @property
+    def bombRange(self):
+        return self.__bombRange
+
+    @property
+    def state(self):
+        return self.__state
+
+    @x.setter
+    def x(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__x = val
+
+    @y.setter
+    def y(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__y = val
+
+    @xres.setter
+    def xres(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__xres = val
+
+    @yres.setter
+    def yres(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__yres = val
+
+    @speed.setter
+    def speed(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__speed = val
+
+    @facing.setter
+    def facing(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__facing = val
+    
+    @kind.setter
+    def kind(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__kind = val
+
+    @activeBombs.setter
+    def activeBombs(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__activeBombs = val
+
+    @bombCount.setter
+    def bombCount(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__bombCount = val
+
+    @bombRange.setter
+    def bombRange(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__bombRange = val
+
+    @state.setter
+    def state(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__state = val
+         
     def move(self, direction, level):
         '''
         Controls movement of a character. Takes a direcetion as input, if character
         is able to move in that direction, will update the character's position and 
         facing. Else, will just update facing.
+        -direction, specifies the direction the character should move
+        -level, contains the object that allows for validation of colisions during character movement 
         ''' 
         layout = level.layout
         self.facing = direction
@@ -76,16 +182,12 @@ class Character(pygame.sprite.Sprite):
         if self.kind == const.PC and not pathBlocked:
             self.changeDirection(direction)
         return pathBlocked
-
-
-        #checks if able to move in direction
-        #if no, stays in same square, but update self.facing
-        #if yes, move to correct square and update self.facing
         
         
-    def update(self, level, player = None):
+    def update(self, level, player):
         '''
         Updates character position when a character is moving towards a grid position
+        -level
         '''
         if self.kind == const.ENEMY:
             if self.state == const.STATE_IDLE:
@@ -123,13 +225,14 @@ class Character(pygame.sprite.Sprite):
                     else:
                         self.direction = const.LEFT
 
-            if self.health < 0:
+            if self.health <= 0:
                 self.state = const.STATE_DYING
             if self.state == const.STATE_DYING:
                 self.fade_out -= 4
                 self.image.set_alpha(self.fade_out)
                 if self.fade_out < 0:
                     self.kill()
+                    player.state = const.STATE_PLAYER_WINS
             
 
         xDest = const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE
@@ -385,6 +488,9 @@ class Boss(Character):
         self.bombCount = 3  #TODO constant
         self.bombRange = max(level.levelHeight, level.levelWidth)
         self.startTicksBomb = 0
+        self.timerTakeDamage = 3 #TODO constant
+        self.canTakeDamage = True
+        self.startTicksTakeDamage = 0
 
         graphicsDir = Path.cwd() / "graphics"
 
@@ -397,28 +503,38 @@ class Boss(Character):
         self.imageMouth.set_colorkey(const.TRAN_COL)
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
+
+        imageFile = str(graphicsDir.joinpath("boss_damaged_1.png"))
+        self.imageDamaged_1 = pygame.image.load(imageFile).convert()
+        self.imageDamaged_1.set_colorkey(const.TRAN_COL)
+
+        imageFile = str(graphicsDir.joinpath("boss_damaged_1_mouth_open.png"))
+        self.imageMouthDamaged_1 = pygame.image.load(imageFile).convert()
+        self.imageMouthDamaged_1.set_colorkey(const.TRAN_COL)
+
+        imageFile = str(graphicsDir.joinpath("boss_damaged_2.png"))
+        self.imageDamaged_2 = pygame.image.load(imageFile).convert()
+        self.imageDamaged_2.set_colorkey(const.TRAN_COL)
+
+        imageFile = str(graphicsDir.joinpath("boss_damaged_2_mouth_open.png"))
+        self.imageMouthDamaged_2 = pygame.image.load(imageFile).convert()
+        self.imageMouthDamaged_2.set_colorkey(const.TRAN_COL)
+
+        imageFile = str(graphicsDir.joinpath("boss_dead.png"))
+        self.imageDead = pygame.image.load(imageFile).convert()
+        self.imageDead.set_colorkey(const.TRAN_COL)
+
         self.fade_out = const.FADE_START
+        self.health = const.BOSS_HEALTH
 
-        self.health = 3
 
+    def update(self, level, player):
+        super().update(level, player)
 
-    #def dropBomb(self, level):
-    #    '''Creates an instance of the bomb class at the boss' position'''
-    #    xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
-    #    yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
-    #    if xDiff < 10 and yDiff < 10 and  self.activeBombs < self.bombCount and level.layout[self.y][self.x] == None:
-    #        newBomb = Bomb.Bomb(self.x + 1, self.y + 2, max(level.levelHeight, level.levelWidth), True)
-    #        return newBomb
-    #    else:
-    #        return None
+        seconds = self.countdownTakeDamage()#calculate how many seconds
+        if seconds > self.timerTakeDamage:
+            self.canTakeDamage = True
 
-        #TODO
-            #self.image = self.imageMouth
-            #else:
-            #    self.image = self.imageNormal
-
-    def update(self, level, player = None):
-        super().update(level)
         seconds = self.countdownDropBomb()#calculate how many seconds
         if seconds > self.timerBomb and self.health > 0:
             self.readyDropBomb = True
@@ -428,16 +544,32 @@ class Boss(Character):
         else:
             self.image = self.imageNormal
     
-   #def countdown(self):
-   #     return (pygame.time.get_ticks() - self.start_ticks) / const.SECOND
-
-
+    
     def countdownDropBomb(self):
-        return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND 
+        return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND
+
+
+    def countdownTakeDamage(self):
+        return (pygame.time.get_ticks() - self.startTicksTakeDamage) / const.SECOND 
 
 
     def takeDamage(self):
-        self.health -= 1
-        
-        #TODO implement taking damage, temporary invincibility (so boss doesn't take consecutive hits from same bomb)
-        return True
+        if self.canTakeDamage:
+            self.health -= 1
+            self.canTakeDamage = False
+            self.startTicksTakeDamage = pygame.time.get_ticks()
+
+            if self.health == const.BOSS_HEALTH - 1:
+                self.imageNormal = self.imageDamaged_1
+                self.imageMouth = self.imageMouthDamaged_1
+            elif self.health == const.BOSS_HEALTH - 2:
+                self.imageNormal = self.imageDamaged_2
+                self.imageMouth = self.imageMouthDamaged_2
+            elif self.health <= 0:
+                self.imageNormal = self.imageDead
+                self.imageMouth = self.imageDead
+
+        if self.health > 0:
+            return False
+        else:
+            return True
