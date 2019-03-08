@@ -415,8 +415,7 @@ class PlayerCharacter(Character):
 
     @score.setter
     def score(self, val):
-        if val < 0:
-            raise RuntimeError('Value is less than 0')
+        
         self.__score = val
     
     @lives.setter
