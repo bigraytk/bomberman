@@ -576,7 +576,7 @@ class Enemy(Character):
     def speed(self, val):
         if val < 0 :
             raise RuntimeError('Incorrect Speed')
-        self.__direction = val
+        self.__speed = val
 
     @direction.setter
     def direction(self, val):
@@ -649,6 +649,34 @@ class Boss(Character):
         
         self.fade_out = const.FADE_START
         self.health = const.BOSS_HEALTH
+
+    @property
+    def speed(self):
+        return self.__speed
+
+    def readyDropBomb(self):
+        return self.__readyDropBomb
+
+    def timerBomb(self):
+        return self.__timerBomb
+
+    def startTicksBomb(self):
+        return self.__startTicksBomb
+
+    def timerTakeDamage(self):
+        return self.__timerTakeDamage
+
+    def canTakeDamage(self):
+        return self.__canTakeDamage
+    
+    def startTicksTakeDamage(self):
+        return self.__startTicksTakeDamage
+
+    @x.setter
+    def x(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__x = val
 
 
     def update(self, level, player):
