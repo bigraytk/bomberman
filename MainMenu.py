@@ -7,6 +7,14 @@ class MainMenu(object):
 
     def __init__(self, screen, screenWidth, screenHeight):
         '''Constructor'''
+
+        #check that screenWidth and height are ints
+        if not isinstance(screenWidth,int) or not isinstance(screenHeight,int):
+            raise RuntimeError('Error: screenWidth and screenHeight must be ints')
+
+        if not isinstance(screen,pygame.Surface):
+            raise RuntimeError('Error: screen must be an instance of pygame.Surface')
+
         self.__screen__ = screen
         
         newGameButtonX = screenWidth / 2
@@ -21,7 +29,6 @@ class MainMenu(object):
         graphicsDir = Path.cwd() / "graphics"
 
         try:
-
             imageFile = str(graphicsDir.joinpath("main_menu.png"))
             self.__background__ = pygame.image.load(imageFile)
             
@@ -47,14 +54,20 @@ class MainMenu(object):
             imageFile = str(graphicsDir.joinpath("button_quit_hover.png"))
             self.__btnQuitHover__ = pygame.image.load(imageFile)
         except:
-            raise RuntimeError('Error: Unable to load graphis file')
+            raise RuntimeError('Error: Unable to load graphics files')
 
-        self.hoveringNG = False
-        self.hoveringHS = False
-        self.hoveringQT = False
+        self.__hoveringNG__ = False
+        self.__hoveringHS__ = False
+        self.__hoveringQT__ = False
 
-    #main menu loop
+    
     def showMenu(self, musicOn):
+        '''Method that contians the loop that displays the main menu and handles game state transitions to other elements of the game'''
+
+    
+        if not isinstance(musicOn,bool):
+            raise RuntimeError('Error: musicOn must be a boolean')
+
         
         gameState = const.GAME_STATE_MENU
         while gameState == const.GAME_STATE_MENU:
@@ -65,17 +78,17 @@ class MainMenu(object):
                 pygame.mixer.music.stop()
             
             self.__screen__.blit(self.__background__, (0,0))
-            if self.hoveringNG == False:
+            if self.__hoveringNG__ == False:
                 self.__screen__.blit(self.__btnNewGame__, self.__ngRect__)
             else:
                 self.__screen__.blit(self.__btnNewGameHover__, self.__ngRect__)
 
-            if self.hoveringHS == False:
+            if self.__hoveringHS__ == False:
                 self.__screen__.blit(self.__btnHighScore__, self.__hsRect__)
             else:
                 self.__screen__.blit(self.__btnHighScoreHover__, self.__hsRect__)
 
-            if self.hoveringQT == False:
+            if self.__hoveringQT__ == False:
                 self.__screen__.blit(self.__btnQuit__, self.__quitRectt__)
             else:
                 self.__screen__.blit(self.__btnQuitHover__, self.__quitRectt__)
@@ -88,17 +101,17 @@ class MainMenu(object):
                 elif event.type == pygame.MOUSEMOTION:
                     mousex, mousey = event.pos
                     if self.__ngRect__.collidepoint(mousex, mousey):
-                        self.hoveringNG = True
+                        self.__hoveringNG__ = True
                     elif not self.__ngRect__.collidepoint(mousex, mousey):
-                        self.hoveringNG = False
+                        self.__hoveringNG__ = False
                     if self.__hsRect__.collidepoint(mousex, mousey):
-                        self.hoveringHS = True
+                        self.__hoveringHS__ = True
                     elif not self.__hsRect__.collidepoint(mousex, mousey):
-                        self.hoveringHS = False
+                        self.__hoveringHS__ = False
                     if self.__quitRectt__.collidepoint(mousex, mousey):
-                        self.hoveringQT = True
+                        self.__hoveringQT__ = True
                     elif not self.__quitRectt__.collidepoint(mousex, mousey):
-                        self.hoveringQT = False
+                        self.__hoveringQT__ = False
                 
                 elif event.type == pygame.MOUSEBUTTONUP:
                     mousex, mousey = event.pos

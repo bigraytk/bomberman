@@ -5,6 +5,11 @@ import LinkedList
 
 def loadData(data,filePath):
     '''Global function that saves data as a .json file'''
+
+    if not isinstance(data,LinkedList.LinkedList):
+        raise RuntimeError('Error: data must be an instance of LinkedList')
+
+
     try:
         with open(filePath,'w') as scoreFile:
             json.dump(data,scoreFile, cls = MyListEncoder)

@@ -13,6 +13,15 @@ class HighScore(object):
 
     def __init__(self, screen, screenWidth, screenHeight):
         '''Constructor'''
+
+        if not isinstance(screenWidth,int) or not isinstance(screenHeight,int):
+            raise RuntimeError('Error: screenWidth and screenHeight must be ints')
+
+        if not isinstance(screen,pygame.Surface):
+            raise RuntimeError('Error: screen must be an instance of pygame.Surface')
+
+
+
         self.__screen__ = screen #how to check this
         self.__screenWidth__ = screenWidth
         self.__screenHeight__ = screenHeight

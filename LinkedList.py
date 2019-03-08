@@ -217,8 +217,6 @@ class LinkedList(object):
                     current = current.nextNode
                     i += 1
 
-                #print('current: ' , current)
-                
                 if i == index-1:
                     newNode.nextNode = current.nextNode
                     current.nextNode.prevNode = newNode
@@ -242,8 +240,6 @@ class LinkedList(object):
             self.insertAtIndex(index,score,name)
 
       
-
-
     def deleteAtIndex(self, index):
         '''Deletes Node at index, silent completion, no error generated if
         index beyond end of list. '''
@@ -284,17 +280,12 @@ class LinkedList(object):
             self.tail.nextNode = None
             self.numberOfNodes -= 1
         
-
-
     def empty(self):
         '''Returns True if the List is empty, False otherwise.'''
         if self.head:
             return False
         else:
             return True  
-
-
-
 
     def __str__(self):
 
