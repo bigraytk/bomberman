@@ -92,6 +92,7 @@ STATE_PLAYER_WINS = 7
 
 #bomb state
 STATE_KICKED = 8
+STATE_STOPPING = 9
 
 
 #game states

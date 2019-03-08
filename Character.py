@@ -271,10 +271,8 @@ class Character(pygame.sprite.Sprite):
         
         #temporary means to handle the image size difference (from tilesize) for the bman image
         if self.kind == const.PC:
-            #self.changeDirection(self.facing)
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X - 2
             self.hitbox.y = self.rect.y + 4
-            #self.rect.x += 0#8
             self.rect.y -= 8
         else:
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X / 2
@@ -282,6 +280,10 @@ class Character(pygame.sprite.Sprite):
 
 
     def advancedMovement(self, level, player):
+        ''' This method contains logic for advanced movement for enemy sprites idenfied as advanced
+        -Level, contains a matrix to identify location of stationary objects
+        -player, contains the current player object
+        '''
         pathsBlocked = 0
         if self.x > player.x:
             self.direction = const.LEFT
@@ -309,7 +311,9 @@ class Character(pygame.sprite.Sprite):
 
 
     def dropBomb(self, level):
-        '''Creates an instance of the bomb class at the PC's position'''
+        '''Creates an instance of the bomb class at the PC's position
+        -level, contains matrix to identify location of stationary objects
+        '''
         xDiff = abs(self.xres - (const.SCREEN_OFFSET_X_LEFT + self.x * const.TILE_SIZE))
         yDiff = abs(self.yres - (const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE))
         if self.kind == const.BOSS:
@@ -335,6 +339,7 @@ class Character(pygame.sprite.Sprite):
         '''This method is how to change the value of self.activeBombs
         will be called by dropBomb method of the PlayerCharacter, and
         the explode method of the Bomb
+        -change, used to increment or decrement number of active bombs
         '''
         self.activeBombs = self.activeBombs + change
         if self.activeBombs < 0:
@@ -344,7 +349,6 @@ class Character(pygame.sprite.Sprite):
 
 
 class PlayerCharacter(Character):
-    
     '''
     This object is for the player's character. Only one
     should be instantiated.
@@ -356,14 +360,11 @@ class PlayerCharacter(Character):
         super().__init__(x, y, facing, const.PLAYER_SPEED, const.PC)
         self.bombCount = const.PLAYER_DEFAULT_NUM_BOMBS
         self.bombRange = 1
-        #self.speed = 40 #placeholder
         self.boot = False
         self.lives = const.LIVES
         self.score = 0
         
-        #imageFile = str(Path.cwd() / "graphics" / "player_bman.png")
-        #self.image = pygame.image.load(imageFile).convert_alpha()
-
+       
         imageFile = str(Path.cwd() / "graphics" / "Left.png")
         self.left = pygame.image.load(imageFile).convert_alpha()
 
@@ -375,19 +376,98 @@ class PlayerCharacter(Character):
 
         imageFile = str(Path.cwd() / "graphics" / "Back.png")
         self.back = pygame.image.load(imageFile).convert_alpha()
+    
 
         self.image = self.front
 
 
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
 
+    @property
+    def score(self):
+        return self.__score
+
+    @property
+    def lives(self):
+        return self.__lives
+
+    @property
+    def front(self):
+        return self.__front
+
+    @property
+    def left(self):
+        return self.__left
+
+    @property
+    def right(self):
+        return self.__right
+    
+    @property
+    def back(self):
+        return self.__back
+    
+    @property
+    def image(self):
+        return self.__image
+
+    @score.setter
+    def score(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__score = val
+    
+    @lives.setter
+    def lives(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__lives = val
+    
+    @image.setter
+    def image(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__image = val
+
+    @front.setter
+    def front(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__front = val
+
+    @left.setter
+    def left(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__left = val
+
+    @right.setter
+    def right(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__right = val
+
+    @back.setter
+    def back(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__back = val
+
     def increaseScore(self,score):
+        ''' This method increases/decreases the player's score dependent on the action taken by the player
+        -score, value to be added to player's score
+        '''
         self.score += score
         if self.score < 0:
             self.score = 0
 
     def move(self, direction, level):
+        ''' This method implements movement unique to a player.  To be specific, whether or not a bomb should be kicked.
+        -direction, based on the direction key the user selects
+        -level, used to validate stationary objects on map
+        '''
         layout = level.layout
         self.facing = direction
         pathBlocked = False
@@ -406,13 +486,14 @@ class PlayerCharacter(Character):
             if bomb and not bomb.bossBomb:
                 bomb.kick(direction, level)
                 
-
+        #calls parent class' move function
         super().move(direction, level)
 
 
     def getPowerup(self, powerup):
         '''This method is called when the PC occupies the same space as a 
         powerup. 
+        -powerup, type of powerup to provide the player
         '''
         if powerup.powerupType == const.POWERUP_RANGE and self.bombRange < 5:
             self.bombRange += 1
@@ -423,21 +504,20 @@ class PlayerCharacter(Character):
 
     
     def changeDirection(self,direction):
-        if direction == const.RIGHT and self.image != self.right: #and self.state == const.STATE_IDLE:
+        '''This method cnanges the direction of the player image
+        -direction, used to decide what image to select.
+        '''
+        if direction == const.RIGHT and self.image != self.right:
             self.image = self.right
-        if direction == const.LEFT and self.image != self.left: #and self.state == const.STATE_IDLE:
+        if direction == const.LEFT and self.image != self.left: 
             self.image = self.left
-        if direction == const.UP and self.image != self.back: #and self.state == const.STATE_IDLE:
+        if direction == const.UP and self.image != self.back: 
             self.image = self.back
-        if direction == const.DOWN and self.image != self.front:# and self.state == const.STATE_IDLE:
+        if direction == const.DOWN and self.image != self.front:
             self.image = self.front
-
-        
-    
 
 
 class Enemy(Character):
-
     '''
     This is the object for enemies. Many of them will be 
     instantiated at once. Version  allows the
@@ -453,9 +533,10 @@ class Enemy(Character):
         version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED])
         self.pursuePlayer = False
 
-        self.image = pygame.image.load(level.enemyFile).convert()
+        self.image = pygame.image.load(str(level.enemyFile)).convert()
         self.image.set_colorkey(const.TRAN_COL)
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
         self.fade_out = const.FADE_START
         
@@ -469,9 +550,49 @@ class Enemy(Character):
             self.speed = const.SPEED_LOW    #advanced enemies start slow but speed up when in pursuit
             self.logic = const.ADVANCED
 
-    
+    @property
+    def direction(self):
+        return self.__direction
+
+    @property
+    def pursuePlayer(self):
+        return self.__pursuePlayer
+
+    @property
+    def speed(self):
+        return self.__speed
+
+    @property
+    def version(self):
+        return self.__version
+
+    @version.setter
+    def version(self, val):
+        if val < 0 :
+            raise RuntimeError('Incorrect Speed')
+        self.__version = val
+
+    @speed.setter
+    def speed(self, val):
+        if val < 0 :
+            raise RuntimeError('Incorrect Speed')
+        self.__direction = val
+
+    @direction.setter
+    def direction(self, val):
+        if val != const.UP and val != const.DOWN and val != const.RIGHT and val != const.UP and val != const.LEFT :
+            raise RuntimeError('Incorrect Direction Val')
+        self.__direction = val
+
+    @pursuePlayer.setter
+    def pursuePlayer(self, val):
+        if val != False and val != True:
+            raise RuntimeError('Not Boolean')
+        self.__pursuePlayer = val
+
     def destroy(self):
-        #gets called if something destroys an enemy
+        '''Used to manage the state of a dead enemy
+        '''
         self.state = const.STATE_DYING
 
 
@@ -524,11 +645,17 @@ class Boss(Character):
         self.imageDead = pygame.image.load(imageFile).convert()
         self.imageDead.set_colorkey(const.TRAN_COL)
 
+        self.mask = pygame.mask.from_surface(self.image)
+        
         self.fade_out = const.FADE_START
         self.health = const.BOSS_HEALTH
 
 
     def update(self, level, player):
+        '''Used to manage timing for when the boss drops a bomb and how he takes damage.
+        - level, not currently used in method
+        - player, not currently used in method
+        '''
         super().update(level, player)
 
         seconds = self.countdownTakeDamage()#calculate how many seconds
@@ -544,16 +671,22 @@ class Boss(Character):
         else:
             self.image = self.imageNormal
     
-    
+
     def countdownDropBomb(self):
+        '''Used to manage when the boss drops a bomb
+        '''
         return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND
 
 
     def countdownTakeDamage(self):
+        '''Used to manage timer for damage
+        '''
         return (pygame.time.get_ticks() - self.startTicksTakeDamage) / const.SECOND 
 
 
     def takeDamage(self):
+        '''Used to manage when a boss character takes damage
+        '''
         if self.canTakeDamage:
             self.health -= 1
             self.canTakeDamage = False
