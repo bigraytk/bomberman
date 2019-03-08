@@ -576,7 +576,7 @@ class Enemy(Character):
     def speed(self, val):
         if val < 0 :
             raise RuntimeError('Incorrect Speed')
-        self.__direction = val
+        self.__speed = val
 
     @direction.setter
     def direction(self, val):
@@ -650,6 +650,75 @@ class Boss(Character):
         self.fade_out = const.FADE_START
         self.health = const.BOSS_HEALTH
 
+    @property
+    def speed(self):
+        return self.__speed
+
+    @property
+    def readyDropBomb(self):
+        return self.__readyDropBomb
+
+    @property
+    def timerBomb(self):
+        return self.__timerBomb
+    
+    @property
+    def startTicksBomb(self):
+        return self.__startTicksBomb
+    
+    @property
+    def timerTakeDamage(self):
+        return self.__timerTakeDamage
+
+    @property
+    def canTakeDamage(self):
+        return self.__canTakeDamage
+    
+    @property
+    def startTicksTakeDamage(self):
+        return self.__startTicksTakeDamage
+
+    @speed.setter
+    def speed(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__speed = val
+
+    @readyDropBomb.setter
+    def readyDropBomb(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__readyDropBomb = val
+        
+    @timerBomb.setter
+    def timerBomb(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__timerBomb = val
+
+    @startTicksBomb.setter
+    def startTicksBomb(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__startTicksBomb = val
+
+    @timerTakeDamage.setter
+    def timerTakeDamage(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__timerTakeDamage = val
+    
+    @canTakeDamage.setter
+    def canTakeDamage(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__canTakeDamage = val
+
+    @startTicksTakeDamage.setter
+    def startTicksTakeDamage(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__startTicksTakeDamage = val
 
     def update(self, level, player):
         '''Used to manage timing for when the boss drops a bomb and how he takes damage.
