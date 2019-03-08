@@ -158,9 +158,11 @@ class Game(object):
 
         for enemy in self.spriteEnemies:
             if enemy.rect.colliderect(self.player.hitbox) and enemy.state != const.STATE_DYING:
-                if pygame.sprite.spritecollide(enemy, self.spritePlayer, False, pygame.sprite.collide_circle): #TODO TESTESTEST
+                #if pygame.sprite.spritecollide(enemy, self.spritePlayer, False, pygame.sprite.collide_circle): #TODO TESTESTEST
+                if pygame.sprite.spritecollide(enemy, self.spritePlayer, False, pygame.sprite.collide_mask):
                     self.killPlayer()
-            if pygame.sprite.spritecollide(enemy, self.spriteBombBlasts, False, pygame.sprite.collide_circle):
+            #if pygame.sprite.spritecollide(enemy, self.spriteBombBlasts, False, pygame.sprite.collide_circle):
+            if pygame.sprite.spritecollide(enemy, self.spriteBombBlasts, False, pygame.sprite.collide_mask):
                 if enemy.kind == const.BOSS:# and pygame.sprite.spritecollide(enemy, blast, False, pygame.sprite.collide_circle):
                     if enemy.takeDamage():
                       self.player.increaseScore(const.ENEMY_DIED)
@@ -180,8 +182,19 @@ class Game(object):
                 self.killPlayer()
 
         for bomb in self.spriteBombs:
+            for enemy in self.spriteEnemies:
+                if bomb.state == const.STATE_MOVING_UP and bomb.y == enemy.y +1 and bomb.x == enemy.x:
+                    bomb.collision = True
+                if bomb.state == const.STATE_MOVING_DOWN and bomb.y == enemy.y - 1 and bomb.x == enemy.x:
+                    bomb.collision = True
+                if bomb.state == const.STATE_MOVING_LEFT and bomb.y == enemy.y and bomb.x == enemy.x + 1:
+                    bomb.collision = True
+                if bomb.state == const.STATE_MOVING_RIGHT and bomb.y == enemy.y and bomb.x == enemy.x - 1:
+                    bomb.collision = True
             if pygame.sprite.spritecollideany(bomb, self.spriteBombBlasts, collided = None) or pygame.sprite.spritecollideany(bomb, self.spriteBossBombBlasts, collided = None):
                 bomb.expiditeExplosion()
+            #if pygame.sprite.spritecollideany(bomb, self.spriteEnemies) and bomb.state != const.STATE_IDLE:
+            #    bomb.collision = True
             if bomb.exploded:
                 if self.soundOn:
                     self.explodeSound.play()
@@ -525,6 +538,8 @@ class Game(object):
                 self.gameState = self.resetLevel()
         elif event.key == pygame.K_PERIOD:
             if self.levelNum < self.numLevels:
+                #self.level.__levelWidth = 12
+                #print(self.level.__levelWidth)
                 self.levelNum += 1
                 self.gameState = self.resetLevel()
         elif event.key == pygame.K_LSHIFT:
