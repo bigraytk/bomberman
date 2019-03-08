@@ -271,10 +271,8 @@ class Character(pygame.sprite.Sprite):
         
         #temporary means to handle the image size difference (from tilesize) for the bman image
         if self.kind == const.PC:
-            #self.changeDirection(self.facing)
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X - 2
             self.hitbox.y = self.rect.y + 4
-            #self.rect.x += 0#8
             self.rect.y -= 8
         else:
             self.hitbox.x = self.rect.x + const.HIT_BOX_OFFSET_X / 2
@@ -387,6 +385,76 @@ class PlayerCharacter(Character):
         self.mask = pygame.mask.from_surface(self.image)
         self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
 
+    @property
+    def score(self):
+        return self.__score
+
+    @property
+    def lives(self):
+        return self.__lives
+
+    @property
+    def front(self):
+        return self.__front
+
+    @property
+    def left(self):
+        return self.__left
+
+    @property
+    def right(self):
+        return self.__right
+    
+    @property
+    def back(self):
+        return self.__back
+    
+    @property
+    def image(self):
+        return self.__image
+
+    @score.setter
+    def score(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__score = val
+    
+    @lives.setter
+    def lives(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__lives = val
+    
+    @image.setter
+    def image(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__image = val
+
+    @front.setter
+    def front(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__front = val
+
+    @left.setter
+    def left(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__left = val
+
+    @right.setter
+    def right(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__right = val
+
+    @back.setter
+    def back(self, val):
+        if val == None:
+            raise RuntimeError('Image Cannot Equal None')
+        self.__back = val
+
     def increaseScore(self,score):
         ''' This method increases/decreases the player's score dependent on the action taken by the player
         -score, value to be added to player's score
@@ -448,9 +516,6 @@ class PlayerCharacter(Character):
         if direction == const.DOWN and self.image != self.front:
             self.image = self.front
 
-        
-    
-
 
 class Enemy(Character):
     '''
@@ -485,9 +550,49 @@ class Enemy(Character):
             self.speed = const.SPEED_LOW    #advanced enemies start slow but speed up when in pursuit
             self.logic = const.ADVANCED
 
-    
+    @property
+    def direction(self):
+        return self.__direction
+
+    @property
+    def pursuePlayer(self):
+        return self.__pursuePlayer
+
+    @property
+    def speed(self):
+        return self.__speed
+
+    @property
+    def version(self):
+        return self.__version
+
+    @version.setter
+    def version(self, val):
+        if val < 0 :
+            raise RuntimeError('Incorrect Speed')
+        self.__version = val
+
+    @speed.setter
+    def speed(self, val):
+        if val < 0 :
+            raise RuntimeError('Incorrect Speed')
+        self.__direction = val
+
+    @direction.setter
+    def direction(self, val):
+        if val != const.UP and val != const.DOWN and val != const.RIGHT and val != const.UP and val != const.LEFT :
+            raise RuntimeError('Incorrect Direction Val')
+        self.__direction = val
+
+    @pursuePlayer.setter
+    def pursuePlayer(self, val):
+        if val != False and val != True:
+            raise RuntimeError('Not Boolean')
+        self.__pursuePlayer = val
+
     def destroy(self):
-        #gets called if something destroys an enemy
+        '''Used to manage the state of a dead enemy
+        '''
         self.state = const.STATE_DYING
 
 
@@ -547,6 +652,10 @@ class Boss(Character):
 
 
     def update(self, level, player):
+        '''Used to manage timing for when the boss drops a bomb and how he takes damage.
+        - level, not currently used in method
+        - player, not currently used in method
+        '''
         super().update(level, player)
 
         seconds = self.countdownTakeDamage()#calculate how many seconds
@@ -564,14 +673,20 @@ class Boss(Character):
     
 
     def countdownDropBomb(self):
+        '''Used to manage when the boss drops a bomb
+        '''
         return (pygame.time.get_ticks() - self.startTicksBomb) / const.SECOND
 
 
     def countdownTakeDamage(self):
+        '''Used to manage timer for damage
+        '''
         return (pygame.time.get_ticks() - self.startTicksTakeDamage) / const.SECOND 
 
 
     def takeDamage(self):
+        '''Used to manage when a boss character takes damage
+        '''
         if self.canTakeDamage:
             self.health -= 1
             self.canTakeDamage = False
