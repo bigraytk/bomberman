@@ -11,8 +11,8 @@ import pygame
 class Character(pygame.sprite.Sprite):
 
     '''
-    This class encompasess all characters (Player and Enemy)
-    PlayerCharacter and Emeny are subclasses
+    This class encompasess all characters (Player, Enemy and Boss)
+    PlayerCharacter, Emeny and Boss are subclasses
     '''
 
     def __init__(self, x, y, facing, speed, kind):
@@ -187,7 +187,8 @@ class Character(pygame.sprite.Sprite):
     def update(self, level, player):
         '''
         Updates character position when a character is moving towards a grid position
-        -level
+        -level, used to verify level layout to prevent movement into walls
+        -player, used to get player information for enemies who persue the player (advanced movement)
         '''
         if self.kind == const.ENEMY:
             if self.state == const.STATE_IDLE:
@@ -721,8 +722,8 @@ class Boss(Character):
 
     def update(self, level, player):
         '''Used to manage timing for when the boss drops a bomb and how he takes damage.
-        - level, not currently used in method
-        - player, not currently used in method
+        - level, required for parent update method
+        - player, required for parent update method
         '''
         super().update(level, player)
 
