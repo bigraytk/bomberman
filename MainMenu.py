@@ -7,7 +7,15 @@ class MainMenu(object):
 
     def __init__(self, screen, screenWidth, screenHeight):
         '''Constructor'''
-        self.screen = screen
+
+        #check that screenWidth and height are ints
+        if not isinstance(screenWidth,int) or not isinstance(screenHeight,int):
+            raise RuntimeError('Error: screenWidth and screenHeight must be ints')
+
+        if not isinstance(screen,pygame.Surface):
+            raise RuntimeError('Error: screen must be an instance of pygame.Surface')
+
+        self.__screen__ = screen
         
         newGameButtonX = screenWidth / 2
         newGameButtonY = const.TILE_SIZE * 8
@@ -20,36 +28,46 @@ class MainMenu(object):
 
         graphicsDir = Path.cwd() / "graphics"
 
-        imageFile = str(graphicsDir.joinpath("main_menu.png"))
-        self.background = pygame.image.load(imageFile)
+        try:
+            imageFile = str(graphicsDir.joinpath("main_menu.png"))
+            self.__background__ = pygame.image.load(imageFile)
+            
 
-        NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
-        self.btnNewGame = pygame.image.load(NewGameGraph)
+            NewGameGraph = str(graphicsDir.joinpath("NewGameButton.png"))
+            self.__btnNewGame__ = pygame.image.load(NewGameGraph)
 
-        NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_hover.png"))
-        self.btnNewGameHover = pygame.image.load(NewGameGraphRed)
-        self.ngRect = self.btnNewGameHover.get_rect(center =(newGameButtonX, newGameButtonY))
-        
-        highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
-        self.btnHighScore = pygame.image.load(highScoreGraph)
-        self.hsRect = self.btnHighScore.get_rect(center =(highScoreButtonX, highScoreButtonY))
-        
-        highScoreGraphRed = str(graphicsDir.joinpath("HighScores_hover.png"))
-        self.btnHighScoreHover = pygame.image.load(highScoreGraphRed)
+            NewGameGraphRed = str(graphicsDir.joinpath("NewGameButton_hover.png"))
+            self.__btnNewGameHover__ = pygame.image.load(NewGameGraphRed)
+            self.__ngRect__ = self.__btnNewGameHover__.get_rect(center =(newGameButtonX, newGameButtonY))
+            
+            highScoreGraph = str(graphicsDir.joinpath("HighScores.png"))
+            self.__btnHighScore__ = pygame.image.load(highScoreGraph)
+            self.__hsRect__ = self.__btnHighScore__.get_rect(center =(highScoreButtonX, highScoreButtonY))
+            
+            highScoreGraphRed = str(graphicsDir.joinpath("HighScores_hover.png"))
+            self.__btnHighScoreHover__ = pygame.image.load(highScoreGraphRed)
 
-        imageFile = str(graphicsDir.joinpath("button_quit.png"))
-        self.btnQuit = pygame.image.load(imageFile)
-        self.quitRect = self.btnQuit.get_rect(center =(quitButtonX, quitButtonY))
-        
-        imageFile = str(graphicsDir.joinpath("button_quit_hover.png"))
-        self.btnQuitHover = pygame.image.load(imageFile)
+            imageFile = str(graphicsDir.joinpath("button_quit.png"))
+            self.__btnQuit__ = pygame.image.load(imageFile)
+            self.__quitRectt__ = self.__btnQuit__.get_rect(center =(quitButtonX, quitButtonY))
+            
+            imageFile = str(graphicsDir.joinpath("button_quit_hover.png"))
+            self.__btnQuitHover__ = pygame.image.load(imageFile)
+        except:
+            raise RuntimeError('Error: Unable to load graphics files')
 
-        self.hoveringNG = False
-        self.hoveringHS = False
-        self.hoveringQT = False
+        self.__hoveringNG__ = False
+        self.__hoveringHS__ = False
+        self.__hoveringQT__ = False
 
-    #main menu loop
+    
     def showMenu(self, musicOn):
+        '''Method that contians the loop that displays the main menu and handles game state transitions to other elements of the game'''
+
+    
+        if not isinstance(musicOn,bool):
+            raise RuntimeError('Error: musicOn must be a boolean')
+
         
         gameState = const.GAME_STATE_MENU
         while gameState == const.GAME_STATE_MENU:
@@ -59,21 +77,21 @@ class MainMenu(object):
             else:
                 pygame.mixer.music.stop()
             
-            self.screen.blit(self.background, (0,0))
-            if self.hoveringNG == False:
-                self.screen.blit(self.btnNewGame, self.ngRect)
+            self.__screen__.blit(self.__background__, (0,0))
+            if self.__hoveringNG__ == False:
+                self.__screen__.blit(self.__btnNewGame__, self.__ngRect__)
             else:
-                self.screen.blit(self.btnNewGameHover, self.ngRect)
+                self.__screen__.blit(self.__btnNewGameHover__, self.__ngRect__)
 
-            if self.hoveringHS == False:
-                self.screen.blit(self.btnHighScore, self.hsRect)
+            if self.__hoveringHS__ == False:
+                self.__screen__.blit(self.__btnHighScore__, self.__hsRect__)
             else:
-                self.screen.blit(self.btnHighScoreHover, self.hsRect)
+                self.__screen__.blit(self.__btnHighScoreHover__, self.__hsRect__)
 
-            if self.hoveringQT == False:
-                self.screen.blit(self.btnQuit, self.quitRect)
+            if self.__hoveringQT__ == False:
+                self.__screen__.blit(self.__btnQuit__, self.__quitRectt__)
             else:
-                self.screen.blit(self.btnQuitHover, self.quitRect)
+                self.__screen__.blit(self.__btnQuitHover__, self.__quitRectt__)
 
 
             for event in pygame.event.get():
@@ -82,27 +100,27 @@ class MainMenu(object):
 
                 elif event.type == pygame.MOUSEMOTION:
                     mousex, mousey = event.pos
-                    if self.ngRect.collidepoint(mousex, mousey):
-                        self.hoveringNG = True
-                    elif not self.ngRect.collidepoint(mousex, mousey):
-                        self.hoveringNG = False
-                    if self.hsRect.collidepoint(mousex, mousey):
-                        self.hoveringHS = True
-                    elif not self.hsRect.collidepoint(mousex, mousey):
-                        self.hoveringHS = False
-                    if self.quitRect.collidepoint(mousex, mousey):
-                        self.hoveringQT = True
-                    elif not self.quitRect.collidepoint(mousex, mousey):
-                        self.hoveringQT = False
+                    if self.__ngRect__.collidepoint(mousex, mousey):
+                        self.__hoveringNG__ = True
+                    elif not self.__ngRect__.collidepoint(mousex, mousey):
+                        self.__hoveringNG__ = False
+                    if self.__hsRect__.collidepoint(mousex, mousey):
+                        self.__hoveringHS__ = True
+                    elif not self.__hsRect__.collidepoint(mousex, mousey):
+                        self.__hoveringHS__ = False
+                    if self.__quitRectt__.collidepoint(mousex, mousey):
+                        self.__hoveringQT__ = True
+                    elif not self.__quitRectt__.collidepoint(mousex, mousey):
+                        self.__hoveringQT__ = False
                 
                 elif event.type == pygame.MOUSEBUTTONUP:
                     mousex, mousey = event.pos
-                    if self.ngRect.collidepoint(mousex, mousey):      #clicked on new game: start level 1
+                    if self.__ngRect__.collidepoint(mousex, mousey):      #clicked on new game: start level 1
                         gameState = const.GAME_STATE_RUNNING
-                    elif self.hsRect.collidepoint(mousex, mousey):    #clicked on high score: show high score screen
+                    elif self.__hsRect__.collidepoint(mousex, mousey):    #clicked on high score: show high score screen
                         gameState = const.GAME_STATE_HIGHSCORES
                         
-                    elif self.quitRect.collidepoint(mousex, mousey):
+                    elif self.__quitRectt__.collidepoint(mousex, mousey):
                         gameState = const.GAME_STATE_QUITTING
 
                 elif event.type == pygame.KEYDOWN:

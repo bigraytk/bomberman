@@ -1,18 +1,9 @@
 import pickle
 from pathlib import Path
 import sys
+import JsonEncoder
+import json
 
-
-def loadList(filePath):
-    scoreFile = open(filePath,'rb')
-    scoreList = pickle.load(scoreFile)
-    scoreFile.close()
-    return scoreList
-
-def saveList(scoreList, filePath):
-    scoreFile = open(filePath,'wb')
-    pickle.dump(scoreList,scoreFile)
-    scoreFile.close()
 
 class LinkedList(object):
     
@@ -26,14 +17,20 @@ class LinkedList(object):
 
         '''
         def __init__(self, score, name):
-            ''' Constructor. -dataIn may not be None'''
-            if score == None or name == None:
-                raise RuntimeError('data item to put in Node is None.')
+            ''' Constructor. score must be an int, name must be a str'''
             
             self.score = score
             self.name = name
             self.nextNode = None    
             self.prevNode = None
+        
+        @property
+        def score(self):
+            return self.__score
+
+        @property
+        def name(self):
+            return self.__name
 
         @property
         def nextNode(self):
@@ -44,6 +41,18 @@ class LinkedList(object):
         def prevNode(self):
             ''' Accessor. '''
             return self.__prevNode
+
+        @score.setter
+        def score(self,nextIn):
+            if not isinstance(nextIn,int):
+                raise RuntimeError('Error: The value for score must be an int')
+            self.__score = nextIn
+
+        @name.setter
+        def name(self,nextIn):
+            if not isinstance(nextIn,str):
+                raise RuntimeError('Error: The value for name must be a string')
+            self.__name = nextIn
 
         @nextNode.setter
         def nextNode(self, nextIn):
@@ -80,32 +89,58 @@ class LinkedList(object):
 
     def __init__(self):
         ''' Constructor. Allocates an empty Linked-List shell. '''
+        print('in the constructor')
         self.head = None
         self.tail = None
         self.numberOfNodes = 0
 
+    @property
+    def head(self):
+        return self.__head
+
+    @property
+    def tail(self):
+        return self.__tail
+
+    @property
+    def numberOfNodes(self):
+        return self.__numberOfNodes
+
+    @numberOfNodes.setter
+    def numberOfNodes(self,value):
+        if value < 0 or not isinstance(value,int):
+            raise RuntimeError('Error: numberOfNodes but be and integer greater than or equal to 0')
+        self.__numberOfNodes = value
+
+    @tail.setter
+    def tail(self,value):
+        node = self.Node(0,'test')
+        if value!= None and not isinstance(value,node.__class__):
+            raise RuntimeError('Error: Head must point to None or a Node')
+        self.__tail = value
+
+    @head.setter
+    def head(self,value):
+        node = self.Node(0,'test')
+        if value!= None and not isinstance(value,node.__class__):
+            raise RuntimeError('Error: Head must point to None or a Node')
+        self.__head = value
 
     def readData(self):
         ''' Returns all the data in the nodes as a list. '''
-
         if self.head:
             answer = []
             current = self.head
-            i = 0
-            
             while current:
-                #print('current: ' , current)
                 data = (current.score,current.name)
                 answer.append(data)
-                #print('data: ' , data)
                 current = current.nextNode
-
         else:
-            answer = []
-            
+            answer = []   
         return answer
 
     def readTail(self):
+        '''Returns the score and name of the tail in a tuple (score,name)'''
         if self.tail:
             return (self.tail.score,self.tail.name)
         else:
@@ -182,8 +217,6 @@ class LinkedList(object):
                     current = current.nextNode
                     i += 1
 
-                #print('current: ' , current)
-                
                 if i == index-1:
                     newNode.nextNode = current.nextNode
                     current.nextNode.prevNode = newNode
@@ -207,8 +240,6 @@ class LinkedList(object):
             self.insertAtIndex(index,score,name)
 
       
-
-
     def deleteAtIndex(self, index):
         '''Deletes Node at index, silent completion, no error generated if
         index beyond end of list. '''
@@ -218,39 +249,43 @@ class LinkedList(object):
 
         if index == 0:
             self.head = self.head.nextNode
+            self.head.prevNode = None
+            self.numberOfNodes -= 1
         else:
             current = self.head
             i = 0
-            while i < index-1 and current.nextNode:
+            while i < index and current.nextNode:
                 current = current.nextNode
                 i += 1
 
-            if i == index-1 and current.nextNode:
+            if i == index and current.nextNode:
+                #print('current: ' ,current)
                 current.nextNode = current.nextNode.nextNode
-            elif i == index-1:
-                current.nextNode = None
+                self.numberOfNodes -= 1
+            elif i == index and not current.nextNode:
+                current.prevNode.nextNode = None
+                self.tail = current.prevNode
+                self.numberOfNodes -= 1
 
     def deleteTail(self):
+        '''Deletes the tail Node, if tail and head are same Node, will delete both. No return'''
         if self.tail == self.head:
             self.head = None
             self.tail = None
+            self.numberOfNodes = 0
         else:
             #print('deleting: ' , self.tail)
             self.tail = self.tail.prevNode
             #print('new tail is : ' , self.tail)
             self.tail.nextNode = None
+            self.numberOfNodes -= 1
         
-
-
     def empty(self):
         '''Returns True if the List is empty, False otherwise.'''
         if self.head:
             return False
         else:
             return True  
-
-
-
 
     def __str__(self):
 
@@ -278,19 +313,17 @@ class LinkedList(object):
 def saveBlankList():
     scoreList = LinkedList()
     scoreList.append(1000,'JLW')
-    filePath = str(Path.cwd() / "HighScores" / "Scores.pickle")
-    scoreFile = open(filePath,'wb')
-    pickle.dump(scoreList,scoreFile)
-    scoreFile.close()
+    filePath = str(Path.cwd() / "HighScores" / "Scores.json")
+    JsonEncoder.loadData(scoreList,filePath)
     
 ##########################################################
 #main
 
 
 if __name__=="__main__":
-    
+    saveBlankList()
 
-    
+    '''
     filePath = str(Path.cwd() / "HighScores" / "Scores.pickle")
     test = loadList(filePath)
     print(test)
@@ -300,7 +333,7 @@ if __name__=="__main__":
     
     
 
-    '''
+    
     test.append(400,'bAA')
     print(test)
     saveList(test,filePath)
