@@ -435,15 +435,28 @@ class PlayerCharacter(Character):
     def image(self):
         return self.__image
 
+    @property
+    def imageIndex(self):
+        return self.__imageIndex
+    
+    @property
+    def imageFrame(self):
+        return self.__imageFrame
+
+    @property
+    def start_ticks(self):
+        return self.__start_ticks
+
     @score.setter
     def score(self, val):
-        
+        if val < 0:
+            val = 0
         self.__score = val
     
     @lives.setter
     def lives(self, val):
         if val < 0:
-            raise RuntimeError('Value is less than 0')
+            raise RuntimeError('Lives cannot be less than 0')
         self.__lives = val
     
     @image.setter
@@ -475,6 +488,26 @@ class PlayerCharacter(Character):
         if val == None:
             raise RuntimeError('Image Cannot Equal None')
         self.__up = val
+
+    @imageIndex.setter
+    def imageIndex(self, val):
+        if val < 0:
+            raise RuntimeError('Image index cannot be less than 0')
+        self.__imageIndex = val
+    
+    @imageFrame.setter
+    def imageFrame(self, val):
+        if val == None:
+            raise RuntimeError('ImageFrame Cannot Equal None')
+        self.__imageFrame = val
+
+    @start_ticks.setter
+    def start_ticks(self, val):
+        if val < 0:
+            raise RuntimeError('Start Ticks cannot be less than 0')
+        self.__start_ticks = val
+
+
 
     def increaseScore(self,score):
         ''' This method increases/decreases the player's score dependent on the action taken by the player
