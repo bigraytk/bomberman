@@ -179,8 +179,8 @@ class Character(pygame.sprite.Sprite):
             else:
                 pathBlocked = True
 
-        #if self.kind == const.PC and not pathBlocked:
-        #    self.changeDirection(direction)
+        if self.kind == const.PC and not pathBlocked:
+            self.changeDirection(direction)
         return pathBlocked
         
         
@@ -365,29 +365,44 @@ class PlayerCharacter(Character):
         self.lives = const.LIVES
         self.score = 0
         self.imageIndex = 0
+        self.imageFrame  = [None] * const.PLAYER_ANIM_FRAMES
         self.animationTimer = .09
         self.start_ticks = pygame.time.get_ticks() #starter tick
-        
-       
+
+        self.left = []
         imageFile = str(Path.cwd() / "graphics" / "Left.png")
-        self.left = pygame.image.load(imageFile).convert_alpha()
+        image1 = pygame.image.load(imageFile).convert_alpha()
+        imageFile = str(Path.cwd() / "graphics" / "Left2.png")
+        image2 = pygame.image.load(imageFile).convert_alpha()
+        self.left.extend([image1, image2, image1, image2])
 
+        self.right = []
         imageFile = str(Path.cwd() / "graphics" / "Right.png")
-        self.right = pygame.image.load(imageFile).convert_alpha()
-
-        imageFile = str(Path.cwd() / "graphics" / "Front.png")
-        self.front = pygame.image.load(imageFile).convert_alpha()
-
-        imageFile = str(Path.cwd() / "graphics" / "Back.png")
-        self.back = pygame.image.load(imageFile).convert_alpha()
-    
-        self.right2 = []
-        self.right2.append(self.right)
+        image1 = pygame.image.load(imageFile).convert_alpha()
         imageFile = str(Path.cwd() / "graphics" / "Right2.png")
-        self.right2.append(pygame.image.load(imageFile).convert_alpha())
+        image2 = pygame.image.load(imageFile).convert_alpha()
+        self.right.extend([image1, image2, image1, image2])
 
-        self.image = self.front
-
+        self.up = []
+        imageFile = str(Path.cwd() / "graphics" / "Up.png")
+        image1 = pygame.image.load(imageFile).convert_alpha()
+        imageFile = str(Path.cwd() / "graphics" / "Up2.png")
+        image2 = pygame.image.load(imageFile).convert_alpha()
+        imageFile = str(Path.cwd() / "graphics" / "Up3.png")
+        image3 = pygame.image.load(imageFile).convert_alpha()
+        self.up.extend([image1, image2, image1, image3])
+        
+        self.down = []
+        imageFile = str(Path.cwd() / "graphics" / "Down.png")
+        image1 = pygame.image.load(imageFile).convert_alpha()
+        imageFile = str(Path.cwd() / "graphics" / "Down2.png")
+        image2 = pygame.image.load(imageFile).convert_alpha()
+        imageFile = str(Path.cwd() / "graphics" / "Down3.png")
+        image3 = pygame.image.load(imageFile).convert_alpha()
+        self.down.extend([image1, image2, image1, image3])
+    
+        self.changeDirection(facing)
+        self.image = self.imageFrame[0]
 
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -402,8 +417,8 @@ class PlayerCharacter(Character):
         return self.__lives
 
     @property
-    def front(self):
-        return self.__front
+    def down(self):
+        return self.__down
 
     @property
     def left(self):
@@ -414,8 +429,8 @@ class PlayerCharacter(Character):
         return self.__right
     
     @property
-    def back(self):
-        return self.__back
+    def up(self):
+        return self.__up
     
     @property
     def image(self):
@@ -438,11 +453,11 @@ class PlayerCharacter(Character):
             raise RuntimeError('Image Cannot Equal None')
         self.__image = val
 
-    @front.setter
-    def front(self, val):
+    @down.setter
+    def down(self, val):
         if val == None:
             raise RuntimeError('Image Cannot Equal None')
-        self.__front = val
+        self.__down = val
 
     @left.setter
     def left(self, val):
@@ -456,11 +471,11 @@ class PlayerCharacter(Character):
             raise RuntimeError('Image Cannot Equal None')
         self.__right = val
 
-    @back.setter
-    def back(self, val):
+    @up.setter
+    def up(self, val):
         if val == None:
             raise RuntimeError('Image Cannot Equal None')
-        self.__back = val
+        self.__up = val
 
     def increaseScore(self,score):
         ''' This method increases/decreases the player's score dependent on the action taken by the player
@@ -514,17 +529,22 @@ class PlayerCharacter(Character):
         '''This method cnanges the direction of the player image
         -direction, used to decide what image to select.
         '''
-        if direction == const.RIGHT:# and self.image != self.right:
-            if self.state == const.STATE_MOVING_RIGHT:
-                self.image = self.right2[self.imageIndex]
-            else:
-                self.image = self.right2[0]
-        if direction == const.LEFT and self.image != self.left: 
-            self.image = self.left
-        if direction == const.UP and self.image != self.back: 
-            self.image = self.back
-        if direction == const.DOWN and self.image != self.front:
-            self.image = self.front
+        if direction == const.RIGHT:
+            for i in range(len(self.right)):
+                self.imageFrame[i] = self.right[i]
+        
+        if direction == const.LEFT:
+            for i in range(len(self.left)):
+                self.imageFrame[i] = self.left[i]
+
+        if direction == const.UP:
+            for i in range(len(self.up)):
+                self.imageFrame[i] = self.up[i]
+        
+        if direction == const.DOWN:
+            for i in range(len(self.down)):
+                self.imageFrame[i] = self.down[i]
+
 
     def update(self, level, player):
         '''Used to update player image frame, for animating walk cycle
@@ -532,14 +552,17 @@ class PlayerCharacter(Character):
         - player, required for parent update method
         '''
         super().update(level, player)
-        self.changeDirection(self.facing)
+        if self.state == const.STATE_IDLE:
+            self.image = self.imageFrame[0]
+        else:
+            self.image = self.imageFrame[self.imageIndex]
 
         checkTimer = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND
         if  checkTimer > self.animationTimer or self.state == const.STATE_IDLE:
             self.start_ticks = pygame.time.get_ticks()
             self.imageIndex += 1
 
-            if self.imageIndex >= len(self.right2):
+            if self.imageIndex >= const.PLAYER_ANIM_FRAMES:
                 self.imageIndex = 0
 
 

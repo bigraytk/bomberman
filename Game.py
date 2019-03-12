@@ -94,7 +94,7 @@ class Game(object):
 
         
         self.statusBar = StatusBar.StatusBar(0, 0)
-        self.statusBar.addIcon("front.png", 0, True)
+        self.statusBar.addIcon("Down.png", 0, True)
         #self.statusBar.addIcon("bomb.png", 1)
         self.statusBar.addIcon("powerup_boot.png", 2, False, const.ICON_SCALE + 5)
         self.statusBar.addIcon("powerup_range.png", 3, False)

@@ -13,13 +13,15 @@ import pygame
 import sys
 
 
-'''
-Verifies an image file is valid
-
-- imageFile, file location of image to be loaded, in pathlib format
-- convertAlpha, if true, use convert_alpha() instead of convert(), for png files with transparency
-'''
 def openImage(imageFile, convertAlpha = False):
+    
+    '''
+    Verifies an image file is valid
+
+    - imageFile, file location of image to be loaded, in pathlib format
+    - convertAlpha, if true, use convert_alpha() instead of convert(), for png files with transparency
+    '''
+
     if imageFile and not imageFile.is_file():
         raise RuntimeError(str(imageFile) + ' is not a valid image file.')
 
@@ -60,7 +62,7 @@ class Level(object):
     def __init__(self, levelNum):
         checkNumeric(levelNum)
         checkPositive(levelNum)
-        
+
         self.layout = []
         self.door = const.TILE_DOOR_HIDDEN
         self.numEnemies = 0
@@ -157,12 +159,7 @@ class Level(object):
         ''' Accessor. '''
         return self.__levelWidth
 
-    #@levelWidth.setter
-    #def levelWidth(self, levelWidth):
-    #    ''' Prevents negative value for level width '''
-    #    if levelWidth and levelWidth < 0:
-    #        raise RuntimeError(levelWidth, ' is not a valid level width.')
-    #    self.__levelWidth = levelWidth
+    #no levelWidth.setter
 
 
     @property
@@ -170,12 +167,7 @@ class Level(object):
         ''' Accessor. '''
         return self.__levelHeight
 
-    #@levelHeight.setter
-    #def levelHeight(self, levelHeight):
-    #    ''' Prevents negative value for level height '''
-    #    if levelHeight and levelHeight < 0:
-    #        raise RuntimeError(levelHeight, ' is not a valid level height.')
-    #    self.__levelHeight = levelHeight
+    #no levelHeight.setter
     
 
     @property
@@ -260,12 +252,14 @@ class Level(object):
         self.__bossStartPosit = bossStartPosit
 
 
-    '''
-    Loads a level file, sets appropriate images for level, and returns the layout
-    
-    - levelFile, file location of level to be loaded, in pathlib format
-    '''
     def levelParser(self, levelFile):
+
+        '''
+        Loads a level file, sets appropriate images for level, and returns the layout
+        
+        - levelFile, file location of level to be loaded, in pathlib format
+        '''
+
         layout = []
         graphicsDir = Path.cwd() / "graphics"
         if levelFile and not levelFile.is_file():
@@ -334,10 +328,12 @@ class Level(object):
         return layout
 
 
-    '''
-    Shows a door where a breakable wall was previously shown, used when the wall hiding the door breaks
-    '''
     def showDoor(self):
+
+        '''
+        Shows a door where a breakable wall was previously shown, used when the wall hiding the door breaks
+        '''
+
         for y in range(self.levelHeight):
             for x in range(self.levelWidth):
                 if isinstance(self.layout[y][x], Wall.Wall) and self.layout[y][x].door:
@@ -345,24 +341,28 @@ class Level(object):
         door = const.TILE_DOOR_CLOSED
         
     
-    '''
-    Opens the door of the level
-    '''
     def openDoor(self):
+
+        '''
+        Opens the door of the level
+        '''
+
         for y in range(self.levelHeight):
             for x in range(self.levelWidth):
                 if self.layout[y][x] == const.TILE_DOOR_CLOSED:
                     self.layout[y][x] = const.TILE_DOOR_OPENED
         
     
-    '''Used when a bomb explodes to put blast graphics in all four directions
-        returns powerups and blasts so they can be drawn onscreen by the caller 
-    - x, x location where blast starts
-    - y, y location where blast starts
-    - level, used to check level layout so that blasts don't go past walls
-    - blastRange, used to limit how far the blasts extend in each direction
-    '''
     def destroyWalls(self, x, y, level, blastRange):
+
+        '''Used when a bomb explodes to put blast graphics in all four directions
+            returns powerups and blasts so they can be drawn onscreen by the caller 
+        - x, x location where blast starts
+        - y, y location where blast starts
+        - level, used to check level layout so that blasts don't go past walls
+        - blastRange, used to limit how far the blasts extend in each direction
+        '''
+
         walls = []
         powerups = []
         hitWallUp = False
@@ -427,12 +427,15 @@ class Level(object):
         return powerups, blasts
 
 
-'''
-Loads level file based on number passed, returns level, player and enemies
- returns the new level, player, enemy list, and boss (None if no boss in level)
-- num, level number which is passed to the level initialization method
-'''
+
 def startNewLevel(num):
+
+    '''
+    Loads level file based on number passed, returns level, player and enemies
+    returns the new level, player, enemy list, and boss (None if no boss in level)
+    - num, level number which is passed to the level initialization method
+    '''
+    
     level = Level(num)
     x, y = level.playerStartPosit
     player = Character.PlayerCharacter(level, x, y)
