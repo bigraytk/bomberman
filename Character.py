@@ -366,7 +366,6 @@ class PlayerCharacter(Character):
         self.score = 0
         self.imageIndex = 0
         self.imageFrame  = [None] * const.PLAYER_ANIM_FRAMES
-        self.animationTimer = .09
         self.start_ticks = pygame.time.get_ticks() #starter tick
 
         self.left = []
@@ -558,7 +557,7 @@ class PlayerCharacter(Character):
             self.image = self.imageFrame[self.imageIndex]
 
         checkTimer = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND
-        if  checkTimer > self.animationTimer or self.state == const.STATE_IDLE:
+        if  checkTimer > const.PLAYER_ANIM_SPEED or self.state == const.STATE_IDLE:
             self.start_ticks = pygame.time.get_ticks()
             self.imageIndex += 1
 
