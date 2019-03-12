@@ -179,8 +179,8 @@ class Character(pygame.sprite.Sprite):
             else:
                 pathBlocked = True
 
-        if self.kind == const.PC and not pathBlocked:
-            self.changeDirection(direction)
+        #if self.kind == const.PC and not pathBlocked:
+        #    self.changeDirection(direction)
         return pathBlocked
         
         
@@ -364,6 +364,9 @@ class PlayerCharacter(Character):
         self.boot = False
         self.lives = const.LIVES
         self.score = 0
+        self.imageIndex = 0
+        self.animationTimer = .09
+        self.start_ticks = pygame.time.get_ticks() #starter tick
         
        
         imageFile = str(Path.cwd() / "graphics" / "Left.png")
@@ -378,6 +381,10 @@ class PlayerCharacter(Character):
         imageFile = str(Path.cwd() / "graphics" / "Back.png")
         self.back = pygame.image.load(imageFile).convert_alpha()
     
+        self.right2 = []
+        self.right2.append(self.right)
+        imageFile = str(Path.cwd() / "graphics" / "Right2.png")
+        self.right2.append(pygame.image.load(imageFile).convert_alpha())
 
         self.image = self.front
 
@@ -507,14 +514,34 @@ class PlayerCharacter(Character):
         '''This method cnanges the direction of the player image
         -direction, used to decide what image to select.
         '''
-        if direction == const.RIGHT and self.image != self.right:
-            self.image = self.right
+        if direction == const.RIGHT:# and self.image != self.right:
+            if self.state == const.STATE_MOVING_RIGHT:
+                self.image = self.right2[self.imageIndex]
+            else:
+                self.image = self.right2[0]
         if direction == const.LEFT and self.image != self.left: 
             self.image = self.left
         if direction == const.UP and self.image != self.back: 
             self.image = self.back
         if direction == const.DOWN and self.image != self.front:
             self.image = self.front
+
+    def update(self, level, player):
+        '''Used to update player image frame, for animating walk cycle
+        - level, required for parent update method
+        - player, required for parent update method
+        '''
+        super().update(level, player)
+        self.changeDirection(self.facing)
+
+        checkTimer = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND
+        if  checkTimer > self.animationTimer or self.state == const.STATE_IDLE:
+            self.start_ticks = pygame.time.get_ticks()
+            self.imageIndex += 1
+
+            if self.imageIndex >= len(self.right2):
+                self.imageIndex = 0
+
 
 
 class Enemy(Character):
