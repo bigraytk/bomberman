@@ -83,8 +83,8 @@ class Level(object):
 
     @backgroundImage.setter
     def backgroundImage(self, backgroundImage):
-        '''Sets the background tile image. Allows None or an image'''
-        if backgroundImage and not isinstance(backgroundImage, pygame.SurfaceType):
+        '''Sets the background tile image. Allows only a pygame surface'''
+        if not isinstance(backgroundImage, pygame.SurfaceType):
             raise RuntimeError(str(backgroundImage) + ' is not a valid pygame image.')
         self.__backgroundImage = backgroundImage
 
@@ -96,8 +96,8 @@ class Level(object):
 
     @wallImage.setter
     def wallImage(self, wallImage):
-        '''Sets the wall tile image. Allows None or an image'''
-        if wallImage and not isinstance(wallImage, pygame.SurfaceType):
+        '''Sets the wall tile image. Allows only a pygame surface'''
+        if not isinstance(wallImage, pygame.SurfaceType):
             raise RuntimeError(str(wallImage) + ' is not a valid pygame image.')
         self.__wallImage = wallImage
 
@@ -109,8 +109,8 @@ class Level(object):
 
     @breakableImage.setter
     def breakableImage(self, breakableImage):
-        '''Sets the breakable wall tile image. Allows None or an image'''
-        if breakableImage and not isinstance(breakableImage, pygame.SurfaceType):
+        '''Sets the breakable wall tile image. Allows only a pygame surface'''
+        if not isinstance(breakableImage, pygame.SurfaceType):
             raise RuntimeError(str(breakableImage) + ' is not a valid pygame image.')
         self.__breakableImage = breakableImage
 
@@ -122,8 +122,8 @@ class Level(object):
 
     @doorOpenedImage.setter
     def doorOpenedImage(self, doorOpenedImage):
-        '''Sets the open door image. Allows None or an image'''
-        if doorOpenedImage and not isinstance(doorOpenedImage, pygame.SurfaceType):
+        '''Sets the open door image. Allows only a pygame surface'''
+        if not isinstance(doorOpenedImage, pygame.SurfaceType):
             raise RuntimeError(str(doorOpenedImage) + ' is not a valid pygame image.')
         self.__doorOpenedImage = doorOpenedImage
 
@@ -135,8 +135,8 @@ class Level(object):
 
     @doorClosedImage.setter
     def doorClosedImage(self, doorClosedImage):
-        '''Sets the closed door image. Allows None or an image'''
-        if doorClosedImage and not isinstance(doorClosedImage, pygame.SurfaceType):
+        '''Sets the closed door image. Allows only a pygame surface'''
+        if not isinstance(doorClosedImage, pygame.SurfaceType):
             raise RuntimeError(str(doorClosedImage) + ' is not a valid pygame image.')
         self.__doorClosedImage = doorClosedImage
 
@@ -191,9 +191,9 @@ class Level(object):
     @playerStartPosit.setter
     def playerStartPosit(self, playerStartPosit):
         '''Sets the player starting position '''
-        if playerStartPosit and (not isinstance(playerStartPosit, tuple) or len(playerStartPosit) != 2):
+        if  not isinstance(playerStartPosit, tuple) or len(playerStartPosit) != 2:
             raise RuntimeError(str(playerStartPosit) + ' is not a valid valid value for player starting position. Must be a tuple containing x and y.')
-        elif playerStartPosit and (playerStartPosit[0] < 0 or playerStartPosit[1] < 0):
+        elif playerStartPosit[0] < 0 or playerStartPosit[1] < 0:
             raise RuntimeError(str(playerStartPosit) + ' is not a valid valid value for player starting position. Both x and y must be greater than 0.')
         self.__playerStartPosit = playerStartPosit
 
