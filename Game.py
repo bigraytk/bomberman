@@ -166,7 +166,8 @@ class Game(object):
                 if enemy.kind == const.BOSS:# and pygame.sprite.spritecollide(enemy, blast, False, pygame.sprite.collide_circle):
                     if enemy.takeDamage():
                       self.player.increaseScore(const.ENEMY_DIED)
-                      self.bossDieSound.play()
+                      if self.soundOn:
+                          self.bossDieSound.play()
                 else:
                     enemy.destroy()
                     self.player.increaseScore(const.ENEMY_DIED)
