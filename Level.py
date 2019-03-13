@@ -13,13 +13,15 @@ import pygame
 import sys
 
 
-'''
-Verifies an image file is valid
-
-- imageFile, file location of image to be loaded, in pathlib format
-- convertAlpha, if true, use convert_alpha() instead of convert(), for png files with transparency
-'''
 def openImage(imageFile, convertAlpha = False):
+    
+    '''
+    Verifies an image file is valid
+
+    - imageFile, file location of image to be loaded, in pathlib format
+    - convertAlpha, if true, use convert_alpha() instead of convert(), for png files with transparency
+    '''
+
     if imageFile and not imageFile.is_file():
         raise RuntimeError(str(imageFile) + ' is not a valid image file.')
 
@@ -60,7 +62,7 @@ class Level(object):
     def __init__(self, levelNum):
         checkNumeric(levelNum)
         checkPositive(levelNum)
-        
+
         self.layout = []
         self.door = const.TILE_DOOR_HIDDEN
         self.numEnemies = 0
@@ -81,8 +83,8 @@ class Level(object):
 
     @backgroundImage.setter
     def backgroundImage(self, backgroundImage):
-        '''Sets the background tile image. Allows None or an image'''
-        if backgroundImage and not isinstance(backgroundImage, pygame.SurfaceType):
+        '''Sets the background tile image. Allows only a pygame surface'''
+        if not isinstance(backgroundImage, pygame.SurfaceType):
             raise RuntimeError(str(backgroundImage) + ' is not a valid pygame image.')
         self.__backgroundImage = backgroundImage
 
@@ -94,8 +96,8 @@ class Level(object):
 
     @wallImage.setter
     def wallImage(self, wallImage):
-        '''Sets the wall tile image. Allows None or an image'''
-        if wallImage and not isinstance(wallImage, pygame.SurfaceType):
+        '''Sets the wall tile image. Allows only a pygame surface'''
+        if not isinstance(wallImage, pygame.SurfaceType):
             raise RuntimeError(str(wallImage) + ' is not a valid pygame image.')
         self.__wallImage = wallImage
 
@@ -107,8 +109,8 @@ class Level(object):
 
     @breakableImage.setter
     def breakableImage(self, breakableImage):
-        '''Sets the breakable wall tile image. Allows None or an image'''
-        if breakableImage and not isinstance(breakableImage, pygame.SurfaceType):
+        '''Sets the breakable wall tile image. Allows only a pygame surface'''
+        if not isinstance(breakableImage, pygame.SurfaceType):
             raise RuntimeError(str(breakableImage) + ' is not a valid pygame image.')
         self.__breakableImage = breakableImage
 
@@ -120,8 +122,8 @@ class Level(object):
 
     @doorOpenedImage.setter
     def doorOpenedImage(self, doorOpenedImage):
-        '''Sets the open door image. Allows None or an image'''
-        if doorOpenedImage and not isinstance(doorOpenedImage, pygame.SurfaceType):
+        '''Sets the open door image. Allows only a pygame surface'''
+        if not isinstance(doorOpenedImage, pygame.SurfaceType):
             raise RuntimeError(str(doorOpenedImage) + ' is not a valid pygame image.')
         self.__doorOpenedImage = doorOpenedImage
 
@@ -133,8 +135,8 @@ class Level(object):
 
     @doorClosedImage.setter
     def doorClosedImage(self, doorClosedImage):
-        '''Sets the closed door image. Allows None or an image'''
-        if doorClosedImage and not isinstance(doorClosedImage, pygame.SurfaceType):
+        '''Sets the closed door image. Allows only a pygame surface'''
+        if not isinstance(doorClosedImage, pygame.SurfaceType):
             raise RuntimeError(str(doorClosedImage) + ' is not a valid pygame image.')
         self.__doorClosedImage = doorClosedImage
 
@@ -157,12 +159,7 @@ class Level(object):
         ''' Accessor. '''
         return self.__levelWidth
 
-    #@levelWidth.setter
-    #def levelWidth(self, levelWidth):
-    #    ''' Prevents negative value for level width '''
-    #    if levelWidth and levelWidth < 0:
-    #        raise RuntimeError(levelWidth, ' is not a valid level width.')
-    #    self.__levelWidth = levelWidth
+    #no levelWidth.setter
 
 
     @property
@@ -170,12 +167,7 @@ class Level(object):
         ''' Accessor. '''
         return self.__levelHeight
 
-    #@levelHeight.setter
-    #def levelHeight(self, levelHeight):
-    #    ''' Prevents negative value for level height '''
-    #    if levelHeight and levelHeight < 0:
-    #        raise RuntimeError(levelHeight, ' is not a valid level height.')
-    #    self.__levelHeight = levelHeight
+    #no levelHeight.setter
     
 
     @property
@@ -199,9 +191,9 @@ class Level(object):
     @playerStartPosit.setter
     def playerStartPosit(self, playerStartPosit):
         '''Sets the player starting position '''
-        if playerStartPosit and (not isinstance(playerStartPosit, tuple) or len(playerStartPosit) != 2):
+        if  not isinstance(playerStartPosit, tuple) or len(playerStartPosit) != 2:
             raise RuntimeError(str(playerStartPosit) + ' is not a valid valid value for player starting position. Must be a tuple containing x and y.')
-        elif playerStartPosit and (playerStartPosit[0] < 0 or playerStartPosit[1] < 0):
+        elif playerStartPosit[0] < 0 or playerStartPosit[1] < 0:
             raise RuntimeError(str(playerStartPosit) + ' is not a valid valid value for player starting position. Both x and y must be greater than 0.')
         self.__playerStartPosit = playerStartPosit
 
@@ -260,12 +252,14 @@ class Level(object):
         self.__bossStartPosit = bossStartPosit
 
 
-    '''
-    Loads a level file, sets appropriate images for level, and returns the layout
-    
-    - levelFile, file location of level to be loaded, in pathlib format
-    '''
     def levelParser(self, levelFile):
+
+        '''
+        Loads a level file, sets appropriate images for level, and returns the layout
+        
+        - levelFile, file location of level to be loaded, in pathlib format
+        '''
+
         layout = []
         graphicsDir = Path.cwd() / "graphics"
         if levelFile and not levelFile.is_file():
@@ -334,10 +328,12 @@ class Level(object):
         return layout
 
 
-    '''
-    Shows a door where a breakable wall was previously shown, used when the wall hiding the door breaks
-    '''
     def showDoor(self):
+
+        '''
+        Shows a door where a breakable wall was previously shown, used when the wall hiding the door breaks
+        '''
+
         for y in range(self.levelHeight):
             for x in range(self.levelWidth):
                 if isinstance(self.layout[y][x], Wall.Wall) and self.layout[y][x].door:
@@ -345,24 +341,28 @@ class Level(object):
         door = const.TILE_DOOR_CLOSED
         
     
-    '''
-    Opens the door of the level
-    '''
     def openDoor(self):
+
+        '''
+        Opens the door of the level
+        '''
+
         for y in range(self.levelHeight):
             for x in range(self.levelWidth):
                 if self.layout[y][x] == const.TILE_DOOR_CLOSED:
                     self.layout[y][x] = const.TILE_DOOR_OPENED
         
     
-    '''Used when a bomb explodes to put blast graphics in all four directions
-        returns powerups and blasts so they can be drawn onscreen by the caller 
-    - x, x location where blast starts
-    - y, y location where blast starts
-    - level, used to check level layout so that blasts don't go past walls
-    - blastRange, used to limit how far the blasts extend in each direction
-    '''
     def destroyWalls(self, x, y, level, blastRange):
+
+        '''Used when a bomb explodes to put blast graphics in all four directions
+            returns powerups and blasts so they can be drawn onscreen by the caller 
+        - x, x location where blast starts
+        - y, y location where blast starts
+        - level, used to check level layout so that blasts don't go past walls
+        - blastRange, used to limit how far the blasts extend in each direction
+        '''
+
         walls = []
         powerups = []
         hitWallUp = False
@@ -427,12 +427,15 @@ class Level(object):
         return powerups, blasts
 
 
-'''
-Loads level file based on number passed, returns level, player and enemies
- returns the new level, player, enemy list, and boss (None if no boss in level)
-- num, level number which is passed to the level initialization method
-'''
+
 def startNewLevel(num):
+
+    '''
+    Loads level file based on number passed, returns level, player and enemies
+    returns the new level, player, enemy list, and boss (None if no boss in level)
+    - num, level number which is passed to the level initialization method
+    '''
+    
     level = Level(num)
     x, y = level.playerStartPosit
     player = Character.PlayerCharacter(level, x, y)
