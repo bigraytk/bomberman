@@ -549,9 +549,9 @@ class PlayerCharacter(Character):
         powerup. 
         -powerup, type of powerup to provide the player
         '''
-        if powerup.powerupType == const.POWERUP_RANGE and self.bombRange < 5:
+        if powerup.powerupType == const.POWERUP_RANGE and self.bombRange < const.POWERUP_MAX:
             self.bombRange += 1
-        elif powerup.powerupType == const.POWERUP_COUNT and self.bombCount < 5:
+        elif powerup.powerupType == const.POWERUP_COUNT and self.bombCount < const.POWERUP_MAX:
             self.bombCount += 1
         elif powerup.powerupType == const.POWERUP_BOOT:
             self.boot = True

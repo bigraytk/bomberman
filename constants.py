@@ -47,6 +47,7 @@ HIT_BOX_OFFSET_X = 20
 HIT_BOX_OFFSET_Y = 28
 ICON_X = 32
 ICON_Y = 20
+ICON_TEXT_Y_OFFSET = 12
 ICON_SPACING = 70
 ICON_SCALE = 40
 SCORE_X = 860
@@ -67,6 +68,7 @@ ADVANCED_ENEMY_RANGE = 3    #how close an advanced enemy needs to be to player t
 POWERUP_RANGE = 0
 POWERUP_COUNT = 1
 POWERUP_BOOT = 2
+POWERUP_MAX = 5
 
 #character constants
 PC = 0
