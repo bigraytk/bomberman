@@ -76,16 +76,16 @@ class Game(object):
         self.gameState = const.GAME_STATE_MENU
 
         #Setup screen parameters and the pygame window
-        self.screenWidth = const.MAP_WIDTH * const.TILE_SIZE + const.SCREEN_OFFSET_X_LEFT + const.SCREEN_OFFSET_X_RIGHT
-        self.screenHeight = const.MAP_HEIGHT * const.TILE_SIZE + const.SCREEN_OFFSET_Y_TOP + const.SCREEN_OFFSET_Y_BOTTOM
-        self.screenSize = self.screenWidth, self.screenHeight
-        self.screen = pygame.display.set_mode(self.screenSize)
+        self.__screenWidth = const.MAP_WIDTH * const.TILE_SIZE + const.SCREEN_OFFSET_X_LEFT + const.SCREEN_OFFSET_X_RIGHT
+        self.__screenHeight = const.MAP_HEIGHT * const.TILE_SIZE + const.SCREEN_OFFSET_Y_TOP + const.SCREEN_OFFSET_Y_BOTTOM
+        self.__screenSize = self.__screenWidth, self.__screenHeight
+        self.__screen = pygame.display.set_mode(self.screenSize)
         pygame.display.set_caption("BomberDude")
         self.screenImage = pygame.Surface(self.screenSize)    #used to store the screen to an image, useful for semi-transparent screens 
 
         #Setup the MainMenu and High scores Screen
-        self.theMainMenu = MainMenu.MainMenu(self.screen, self.screenWidth, self.screenHeight)
-        self.highScores = HighScore.HighScore(self.screen, self.screenWidth, self.screenHeight)
+        self.theMainMenu = MainMenu.MainMenu(self.screen, self.__screenWidth, self.__screenHeight)
+        self.highScores = HighScore.HighScore(self.screen, self.__screenWidth, self.__screenHeight)
 
         #Load starting level
         self.levelNum = 1
@@ -116,10 +116,10 @@ class Game(object):
 
         #Player death screen
         imageFile = str(Path.cwd() / "graphics" / "death_screen.png")
-        self.death_test_image = pygame.image.load(imageFile).convert_alpha()
-        self.death_test_rect = self.death_test_image.get_rect()
-        self.death_test_rect.x = int(self.screenWidth / 2 - self.death_test_rect.width / 2)
-        self.death_test_rect.y = int(self.screenHeight / 2 - self.death_test_rect.height / 2)
+        self.deathScreen = pygame.image.load(imageFile).convert_alpha()
+        self.smallScreenRect = self.deathScreen.get_rect()
+        self.smallScreenRect.x = int(self.__screenWidth / 2 - self.smallScreenRect.width / 2)
+        self.smallScreenRect.y = int(self.__screenHeight / 2 - self.smallScreenRect.height / 2)
 
         #Game over screen image
         imageFile = str(Path.cwd() / "graphics" / "game_over_screen.png")    
@@ -135,7 +135,6 @@ class Game(object):
 
         #Debug mode allows cheats, only for developer use
         self.__debugMode = True
-
 
 
     @property
@@ -216,77 +215,393 @@ class Game(object):
         self.__font = font
 
 
-        # #Setup game progression booleans
-        # self.gameRunning = True
-        # self.gameOver = False
-        # self.playerWins = False
-        # self.exitingToMenu = False
-        # self.musicOn = True
-        # self.soundOn = True
+    @property
+    def gameRunning(self):
+        ''' Accessor. '''
+        return self.__gameRunning
 
-        # #Makes game start in main menu
-        # self.gameState = const.GAME_STATE_MENU
+    @gameRunning.setter
+    def gameRunning(self, gameRunning):
+        '''Sets the boolean for gameRunning'''
+        if not isinstance(gameRunning, bool):
+            raise RuntimeError(str(gameRunning) + ' is not a boolean.')
+        self.__gameRunning = gameRunning
 
-        # #Setup screen parameters and the pygame window
-        # self.screenWidth = const.MAP_WIDTH * const.TILE_SIZE + const.SCREEN_OFFSET_X_LEFT + const.SCREEN_OFFSET_X_RIGHT
-        # self.screenHeight = const.MAP_HEIGHT * const.TILE_SIZE + const.SCREEN_OFFSET_Y_TOP + const.SCREEN_OFFSET_Y_BOTTOM
-        # self.screenSize = self.screenWidth, self.screenHeight
-        # self.screen = pygame.display.set_mode(self.screenSize)
-        # pygame.display.set_caption("BomberDude")
-        # self.screenImage = pygame.Surface(self.screenSize)    #used to store the screen to an image, useful for semi-transparent screens 
 
-        # #Setup the MainMenu and High scores Screen
-        # self.theMainMenu = MainMenu.MainMenu(self.screen, self.screenWidth, self.screenHeight)
-        # self.highScores = HighScore.HighScore(self.screen, self.screenWidth, self.screenHeight)
+    @property
+    def gameOver(self):
+        ''' Accessor. '''
+        return self.__gameOver
 
-        # #Load starting level
-        # self.levelNum = 1
-        # self.level, self.player, self.enemies, self.boss = Level.startNewLevel(self.levelNum)
+    @gameOver.setter
+    def gameOver(self, gameOver):
+        '''Sets the boolean for gameOver'''
+        if not isinstance(gameOver, bool):
+            raise RuntimeError(str(gameOver) + ' is not a boolean.')
+        self.__gameOver = gameOver
 
-        # #Retreive total number of levels stored in data directory, requires levels to be numbered sequentially
-        # self.numLevels = 0
-        # dataDir = Path.cwd() / "data"
-        # for f in dataDir.glob("level*.csv"):
-        #     self.numLevels += 1
 
-        # #Create sprite groups for all game sprite objects
-        # self.spritePlayer = pygame.sprite.Group()
-        # self.spritePlayer.add(self.player)
-        # self.spriteEnemies = pygame.sprite.Group()
-        # self.spriteEnemies.add(self.enemies)
-        # self.spriteBombs = pygame.sprite.Group()
-        # self.spriteBombBlasts = pygame.sprite.Group()
-        # self.spriteBossBombBlasts = pygame.sprite.Group()
-        # self.spritePowerups = pygame.sprite.Group()
+    @property
+    def playerWins(self):
+        ''' Accessor. '''
+        return self.__playerWins
 
-        # #Create status bar for displaying player information at top of screen
-        # self.statusBar = StatusBar.StatusBar(0, 0)
-        # self.statusBar.addIcon("Down.png", 0, True)
-        # self.statusBar.addIcon("powerup_boot.png", 2, False, const.ICON_SCALE + 5)  #This is offset because the graphic is a little smaller than the icons
-        # self.statusBar.addIcon("powerup_range.png", 3, False)
-        # self.statusBar.addIcon("powerup_count.png", 4, False)
+    @playerWins.setter
+    def playerWins(self, playerWins):
+        '''Sets the boolean for playerWins'''
+        if not isinstance(playerWins, bool):
+            raise RuntimeError(str(playerWins) + ' is not a boolean.')
+        self.__playerWins = playerWins
 
-        # #Player death screen
-        # imageFile = str(Path.cwd() / "graphics" / "death_screen.png")
-        # self.death_test_image = pygame.image.load(imageFile).convert_alpha()
-        # self.death_test_rect = self.death_test_image.get_rect()
-        # self.death_test_rect.x = int(self.screenWidth / 2 - self.death_test_rect.width / 2)
-        # self.death_test_rect.y = int(self.screenHeight / 2 - self.death_test_rect.height / 2)
 
-        # #Game over screen image
-        # imageFile = str(Path.cwd() / "graphics" / "game_over_screen.png")    
-        # self.gameOverImage = pygame.image.load(imageFile).convert_alpha()
+    @property
+    def exitingToMenu(self):
+        ''' Accessor. '''
+        return self.__exitingToMenu
 
-        # #Player win screen image
-        # imageFile = str(Path.cwd() / "graphics" / "you_win_screen.png")
-        # self.playerWinsImage = pygame.image.load(imageFile).convert_alpha()
+    @exitingToMenu.setter
+    def exitingToMenu(self, exitingToMenu):
+        '''Sets the boolean for exitingToMenu'''
+        if not isinstance(exitingToMenu, bool):
+            raise RuntimeError(str(exitingToMenu) + ' is not a boolean.')
+        self.__exitingToMenu = exitingToMenu
 
-        # #Screen border image
-        # imageFile = str(Path.cwd() / "graphics" / "border.png")
-        # self.borderImage = pygame.image.load(imageFile).convert()
 
-        # #Debug mode allows cheats, only for developer use
-        # self.__debugMode = True
+    @property
+    def musicOn(self):
+        ''' Accessor. '''
+        return self.__musicOn
+
+    @musicOn.setter
+    def musicOn(self, musicOn):
+        '''Sets the boolean for musicOn'''
+        if not isinstance(musicOn, bool):
+            raise RuntimeError(str(musicOn) + ' is not a boolean.')
+        self.__musicOn = musicOn
+
+
+    @property
+    def soundOn(self):
+        ''' Accessor. '''
+        return self.__soundOn
+
+    @soundOn.setter
+    def soundOn(self, soundOn):
+        '''Sets the boolean for soundOn'''
+        if not isinstance(soundOn, bool):
+            raise RuntimeError(str(soundOn) + ' is not a boolean.')
+        self.__soundOn = soundOn
+
+
+    @property
+    def gameState(self):
+        ''' Accessor. '''
+        return self.__gameState
+
+    @gameState.setter
+    def gameState(self, gameState):
+        '''Sets the boolean for soundOn'''
+        if gameState not in ([const.GAME_STATE_HIGHSCORES, const.GAME_STATE_MENU, const.GAME_STATE_PLAYER_DEAD,
+        const.GAME_STATE_PLAYER_WINS, const.GAME_STATE_QUITTING, const.GAME_STATE_RUNNING]):
+            raise RuntimeError(str(gameState) + ' is not a valid value for gameState.')
+        self.__gameState = gameState
+
+
+    @property
+    def screenSize(self):
+        ''' Accessor. '''
+        return self.__screenSize
+
+    #no screenSize.setter
+
+
+
+    @property
+    def screen(self):
+        ''' Accessor. '''
+        return self.__screen
+
+    #no screen.setter
+
+
+    @property
+    def screenImage(self):
+        ''' Accessor. '''
+        return self.__screenImage
+
+    @screenImage.setter
+    def screenImage(self, screenImage):
+        '''Sets the screen image, used for capturing the screen. Allows only a pygame surface'''
+        if not isinstance(screenImage, pygame.SurfaceType):
+            raise RuntimeError(str(screenImage) + ' is not a valid pygame image.')
+        self.__screenImage = screenImage
+
+
+    @property
+    def theMainMenu(self):
+        ''' Accessor. '''
+        return self.__theMainMenu
+
+    @theMainMenu.setter
+    def theMainMenu(self, theMainMenu):
+        '''Sets the main menu object'''
+        if not isinstance(theMainMenu, MainMenu.MainMenu):
+            raise RuntimeError(str(theMainMenu) + ' is not a valid MainMenu object type.')
+        self.__theMainMenu = theMainMenu
+
+    
+    @property
+    def highScores(self):
+        ''' Accessor. '''
+        return self.__highScores
+
+    @highScores.setter
+    def highScores(self, highScores):
+        '''Sets the high score menu object'''
+        if not isinstance(highScores, HighScore.HighScore):
+            raise RuntimeError(str(highScores) + ' is not a valid HighScore object type.')
+        self.__highScores = highScores
+
+
+    @property
+    def levelNum(self):
+        ''' Accessor. '''
+        return self.__levelNum
+
+    @levelNum.setter
+    def levelNum(self, levelNum):
+        '''Sets the current level number'''
+        checkNumeric(levelNum)
+        checkPositive(levelNum)
+        self.__levelNum = levelNum
+
+
+    @property
+    def level(self):
+        ''' Accessor. '''
+        return self.__level
+
+    @level.setter
+    def level(self, level):
+        '''Sets the level object'''
+        if not isinstance(level, Level.Level):
+            raise RuntimeError(str(level) + ' is not a valid Level object type.')
+        self.__level = level
+
+
+    @property
+    def player(self):
+        ''' Accessor. '''
+        return self.__player
+
+    @player.setter
+    def player(self, player):
+        '''Sets the player object'''
+        if not isinstance(player, Character.PlayerCharacter):
+            raise RuntimeError(str(player) + ' is not a valid PlayerCharacter object type.')
+        self.__player = player
+
+
+    @property
+    def enemies(self):
+        ''' Accessor. '''
+        return self.__enemies
+
+    @enemies.setter
+    def enemies(self, enemies):
+        '''Sets the list of enemies objects'''
+        if not isinstance(enemies, list):
+            raise RuntimeError(str(enemies) + ' is not a valid Python list.')
+        else:
+            for i in range(len(enemies)):
+                if not isinstance(enemies[i], Character.Enemy):
+                    raise RuntimeError(str(enemies[i]) + ' is not a valid Enemy object type.')
+        self.__enemies = enemies
+
+
+    @property
+    def boss(self):
+        ''' Accessor. '''
+        return self.__boss
+
+    @boss.setter
+    def boss(self, boss):
+        '''Sets the boss object'''
+        if boss and not isinstance(boss, Character.Boss):
+            raise RuntimeError(str(boss) + ' is not a valid Boss object type.')
+        self.__boss = boss
+
+
+    @property
+    def numLevels(self):
+        ''' Accessor. '''
+        return self.__numLevels
+
+    @numLevels.setter
+    def numLevels(self, numLevels):
+        '''Sets the total number of levels in the game'''
+        checkNumeric(numLevels)
+        if numLevels != 0:
+            checkPositive(numLevels)
+        self.__numLevels = numLevels
+
+
+    @property
+    def spritePlayer(self):
+        ''' Accessor. '''
+        return self.__spritePlayer
+
+    @spritePlayer.setter
+    def spritePlayer(self, spritePlayer):
+        '''Sets the sprite group for the player sprite'''
+        if not isinstance(spritePlayer, pygame.sprite.Group):
+            raise RuntimeError(str(spritePlayer) + ' is not a valid pygame sprite group.')
+        self.__spritePlayer = spritePlayer
+
+
+    @property
+    def spriteEnemies(self):
+        ''' Accessor. '''
+        return self.__spriteEnemies
+
+    @spriteEnemies.setter
+    def spriteEnemies(self, spriteEnemies):
+        '''Sets the sprite group for the enemy sprites'''
+        if not isinstance(spriteEnemies, pygame.sprite.Group):
+            raise RuntimeError(str(spriteEnemies) + ' is not a valid pygame sprite group.')
+        self.__spriteEnemies = spriteEnemies
+
+
+    @property
+    def spriteBombs(self):
+        ''' Accessor. '''
+        return self.__spriteBombs
+
+    @spriteBombs.setter
+    def spriteBombs(self, spriteBombs):
+        '''Sets the sprite group for the bomb sprites'''
+        if not isinstance(spriteBombs, pygame.sprite.Group):
+            raise RuntimeError(str(spriteBombs) + ' is not a valid pygame sprite group.')
+        self.__spriteBombs = spriteBombs
+
+
+    @property
+    def spriteBombBlasts(self):
+        ''' Accessor. '''
+        return self.__spriteBombBlasts
+
+    @spriteBombBlasts.setter
+    def spriteBombBlasts(self, spriteBombBlasts):
+        '''Sets the sprite group for the bomb blasts sprites'''
+        if not isinstance(spriteBombBlasts, pygame.sprite.Group):
+            raise RuntimeError(str(spriteBombBlasts) + ' is not a valid pygame sprite group.')
+        self.__spriteBombBlasts = spriteBombBlasts
+
+
+    @property
+    def spriteBossBombBlasts(self):
+        ''' Accessor. '''
+        return self.__spriteBossBombBlasts
+
+    @spriteBossBombBlasts.setter
+    def spriteBossBombBlasts(self, spriteBossBombBlasts):
+        '''Sets the sprite group for the boss bomb blasts sprites'''
+        if not isinstance(spriteBossBombBlasts, pygame.sprite.Group):
+            raise RuntimeError(str(spriteBossBombBlasts) + ' is not a valid pygame sprite group.')
+        self.__spriteBossBombBlasts = spriteBossBombBlasts
+
+
+    @property
+    def spritePowerups(self):
+        ''' Accessor. '''
+        return self.__spritePowerups
+
+    @spritePowerups.setter
+    def spritePowerups(self, spritePowerups):
+        '''Sets the sprite group for the powerups sprites'''
+        if not isinstance(spritePowerups, pygame.sprite.Group):
+            raise RuntimeError(str(spritePowerups) + ' is not a valid pygame sprite group.')
+        self.__spritePowerups = spritePowerups
+
+
+    @property
+    def statusBar(self):
+        ''' Accessor. '''
+        return self.__statusBar
+
+    @statusBar.setter
+    def statusBar(self, statusBar):
+        '''Sets the status bar object'''
+        if statusBar and not isinstance(statusBar, StatusBar.StatusBar):
+            raise RuntimeError(str(statusBar) + ' is not a valid StatusBar object type.')
+        self.__statusBar = statusBar
+
+
+    @property
+    def deathScreen(self):
+        ''' Accessor. '''
+        return self.__deathScreen
+
+    @deathScreen.setter
+    def deathScreen(self, deathScreen):
+        '''Sets the death screen image. Allows only a pygame surface'''
+        if not isinstance(deathScreen, pygame.SurfaceType):
+            raise RuntimeError(str(deathScreen) + ' is not a valid pygame image.')
+        self.__deathScreen = deathScreen
+
+
+    @property
+    def smallScreenRect(self):
+        ''' Accessor. '''
+        return self.__smallScreenRect
+
+    @smallScreenRect.setter
+    def smallScreenRect(self, smallScreenRect):
+        '''Sets the death screen rectangle, used for holding x and y coords of death/gameover/win screens. Allows only a pygame Rect'''
+        if not isinstance(smallScreenRect, pygame.Rect):
+            raise RuntimeError(str(smallScreenRect) + ' is not a valid pygame Rect.')
+        self.__smallScreenRect = smallScreenRect
+
+
+    @property
+    def gameOverImage(self):
+        ''' Accessor. '''
+        return self.__gameOverImage
+
+    @gameOverImage.setter
+    def gameOverImage(self, gameOverImage):
+        '''Sets the game over screen image. Allows only a pygame surface'''
+        if not isinstance(gameOverImage, pygame.SurfaceType):
+            raise RuntimeError(str(gameOverImage) + ' is not a valid pygame image.')
+        self.__gameOverImage = gameOverImage
+
+
+    @property
+    def playerWinsImage(self):
+        ''' Accessor. '''
+        return self.__playerWinsImage
+
+    @playerWinsImage.setter
+    def playerWinsImage(self, playerWinsImage):
+        '''Sets the player wins screen image. Allows only a pygame surface'''
+        if not isinstance(playerWinsImage, pygame.SurfaceType):
+            raise RuntimeError(str(playerWinsImage) + ' is not a valid pygame image.')
+        self.__playerWinsImage = playerWinsImage
+
+
+    @property
+    def borderImage(self):
+        ''' Accessor. '''
+        return self.__borderImage
+
+    @borderImage.setter
+    def borderImage(self, borderImage):
+        '''Sets the screen border image. Allows only a pygame surface'''
+        if not isinstance(borderImage, pygame.SurfaceType):
+            raise RuntimeError(str(borderImage) + ' is not a valid pygame image.')
+        self.__borderImage = borderImage
+
+
 
     def render(self):
 
@@ -525,9 +840,9 @@ class Game(object):
 
         self.screen.blit(self.screenImage, (0,0))
         if not self.gameOver:
-            self.screen.blit(self.death_test_image, self.death_test_rect)
+            self.screen.blit(self.deathScreen, self.smallScreenRect)
         else:
-            self.screen.blit(self.gameOverImage, self.death_test_rect)
+            self.screen.blit(self.gameOverImage, self.smallScreenRect)
         seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
         newState = self.gameState
         if seconds > const.PLAYER_DEATH_SCREEN_TIMER:
@@ -544,7 +859,7 @@ class Game(object):
         ''' 
 
         self.screen.blit(self.screenImage, (0,0))
-        self.screen.blit(self.playerWinsImage, self.death_test_rect)
+        self.screen.blit(self.playerWinsImage, self.smallScreenRect)
         seconds = (pygame.time.get_ticks() - self.start_ticks) / const.SECOND #calculate how many seconds
         newState = self.gameState
         if seconds > const.PLAYER_DEATH_SCREEN_TIMER:

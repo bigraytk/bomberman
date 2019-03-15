@@ -322,7 +322,6 @@ class Level(object):
         self.doorClosedImage = openImage(doorClosedFile, True)
 
         self.enemyFile = graphicsDir.joinpath("enemy" + str(enemyNum) + ".png")
-
         
         return layout
 
