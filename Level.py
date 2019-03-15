@@ -50,7 +50,6 @@ def checkPositive(value):
     return value
 
 
-
 class Level(object):
 
     '''
@@ -323,7 +322,6 @@ class Level(object):
         self.doorClosedImage = openImage(doorClosedFile, True)
 
         self.enemyFile = graphicsDir.joinpath("enemy" + str(enemyNum) + ".png")
-
         
         return layout
 
@@ -425,7 +423,6 @@ class Level(object):
             if result:
                 powerups.append(result)
         return powerups, blasts
-
 
 
 def startNewLevel(num):
