@@ -31,7 +31,7 @@ MAP_HEIGHT  = 13
 
 
 # Game specifications
-FRAMERATE = 90
+FRAMERATE = 60
 SECOND = 1000  #1 second = 1000 milliseconds
 PLAYER_DEATH_SCREEN_TIMER = 2      #death screen is shown for 2 seconds
 BOMB_TIMER = 4
