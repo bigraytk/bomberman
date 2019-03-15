@@ -682,12 +682,12 @@ class Game(object):
                 if self.soundOn:
                     self.explodeSound.play()
                 if not bomb.bossBomb:
-                    powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, bomb.range)
+                    powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, bomb.range)
                     self.spritePowerups.add(powerups)
                     self.spriteBombBlasts.add(blasts)
                     self.level, self.player = bomb.explode(self.level, self.player)
                 else:
-                    powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, self.level, bomb.range)
+                    powerups, blasts = self.level.destroyWalls(bomb.x, bomb.y, bomb.range)
                     self.spriteBossBombBlasts.add(blasts)
                     self.level, self.boss = bomb.explode(self.level, self.boss)
                 bomb.kill()
@@ -1126,7 +1126,7 @@ class Game(object):
                 self.gameState = self.resetLevel()
         elif event.key == pygame.K_LSHIFT:
             if self.player.state == const.STATE_IDLE:
-                powerups, blasts = self.level.destroyWalls(self.player.x, self.player.y, self.level, self.player.bombRange)
+                powerups, blasts = self.level.destroyWalls(self.player.x, self.player.y, self.player.bombRange)
                 self.spritePowerups.add(powerups)
         elif event.key == pygame.K_q:
             self.player.bombCount = const.POWERUP_MAX
