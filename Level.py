@@ -50,7 +50,6 @@ def checkPositive(value):
     return value
 
 
-
 class Level(object):
 
     '''
@@ -425,7 +424,6 @@ class Level(object):
             if result:
                 powerups.append(result)
         return powerups, blasts
-
 
 
 def startNewLevel(num):

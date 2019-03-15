@@ -19,6 +19,18 @@ from pathlib import Path
 import pygame
 
 
+def checkNumeric(value):
+    if not isinstance(value, int) and not isinstance(value, float):
+        raise RuntimeError('Error: ' + str(value) + ' is not a number')
+    return value
+
+
+def checkPositive(value):
+    if isinstance(value, int) and not value > 0:
+        raise RuntimeError('Error: '  + str(value) + ' is not a positive number')
+    return value
+
+
 class Game(object):
 
     '''
@@ -27,7 +39,7 @@ class Game(object):
     def __init__(self):
 
         #Game states, tells the game what code to run depending on the current state
-        self.states = {const.GAME_STATE_MENU : self.stateMainMenu,
+        self.__states = {const.GAME_STATE_MENU : self.stateMainMenu,
           const.GAME_STATE_RUNNING           : self.stateGameRunning,
           const.GAME_STATE_PLAYER_DEAD       : self.statePlayerDead,
           const.GAME_STATE_PLAYER_WINS       : self.statePlayerWins,
@@ -48,9 +60,9 @@ class Game(object):
         self.bossDieSound = pygame.mixer.Sound(str(Path.cwd() / "sounds" / "boss_no.wav"))
 
         #Setup misc pygame settings such as clock for timers and font for text
-        self.clock = pygame.time.Clock()
-        self.start_ticks = 0
-        self.font = pygame.font.Font(None, 30)
+        self.__clock = pygame.time.Clock()
+        self.start_ticks = 0.0
+        self.font = pygame.font.Font(None, const.FONT_SIZE)
 
         #Setup game progression booleans
         self.gameRunning = True
@@ -124,6 +136,157 @@ class Game(object):
         #Debug mode allows cheats, only for developer use
         self.__debugMode = True
 
+
+
+    @property
+    def musicFile(self):
+        ''' Accessor. '''
+        return self.__musicFile
+
+    @musicFile.setter
+    def musicFile(self, musicFile):
+        '''Sets the file for the current music'''
+        if not isinstance(musicFile, str):
+            raise RuntimeError(str(musicFile) + ' is not a properly formatted filename.')
+        self.__musicFile = musicFile
+
+
+    @property
+    def explodeSound(self):
+        ''' Accessor. '''
+        return self.__explodeSound
+
+    @explodeSound.setter
+    def explodeSound(self, explodeSound):
+        '''Sets the sound for bomb explosions'''
+        if not isinstance(explodeSound, pygame.mixer.SoundType):
+            raise RuntimeError(str(explodeSound) + ' is not a sound file.')
+        self.__explodeSound = explodeSound
+
+
+    @property
+    def deathSound(self):
+        ''' Accessor. '''
+        return self.__deathSound
+
+    @deathSound.setter
+    def deathSound(self, deathSound):
+        '''Sets the sound for player death'''
+        if not isinstance(deathSound, pygame.mixer.SoundType):
+            raise RuntimeError(str(deathSound) + ' is not a sound file.')
+        self.__deathSound = deathSound
+
+
+    @property
+    def bossDieSound(self):
+        ''' Accessor. '''
+        return self.__bossDieSound
+
+    @bossDieSound.setter
+    def bossDieSound(self, bossDieSound):
+        '''Sets the sound for boss death'''
+        if not isinstance(bossDieSound, pygame.mixer.SoundType):
+            raise RuntimeError(str(bossDieSound) + ' is not a sound file.')
+        self.__bossDieSound = bossDieSound
+
+
+    @property
+    def start_ticks(self):
+        ''' Accessor. '''
+        return self.__start_ticks
+
+    @start_ticks.setter
+    def start_ticks(self, start_ticks):
+        '''Sets the ticks counter starting point for timers'''
+        if not isinstance(start_ticks, int) and not isinstance(start_ticks, float):
+            raise RuntimeError(str(start_ticks) + ' is not valid value for start_ticks.  Must be a number.')
+        self.__start_ticks = start_ticks
+
+
+    @property
+    def font(self):
+        ''' Accessor. '''
+        return self.__font
+
+    @font.setter
+    def font(self, font):
+        '''Sets the ticks counter starting point for timers'''
+        if not isinstance(font, pygame.font.FontType):
+            raise RuntimeError(str(font) + ' is not valid font.')
+        self.__font = font
+
+
+        # #Setup game progression booleans
+        # self.gameRunning = True
+        # self.gameOver = False
+        # self.playerWins = False
+        # self.exitingToMenu = False
+        # self.musicOn = True
+        # self.soundOn = True
+
+        # #Makes game start in main menu
+        # self.gameState = const.GAME_STATE_MENU
+
+        # #Setup screen parameters and the pygame window
+        # self.screenWidth = const.MAP_WIDTH * const.TILE_SIZE + const.SCREEN_OFFSET_X_LEFT + const.SCREEN_OFFSET_X_RIGHT
+        # self.screenHeight = const.MAP_HEIGHT * const.TILE_SIZE + const.SCREEN_OFFSET_Y_TOP + const.SCREEN_OFFSET_Y_BOTTOM
+        # self.screenSize = self.screenWidth, self.screenHeight
+        # self.screen = pygame.display.set_mode(self.screenSize)
+        # pygame.display.set_caption("BomberDude")
+        # self.screenImage = pygame.Surface(self.screenSize)    #used to store the screen to an image, useful for semi-transparent screens 
+
+        # #Setup the MainMenu and High scores Screen
+        # self.theMainMenu = MainMenu.MainMenu(self.screen, self.screenWidth, self.screenHeight)
+        # self.highScores = HighScore.HighScore(self.screen, self.screenWidth, self.screenHeight)
+
+        # #Load starting level
+        # self.levelNum = 1
+        # self.level, self.player, self.enemies, self.boss = Level.startNewLevel(self.levelNum)
+
+        # #Retreive total number of levels stored in data directory, requires levels to be numbered sequentially
+        # self.numLevels = 0
+        # dataDir = Path.cwd() / "data"
+        # for f in dataDir.glob("level*.csv"):
+        #     self.numLevels += 1
+
+        # #Create sprite groups for all game sprite objects
+        # self.spritePlayer = pygame.sprite.Group()
+        # self.spritePlayer.add(self.player)
+        # self.spriteEnemies = pygame.sprite.Group()
+        # self.spriteEnemies.add(self.enemies)
+        # self.spriteBombs = pygame.sprite.Group()
+        # self.spriteBombBlasts = pygame.sprite.Group()
+        # self.spriteBossBombBlasts = pygame.sprite.Group()
+        # self.spritePowerups = pygame.sprite.Group()
+
+        # #Create status bar for displaying player information at top of screen
+        # self.statusBar = StatusBar.StatusBar(0, 0)
+        # self.statusBar.addIcon("Down.png", 0, True)
+        # self.statusBar.addIcon("powerup_boot.png", 2, False, const.ICON_SCALE + 5)  #This is offset because the graphic is a little smaller than the icons
+        # self.statusBar.addIcon("powerup_range.png", 3, False)
+        # self.statusBar.addIcon("powerup_count.png", 4, False)
+
+        # #Player death screen
+        # imageFile = str(Path.cwd() / "graphics" / "death_screen.png")
+        # self.death_test_image = pygame.image.load(imageFile).convert_alpha()
+        # self.death_test_rect = self.death_test_image.get_rect()
+        # self.death_test_rect.x = int(self.screenWidth / 2 - self.death_test_rect.width / 2)
+        # self.death_test_rect.y = int(self.screenHeight / 2 - self.death_test_rect.height / 2)
+
+        # #Game over screen image
+        # imageFile = str(Path.cwd() / "graphics" / "game_over_screen.png")    
+        # self.gameOverImage = pygame.image.load(imageFile).convert_alpha()
+
+        # #Player win screen image
+        # imageFile = str(Path.cwd() / "graphics" / "you_win_screen.png")
+        # self.playerWinsImage = pygame.image.load(imageFile).convert_alpha()
+
+        # #Screen border image
+        # imageFile = str(Path.cwd() / "graphics" / "border.png")
+        # self.borderImage = pygame.image.load(imageFile).convert()
+
+        # #Debug mode allows cheats, only for developer use
+        # self.__debugMode = True
 
     def render(self):
 
@@ -329,12 +492,12 @@ class Game(object):
         self.getUserInput()
 
         #Handles switching game states by calling gamestate fucntions from a dictionary
-        self.gameState = self.states[self.gameState]()
+        self.gameState = self.__states[self.gameState]()
 
         #Update the screen
         pygame.display.update()
         self.screen.fill(colors.Black)
-        self.clock.tick(const.FRAMERATE)
+        self.__clock.tick(const.FRAMERATE)
 
         #Make sure game finishes cycles before quitting
         if self.gameState == const.GAME_STATE_QUITTING:
