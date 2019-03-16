@@ -145,7 +145,7 @@ class Game(object):
     @musicFile.setter
     def musicFile(self, musicFile):
         '''Sets the file for the current music'''
-        if not isinstance(musicFile, str):
+        if not isinstance(musicFile, str) or (".mp3" not in(musicFile)):
             raise RuntimeError(str(musicFile) + ' is not a properly formatted filename.')
         self.__musicFile = musicFile
 
@@ -753,8 +753,8 @@ class Game(object):
                         self.drawTile(self.level.doorOpenedImage, column, row)
                     if self.level.layout[row][column] == const.TILE_DOOR_CLOSED:
                         self.drawTile(self.level.doorClosedImage, column, row)
-                except:
-                    print("Index out of range error")
+                except RuntimeError:
+                    print("Index out of range error in level.layout")
 
 
     def drawTile(self, image, x, y):
@@ -815,6 +815,9 @@ class Game(object):
         self.__clock.tick(const.FRAMERATE)
 
         #Make sure game finishes cycles before quitting
+        if self.exitingToMenu:
+            self.exitingToMenu = False
+            self.gameState = const.GAME_STATE_MENU
         if self.gameState == const.GAME_STATE_QUITTING:
             self.quitGame()
 
@@ -936,10 +939,7 @@ class Game(object):
         #Since the player is initialized in the level class, backup the parameters that we want to keep by copying player to temp variable
         tempPlayer = self.player
         self.level, self.player, self.enemies, self.boss = Level.startNewLevel(self.levelNum)
-        if self.exitingToMenu:
-            self.exitingToMenu = False
-            newState = const.GAME_STATE_MENU
-        elif self.gameOver:
+        if self.gameOver:
             self.gameOver = False
             self.highScores.newScore(tempPlayer.score)
             newState = const.GAME_STATE_HIGHSCORES
@@ -1068,7 +1068,7 @@ class Game(object):
                 self.exitingToMenu = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.gameState = const.GAME_STATE_MENU
+                    self.exitingToMenu = True
                 elif event.key == pygame.K_f:
                     if self.screen.get_flags() & pygame.FULLSCREEN:
                         pygame.display.set_mode(self.screenSize)

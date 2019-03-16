@@ -1,5 +1,3 @@
-
-
 import LinkedList
 import unittest
 

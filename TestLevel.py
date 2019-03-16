@@ -130,7 +130,6 @@ class TestLevel(unittest.TestCase):
 
 
     def testLevelParser(self):
-
         levelNum = 1
         level, player, enemies, boss = Level.startNewLevel(levelNum)
 
@@ -314,7 +313,6 @@ class TestLevel(unittest.TestCase):
 
 
     def testStartNewLevel(self):
-        
         levelNum = 1
         level, player, enemies, boss = Level.startNewLevel(levelNum)
         level2, player, enemies, boss = Level.startNewLevel(levelNum)
