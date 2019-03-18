@@ -20,7 +20,7 @@ class StatusBar(object):
         self.resy = const.SCREEN_OFFSET_Y_TOP + self.y * const.TILE_SIZE
 
         self.spriteIcon = pygame.sprite.Group()
-
+    
     
     def addIcon(self, imageFileName, iconNum, alpha, scale = const.ICON_SCALE):
         x = const.ICON_X + const.ICON_SPACING * iconNum

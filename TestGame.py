@@ -530,13 +530,26 @@ class TestLevel(unittest.TestCase):
         game.gameState = game.checkPlayerProgress()
         self.assertEqual(game.levelNum, 2)
         self.assertGreater(game.player.score, 0)
-        
+
+    def testPowerUp(self):
+        game = Game.Game()
+        p = Powerup.Powerup(const.POWERUP_BOOT,1,1)
+        self.assertEqual(p.pickUp(game.player),const.POWERUP_BOOT)
+
 
     '''
     drawStatusBar, drawText, drawTile, statePlayerDead, statePlayerWin, getUserInut, getEvents, quitGame, and debugMode
         either require user input or do not perform any actions that can be unit tested.
     stateMainMenu and stateHighScores can't be unit tested because they will load their respective menus, requiring user input.
     update can't be unit tested because it will cause the game to fully run and require user input.
+
+    Below are the other classes tested by this test suite
+    - Wall
+    - Characters (Boss, Player, and Enemy)
+    - Door
+    - Bomb
+    - StatusBar
+    - PowerUp
     '''
 
 #
