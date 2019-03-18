@@ -199,11 +199,14 @@ class Blast (Bomb):
                 imageFile = str(Path.cwd() / "graphics" / "flame_left.png")
             elif direction == const.RIGHT_FLAME:
                 imageFile = str(Path.cwd() / "graphics" / "flame_right.png")
-        self.image = pygame.image.load(imageFile).convert()
-        self.image.set_colorkey(const.BLACK)
-        self.mask = pygame.mask.from_surface(self.image)
-        self.direction = direction
-        self.timer = const.BLAST_TIMER
+        try:
+            self.image = pygame.image.load(imageFile).convert()
+            self.image.set_colorkey(const.BLACK)
+            self.mask = pygame.mask.from_surface(self.image)
+            self.direction = direction
+            self.timer = const.BLAST_TIMER
+        except:
+            raise RuntimeError('Error: Unable to load graphics files')
 	
 	
     def update(self):

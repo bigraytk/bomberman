@@ -29,15 +29,18 @@ class Powerup(pygame.sprite.Sprite):
         else:
             raise RuntimeError(str(powerupType) + ' is not a valid kind of powerup')
 
-        self.image = pygame.image.load(imageFile).convert()
-        self.image.set_colorkey(const.TRAN_COL)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.resx
-        self.rect.y = self.resy
-        self.fade = const.FADE_START
-        self.fadeIncrease = False
-        self.fadeSpeed = 6
-        self.fadeMinimum = 120
+        try:
+            self.image = pygame.image.load(imageFile).convert()
+            self.image.set_colorkey(const.TRAN_COL)
+            self.rect = self.image.get_rect()
+            self.rect.x = self.resx
+            self.rect.y = self.resy
+            self.fade = const.FADE_START
+            self.fadeIncrease = False
+            self.fadeSpeed = 6
+            self.fadeMinimum = 120
+        except:
+            raise RuntimeError('Error: Unable to load graphics files')
 
     @property
     def x(self):

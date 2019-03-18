@@ -96,13 +96,16 @@ class Icon(pygame.sprite.Sprite):
         '''Constructor'''
         pygame.sprite.Sprite.__init__(self)
 
-        imageFile = str(Path.cwd() / "graphics" / imageFileName)
-        if alpha:
-            self.image = pygame.image.load(imageFile).convert_alpha()
-        else:
-            self.image = pygame.image.load(imageFile).convert()
-            self.image.set_colorkey(const.TRAN_COL)
-        self.image = pygame.transform.scale(self.image, (scale, scale))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        try:
+            imageFile = str(Path.cwd() / "graphics" / imageFileName)
+            if alpha:
+                self.image = pygame.image.load(imageFile).convert_alpha()
+            else:
+                self.image = pygame.image.load(imageFile).convert()
+                self.image.set_colorkey(const.TRAN_COL)
+            self.image = pygame.transform.scale(self.image, (scale, scale))
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+        except:
+            raise RuntimeError('Error: Unable to load graphics files')
