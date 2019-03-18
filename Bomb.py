@@ -29,7 +29,7 @@ class Bomb(pygame.sprite.Sprite):
         imageFile = str(Path.cwd() / "graphics" / "bomb.png")
         self.image = pygame.image.load(imageFile).convert()
         self.image.set_colorkey(const.BLACK)
-        self.blink = 255            #opacity of image, for flashing animation
+        self.blink = const.FADE_START            #opacity of image, for flashing animation
         self.rect = self.image.get_rect()
         self.rect.x = self.xres
         self.rect.y = self.yres
@@ -49,9 +49,9 @@ class Bomb(pygame.sprite.Sprite):
             self.exploded = True
         self.image.set_alpha(self.blink)
         if int(seconds * 10) % (const.BOMB_FLASH_SPEED * 2) < const.BOMB_FLASH_SPEED:
-            self.blink = 100
+            self.blink = const.FADE_START / 3
         else:
-            self.blink = 255
+            self.blink = const.FADE_START
 
         # if bomb is moving because it was kicked
         if self.state != const.STATE_IDLE:
