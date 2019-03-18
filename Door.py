@@ -12,13 +12,35 @@ class Door(object):
         self.y = y
         checkIfOpen()
 
+    @property
+    def x(self):
+        return self.__x
+
+    @property
+    def y(self):
+        return self.__y
+
+    @x.setter
+    def x(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__x = val
+
+    @y.setter
+    def y(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__y = val
+
     def checkIfOpen(self):
         '''This method is called when the door is created, it must 
         be able too look at the list of active enemies, if it is 
         empty, then open the door.
         ''' 
         numEnemyLeft = #not sure how to do this yet
+
         if numEnemyLeft == 0:
+            
             openDoor()
 
     def openDoor(self):

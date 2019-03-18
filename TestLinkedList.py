@@ -1,5 +1,3 @@
-
-
 import LinkedList
 import unittest
 
@@ -323,8 +321,6 @@ class TestList(unittest.TestCase):
     Not providing unit test for the str methods, as those are never called by the program. 
     They were only made for troubleshooting purposes to be used when creating the methods.
     '''
-
-
 
 
 

@@ -29,16 +29,125 @@ class Powerup(pygame.sprite.Sprite):
         else:
             raise RuntimeError(str(powerupType) + ' is not a valid kind of powerup')
 
-        self.image = pygame.image.load(imageFile).convert()
-        self.image.set_colorkey(const.TRAN_COL)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.resx
-        self.rect.y = self.resy
-        self.fade = const.FADE_START
-        self.fadeIncrease = False
-        self.fadeSpeed = 6
-        self.fadeMinimum = 120
+        try:
+            self.image = pygame.image.load(imageFile).convert()
+            self.image.set_colorkey(const.TRAN_COL)
+            self.rect = self.image.get_rect()
+            self.rect.x = self.resx
+            self.rect.y = self.resy
+            self.fade = const.FADE_START
+            self.fadeIncrease = False
+            self.fadeSpeed = 6
+            self.fadeMinimum = 120
+        except:
+            raise RuntimeError('Error: Unable to load graphics files')
 
+    @property
+    def x(self):
+        return self.__x
+
+    @property
+    def y(self):
+        return self.__y
+
+    @property
+    def xres(self):
+        return self.__xres
+
+    @property
+    def yres(self):
+        return self.__yres
+
+    @property
+    def image(self):
+        return self.__image
+
+    @property
+    def rect(self):
+        return self.__rect
+
+    @property
+    def fade(self):
+        return self.__fade
+
+    @property
+    def fadeIncrease(self):
+        return self.__fadeIncrease
+
+    @property
+    def fadeSpeed(self):
+        return self.__fadeSpeed
+
+    @property
+    def fadeMinimum(self):
+        return self.__fadeMinimum
+
+    @x.setter
+    def x(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__x = val
+
+    @y.setter
+    def y(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__y = val
+
+    @xres.setter
+    def xres(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__xres = val
+
+    @yres.setter
+    def yres(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__yres = val
+
+    @image.setter
+    def image(self,val):
+        if val == None:
+            raise RuntimeError('Invalid assignment')
+        else:
+            self.__image = val
+
+    @rect.setter
+    def rect(self,val):
+        if val == None:
+            raise RuntimeError('Invalid assignment')
+        else:
+            self.__rect = val
+
+    @fade.setter
+    def fade(self,val):
+        if val < 0:
+            raise RuntimeError('Invalid assignment')
+        else:
+            self.__fade = val
+
+    @fadeIncrease.setter
+    def fadeIncrease(self,val):
+        if isinstance(val,bool):
+            self.__fadeIncrease = val
+        else:
+            raise RuntimeError('Invalid assignment')
+            
+
+    @fadeSpeed.setter
+    def fadeSpeed(self,val):
+        if val < 0:
+            raise RuntimeError('Invalid assignment')
+        else:
+            self.__fadeSpeed = val
+
+    @fadeMinimum.setter
+    def fadeMinimum(self,val):
+        if val < 0:
+            raise RuntimeError('Invalid assignment')
+        else:
+            self.__fadeMinimum = val
 
     def update(self):
         if self.fadeIncrease:

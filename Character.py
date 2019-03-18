@@ -368,37 +368,40 @@ class PlayerCharacter(Character):
         self.imageFrame  = [None] * const.PLAYER_ANIM_FRAMES
         self.start_ticks = pygame.time.get_ticks() #starter tick
 
-        self.left = []
-        imageFile = str(Path.cwd() / "graphics" / "Left.png")
-        image1 = pygame.image.load(imageFile).convert_alpha()
-        imageFile = str(Path.cwd() / "graphics" / "Left2.png")
-        image2 = pygame.image.load(imageFile).convert_alpha()
-        self.left.extend([image1, image2, image1, image2])
+        try:
+            self.left = []
+            imageFile = str(Path.cwd() / "graphics" / "Left.png")
+            image1 = pygame.image.load(imageFile).convert_alpha()
+            imageFile = str(Path.cwd() / "graphics" / "Left2.png")
+            image2 = pygame.image.load(imageFile).convert_alpha()
+            self.left.extend([image1, image2, image1, image2])
 
-        self.right = []
-        imageFile = str(Path.cwd() / "graphics" / "Right.png")
-        image1 = pygame.image.load(imageFile).convert_alpha()
-        imageFile = str(Path.cwd() / "graphics" / "Right2.png")
-        image2 = pygame.image.load(imageFile).convert_alpha()
-        self.right.extend([image1, image2, image1, image2])
+            self.right = []
+            imageFile = str(Path.cwd() / "graphics" / "Right.png")
+            image1 = pygame.image.load(imageFile).convert_alpha()
+            imageFile = str(Path.cwd() / "graphics" / "Right2.png")
+            image2 = pygame.image.load(imageFile).convert_alpha()
+            self.right.extend([image1, image2, image1, image2])
 
-        self.up = []
-        imageFile = str(Path.cwd() / "graphics" / "Up.png")
-        image1 = pygame.image.load(imageFile).convert_alpha()
-        imageFile = str(Path.cwd() / "graphics" / "Up2.png")
-        image2 = pygame.image.load(imageFile).convert_alpha()
-        imageFile = str(Path.cwd() / "graphics" / "Up3.png")
-        image3 = pygame.image.load(imageFile).convert_alpha()
-        self.up.extend([image1, image2, image1, image3])
-        
-        self.down = []
-        imageFile = str(Path.cwd() / "graphics" / "Down.png")
-        image1 = pygame.image.load(imageFile).convert_alpha()
-        imageFile = str(Path.cwd() / "graphics" / "Down2.png")
-        image2 = pygame.image.load(imageFile).convert_alpha()
-        imageFile = str(Path.cwd() / "graphics" / "Down3.png")
-        image3 = pygame.image.load(imageFile).convert_alpha()
-        self.down.extend([image1, image2, image1, image3])
+            self.up = []
+            imageFile = str(Path.cwd() / "graphics" / "Up.png")
+            image1 = pygame.image.load(imageFile).convert_alpha()
+            imageFile = str(Path.cwd() / "graphics" / "Up2.png")
+            image2 = pygame.image.load(imageFile).convert_alpha()
+            imageFile = str(Path.cwd() / "graphics" / "Up3.png")
+            image3 = pygame.image.load(imageFile).convert_alpha()
+            self.up.extend([image1, image2, image1, image3])
+            
+            self.down = []
+            imageFile = str(Path.cwd() / "graphics" / "Down.png")
+            image1 = pygame.image.load(imageFile).convert_alpha()
+            imageFile = str(Path.cwd() / "graphics" / "Down2.png")
+            image2 = pygame.image.load(imageFile).convert_alpha()
+            imageFile = str(Path.cwd() / "graphics" / "Down3.png")
+            image3 = pygame.image.load(imageFile).convert_alpha()
+            self.down.extend([image1, image2, image1, image3])
+        except:
+            raise RuntimeError('Error: Unable to load graphics files')
     
         self.changeDirection(facing)
         self.image = self.imageFrame[0]
@@ -615,7 +618,11 @@ class Enemy(Character):
         version = random.choice([const.BASIC, const.RANDOM, const.ADVANCED])
         self.pursuePlayer = False
 
-        self.image = pygame.image.load(str(level.enemyFile)).convert()
+        try:
+            self.image = pygame.image.load(str(level.enemyFile)).convert()
+        except:
+           raise RuntimeError('Error: Unable to load graphics files')
+
         self.image.set_colorkey(const.TRAN_COL)
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -696,36 +703,38 @@ class Boss(Character):
         self.startTicksTakeDamage = 0
 
         graphicsDir = Path.cwd() / "graphics"
+        try:
+            imageFile = str(graphicsDir.joinpath("boss.png"))
+            self.imageNormal = pygame.image.load(imageFile).convert()
+            self.imageNormal.set_colorkey(const.TRAN_COL)
+            self.image = self.imageNormal
+            imageFile = str(graphicsDir.joinpath("boss_mouth_open.png"))
+            self.imageMouth = pygame.image.load(imageFile).convert()
+            self.imageMouth.set_colorkey(const.TRAN_COL)
+            self.rect = self.image.get_rect()
+            self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
 
-        imageFile = str(graphicsDir.joinpath("boss.png"))
-        self.imageNormal = pygame.image.load(imageFile).convert()
-        self.imageNormal.set_colorkey(const.TRAN_COL)
-        self.image = self.imageNormal
-        imageFile = str(graphicsDir.joinpath("boss_mouth_open.png"))
-        self.imageMouth = pygame.image.load(imageFile).convert()
-        self.imageMouth.set_colorkey(const.TRAN_COL)
-        self.rect = self.image.get_rect()
-        self.hitbox = self.rect.inflate(-const.HIT_BOX_OFFSET_X, -const.HIT_BOX_OFFSET_Y)
+            imageFile = str(graphicsDir.joinpath("boss_damaged_1.png"))
+            self.imageDamaged_1 = pygame.image.load(imageFile).convert()
+            self.imageDamaged_1.set_colorkey(const.TRAN_COL)
 
-        imageFile = str(graphicsDir.joinpath("boss_damaged_1.png"))
-        self.imageDamaged_1 = pygame.image.load(imageFile).convert()
-        self.imageDamaged_1.set_colorkey(const.TRAN_COL)
+            imageFile = str(graphicsDir.joinpath("boss_damaged_1_mouth_open.png"))
+            self.imageMouthDamaged_1 = pygame.image.load(imageFile).convert()
+            self.imageMouthDamaged_1.set_colorkey(const.TRAN_COL)
 
-        imageFile = str(graphicsDir.joinpath("boss_damaged_1_mouth_open.png"))
-        self.imageMouthDamaged_1 = pygame.image.load(imageFile).convert()
-        self.imageMouthDamaged_1.set_colorkey(const.TRAN_COL)
+            imageFile = str(graphicsDir.joinpath("boss_damaged_2.png"))
+            self.imageDamaged_2 = pygame.image.load(imageFile).convert()
+            self.imageDamaged_2.set_colorkey(const.TRAN_COL)
 
-        imageFile = str(graphicsDir.joinpath("boss_damaged_2.png"))
-        self.imageDamaged_2 = pygame.image.load(imageFile).convert()
-        self.imageDamaged_2.set_colorkey(const.TRAN_COL)
+            imageFile = str(graphicsDir.joinpath("boss_damaged_2_mouth_open.png"))
+            self.imageMouthDamaged_2 = pygame.image.load(imageFile).convert()
+            self.imageMouthDamaged_2.set_colorkey(const.TRAN_COL)
 
-        imageFile = str(graphicsDir.joinpath("boss_damaged_2_mouth_open.png"))
-        self.imageMouthDamaged_2 = pygame.image.load(imageFile).convert()
-        self.imageMouthDamaged_2.set_colorkey(const.TRAN_COL)
-
-        imageFile = str(graphicsDir.joinpath("boss_dead.png"))
-        self.imageDead = pygame.image.load(imageFile).convert()
-        self.imageDead.set_colorkey(const.TRAN_COL)
+            imageFile = str(graphicsDir.joinpath("boss_dead.png"))
+            self.imageDead = pygame.image.load(imageFile).convert()
+            self.imageDead.set_colorkey(const.TRAN_COL)
+        except:
+            raise RuntimeError('Error: Unable to load graphics files')
 
         self.mask = pygame.mask.from_surface(self.image)
         

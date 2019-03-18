@@ -63,7 +63,6 @@ class Level(object):
         checkPositive(levelNum)
 
         self.layout = []
-        self.door = const.TILE_DOOR_HIDDEN
         self.numEnemies = 0
         self.enemyStartPosit = []
 
@@ -167,19 +166,6 @@ class Level(object):
         return self.__levelHeight
 
     #no levelHeight.setter
-    
-
-    @property
-    def door(self):
-        ''' Accessor. '''
-        return self.__door
-
-    @door.setter
-    def door(self, door):
-        '''Sets the value of door, used for showing, opening and closing the door '''
-        if door != const.TILE_DOOR_CLOSED and door != const.TILE_DOOR_OPENED and door != const.TILE_DOOR_HIDDEN:
-            raise RuntimeError(str(door) + ' is not a valid valid value for door.')
-        self.__door = door
 
 
     @property
@@ -205,8 +191,9 @@ class Level(object):
     @numEnemies.setter
     def numEnemies(self, numEnemies):
         '''Sets the number of enemies in a level'''
-        if numEnemies and numEnemies < 0:
-            raise RuntimeError(str(numEnemies) + ' is not a valid value for number of enemies.  Must be 0 or greater.')
+        checkNumeric(numEnemies)
+        if numEnemies != 0:
+            checkPositive(numEnemies)
         self.__numEnemies = numEnemies
 
 
@@ -261,7 +248,7 @@ class Level(object):
 
         layout = []
         graphicsDir = Path.cwd() / "graphics"
-        if levelFile and not levelFile.is_file():
+        if not levelFile or not levelFile.is_file():
             raise RuntimeError(str(levelFile) + ' is not a valid file.')
         try:
             with levelFile.open() as f:
@@ -322,7 +309,7 @@ class Level(object):
         self.doorClosedImage = openImage(doorClosedFile, True)
 
         self.enemyFile = graphicsDir.joinpath("enemy" + str(enemyNum) + ".png")
-        
+
         return layout
 
 
@@ -331,12 +318,11 @@ class Level(object):
         '''
         Shows a door where a breakable wall was previously shown, used when the wall hiding the door breaks
         '''
-
+        
         for y in range(self.levelHeight):
             for x in range(self.levelWidth):
                 if isinstance(self.layout[y][x], Wall.Wall) and self.layout[y][x].door:
                     self.layout[y][x] = const.TILE_DOOR_CLOSED
-        door = const.TILE_DOOR_CLOSED
         
     
     def openDoor(self):
@@ -351,15 +337,24 @@ class Level(object):
                     self.layout[y][x] = const.TILE_DOOR_OPENED
         
     
-    def destroyWalls(self, x, y, level, blastRange):
+    def destroyWalls(self, x, y, blastRange):
 
         '''Used when a bomb explodes to put blast graphics in all four directions
             returns powerups and blasts so they can be drawn onscreen by the caller 
         - x, x location where blast starts
         - y, y location where blast starts
-        - level, used to check level layout so that blasts don't go past walls
         - blastRange, used to limit how far the blasts extend in each direction
         '''
+        checkNumeric(x)
+        if x != 0:
+            checkPositive(x)
+
+        checkNumeric(y)
+        if y != 0:
+            checkPositive(y)
+
+        checkNumeric(blastRange)
+        checkPositive(blastRange)
 
         walls = []
         powerups = []
@@ -372,10 +367,10 @@ class Level(object):
         blasts.append(Bomb.Blast(x, y, const.CENTER_FLAME, True))
         for i in range(1, blastRange + 1):
             if y - i > 0 and not hitWallUp:
-                if isinstance(level.layout[y - i][x], Wall.Wall):
-                    walls.append(level.layout[y - i][x])
+                if isinstance(self.layout[y - i][x], Wall.Wall):
+                    walls.append(self.layout[y - i][x])
                     hitWallUp = True
-                    if level.layout[y - i][x].breakable:
+                    if self.layout[y - i][x].breakable:
                         blasts.append(Bomb.Blast(x, y - i, const.UP_FLAME, True))
                 if not hitWallUp:
                     if i < blastRange:
@@ -383,11 +378,11 @@ class Level(object):
                     else:
                         blasts.append(Bomb.Blast(x, y - i, const.UP_FLAME, True))
             
-            if y + i < level.levelHeight and not hitWallDown:
-                if isinstance(level.layout[y + i][x], Wall.Wall):
-                    walls.append(level.layout[y + i][x])
+            if y + i < self.levelHeight and not hitWallDown:
+                if isinstance(self.layout[y + i][x], Wall.Wall):
+                    walls.append(self.layout[y + i][x])
                     hitWallDown = True
-                    if level.layout[y + i][x].breakable:
+                    if self.layout[y + i][x].breakable:
                         blasts.append(Bomb.Blast(x, y + i, const.DOWN_FLAME, True))
                 if not hitWallDown:
                     if i < blastRange:
@@ -396,10 +391,10 @@ class Level(object):
                         blasts.append(Bomb.Blast(x, y + i, const.DOWN_FLAME, True))
             
             if x - i > 0 and not hitWallLeft:
-                if isinstance(level.layout[y][x - i], Wall.Wall):
-                    walls.append(level.layout[y][x - i])
+                if isinstance(self.layout[y][x - i], Wall.Wall):
+                    walls.append(self.layout[y][x - i])
                     hitWallLeft = True
-                    if level.layout[y][x - i].breakable:
+                    if self.layout[y][x - i].breakable:
                         blasts.append(Bomb.Blast(x - i, y, const.LEFT_FLAME, True))
                 if not hitWallLeft:
                     if i < blastRange:
@@ -407,11 +402,11 @@ class Level(object):
                     else:
                         blasts.append(Bomb.Blast(x - i, y, const.LEFT_FLAME, True))
             
-            if x + i < level.levelWidth and not hitWallRight:
-                if isinstance(level.layout[y][x + i], Wall.Wall):
-                    walls.append(level.layout[y][x + i])
+            if x + i < self.levelWidth and not hitWallRight:
+                if isinstance(self.layout[y][x + i], Wall.Wall):
+                    walls.append(self.layout[y][x + i])
                     hitWallRight = True
-                    if level.layout[y][x + i].breakable:
+                    if self.layout[y][x + i].breakable:
                         blasts.append(Bomb.Blast(x + i, y, const.RIGHT_FLAME, True))
                 if not hitWallRight:
                     if i < blastRange:
@@ -419,7 +414,7 @@ class Level(object):
                     else:
                         blasts.append(Bomb.Blast(x + i, y, const.RIGHT_FLAME, True))
         for theWall in walls:
-            result = theWall.destroy(level)
+            result = theWall.destroy(self)
             if result:
                 powerups.append(result)
         return powerups, blasts
