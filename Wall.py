@@ -32,6 +32,57 @@ class Wall(object):
         self.x = x
         self.y = y
 
+    @property
+    def breakable(self):
+        return self.__breakable
+    
+    @property
+    def powerup(self):
+        return self.__powerup
+
+    @property
+    def door(self):
+        return self.__door
+
+    @property
+    def x(self):
+        return self.__x
+
+    @property
+    def y(self):
+        return self.__y
+
+    @x.setter
+    def x(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__x = val
+
+    @y.setter
+    def y(self, val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__y = val
+
+    @breakable.setter
+    def breakable(self,val):
+        if isinstance(val,bool):
+            return self.__breakable
+        else:
+            raise RuntimeError('Value is not a boolean')
+    
+    @powerup.setter
+    def powerup(self,val):
+        if val < 0:
+            raise RuntimeError('Value is less than 0')
+        self.__powerup = val
+
+    @door.setter
+    def door(self,val):
+        if isinstance(val,bool):
+            return self.__door
+        else:
+            raise RuntimeError('Value is not a boolean')
 
     def destroy(self, level):
         '''This method is called to check if a wall would be destryoed by an explosion,
