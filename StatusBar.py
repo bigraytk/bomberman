@@ -93,7 +93,11 @@ class Icon(pygame.sprite.Sprite):
     can appear on the status bar
     '''
     def __init__(self, imageFileName, x, y, scale, alpha):
-        '''Constructor'''
+        '''Constructor
+        - x, desinages the x location for icon
+        - y, designates the y location for icon
+        - scale, designates the scale of icon image
+        - alpha, sets transparency settings'''
         pygame.sprite.Sprite.__init__(self)
 
         try:
