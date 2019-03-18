@@ -5,9 +5,7 @@ import constants as const
 import random
 
 class Wall(object):
-
     '''Wall class
-
     This class is the wall for the game. When creating must pass (breakable,power,door).
     breakable and door are type bool, power is int in range 0-3. 
     '''
@@ -69,6 +67,7 @@ class Wall(object):
         and destroy it if so.  Will return None for no powerup, otherwise return powerup.
         If the wall contained a powerup or door this method will instantiate an object 
         of that class
+        - level, this is userd to handle actions modifying a breakable wall
         '''
         if self.breakable:
             if self.door == True:
